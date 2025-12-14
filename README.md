@@ -31,6 +31,7 @@ A centralized hub for all research, data analysis, literature reviews, and manus
 
 Each project follows this standard organization:
 
+```text
 project-name/
 ├── papers/              # PDF articles, literature notes
 │   └── *.pdf
@@ -50,6 +51,7 @@ project-name/
 │   ├── discussion.md
 │   └── references.md
 └── README.md            # Project-specific notes
+```
 
 ---
 
