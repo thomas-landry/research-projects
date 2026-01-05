@@ -40,6 +40,18 @@ class DiscoveryResult(BaseModel):
     quality_notes: Optional[str] = None
 
 
+class UnifiedField(BaseModel):
+    """A canonical field resulting from merging synonymous suggestions."""
+    canonical_name: str = Field(description="Standardized snake_case name")
+    description: str = Field(description="Comprehensive description")
+    field_type: str = Field(description="text, integer, float, boolean, or list_text")
+    synonyms_merged: List[str] = Field(description="List of original field names merged into this one")
+    frequency: int = Field(description="How many papers mentioned this concept")
+
+class UnificationResult(BaseModel):
+    """Result of the semantic unification process."""
+    fields: List[UnifiedField]
+
 class SchemaDiscoveryAgent:
     """
     Analyzes sample papers to discover potential extraction variables.
@@ -47,9 +59,8 @@ class SchemaDiscoveryAgent:
     Workflow:
     1. Parse first N papers
     2. For each paper, ask LLM what data points could be extracted
-    3. Aggregate suggestions across papers
-    4. Rank by frequency and present to user
-    5. User approves/modifies → final schema
+    3. SEMANTIC UNIFICATION: Aggregate and merge synonyms via LLM
+    4. Return refined schema
     """
     
     DISCOVERY_PROMPT = """You are an expert systematic reviewer analyzing a paper to identify extractable data points.
@@ -79,22 +90,49 @@ PAPER CONTENT:
 {content}
 """
 
-    def __init__(self, provider: str = "openrouter", model: Optional[str] = None):
+    UNIFICATION_PROMPT = """You are a schema architect.
+Your task is to consolidate a list of raw field suggestions extracted from multiple papers into a clean, canonical schema.
+
+INPUT:
+A list of suggested fields (name, description, type) found in various papers. Many will be duplicates or synonyms (e.g., "age", "patient_age", "years").
+
+OUTPUT:
+A list of UNIQUE, CANONICAL fields.
+- Merge synonyms into a single best field name (e.g. merge "sex", "gender", "male_female" -> "sex").
+- Use snake_case for names.
+- Provide a clear, merged description.
+- count how many times this concept appeared (frequency).
+- Select the most appropriate data type.
+
+Input Fields:
+{fields_json}
+"""
+
+    def __init__(self, provider: str = "openrouter", model: Optional[str] = None, api_key: Optional[str] = None):
         """Initialize the discovery agent."""
         self.provider = provider
-        self.model = model
+        self.model = model or "gpt-4o"
+        self.api_key = api_key
         self.parser = DocumentParser()
         self._extractor = None
+        self._client = None
+        
+        from core.utils import get_logger
+        self.logger = get_logger("SchemaDiscoveryAgent")
     
-    def _get_extractor(self):
-        """Lazy-load extractor."""
-        if self._extractor is None:
-            from core.extractor import StructuredExtractor
-            self._extractor = StructuredExtractor(
-                provider=self.provider,
-                model=self.model
-            )
-        return self._extractor
+    @property
+    def client(self):
+        """Initialize instructor client."""
+        if self._client is not None:
+            return self._client
+        
+        from core.utils import get_llm_client
+        self.logger.debug(f"Initializing LLM client for {self.provider}")
+        self._client = get_llm_client(
+            provider=self.provider,
+            api_key=self.api_key
+        )
+        return self._client
     
     def analyze_paper(self, paper_path: str) -> DiscoveryResult:
         """
@@ -106,6 +144,8 @@ PAPER CONTENT:
         Returns:
             DiscoveryResult with suggested fields
         """
+        self.logger.info(f"Analyzing paper: {Path(paper_path).name}")
+        
         # Parse PDF
         doc = self.parser.parse_pdf(paper_path)
         
@@ -115,20 +155,8 @@ PAPER CONTENT:
         # Prepare prompt
         prompt = self.DISCOVERY_PROMPT.format(content=content)
         
-        # Extract suggestions via LLM
-        extractor = self._get_extractor()
-        
-        # Use instructor to get structured output
-        import instructor
-        from openai import OpenAI
-        
-        client = instructor.from_openai(OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-        ))
-        
-        result = client.chat.completions.create(
-            model=self.model or "anthropic/claude-sonnet-4-20250514",
+        result = self.client.chat.completions.create(
+            model=self.model,
             messages=[{"role": "user", "content": prompt}],
             response_model=DiscoveryResult,
         )
@@ -136,6 +164,49 @@ PAPER CONTENT:
         result.filename = Path(paper_path).name
         return result
     
+    def unify_fields(self, suggestions: List[SuggestedField]) -> List[UnifiedField]:
+        """Merge synonymous fields using LLM."""
+        if not suggestions:
+            return []
+            
+        self.logger.info(f"Unifying {len(suggestions)} raw field suggestions...")
+        
+        # Convert to compact dicts for prompt to save tokens
+        simple_suggestions = [
+            {
+                "name": s.field_name,
+                "desc": s.description,
+                "type": s.data_type
+            }
+            for s in suggestions
+        ]
+        
+        import json
+        fields_json = json.dumps(simple_suggestions, indent=2)
+        
+        prompt = self.UNIFICATION_PROMPT.format(fields_json=fields_json)
+        
+        try:
+            result = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                response_model=UnificationResult,
+            )
+            return result.fields
+        except Exception as e:
+            self.logger.error(f"Unification failed: {e}")
+            # Fallback: return raw as if unified (simplified)
+            return [
+                UnifiedField(
+                    canonical_name=s.field_name,
+                    description=s.description,
+                    field_type=s.data_type,
+                    synonyms_merged=[s.field_name],
+                    frequency=1
+                )
+                for s in suggestions
+            ]
+
     def discover_schema(
         self,
         papers_dir: str,
@@ -148,7 +219,7 @@ PAPER CONTENT:
         Args:
             papers_dir: Directory containing PDFs
             sample_size: Number of papers to analyze
-            min_frequency: Minimum papers a field must appear in
+            min_frequency: Minimum papers a concept must appear in
             
         Returns:
             List of suggested FieldDefinition objects
@@ -156,36 +227,21 @@ PAPER CONTENT:
         papers = list(Path(papers_dir).glob("*.pdf"))[:sample_size]
         
         all_suggestions = []
-        paper_types = []
         
         for paper in papers:
             try:
                 result = self.analyze_paper(str(paper))
                 all_suggestions.extend(result.suggested_fields)
-                paper_types.append(result.paper_type)
-                print(f"✓ Analyzed: {paper.name} ({len(result.suggested_fields)} fields)")
             except Exception as e:
-                print(f"✗ Failed: {paper.name}: {e}")
+                self.logger.error(f"Failed to analyze {paper.name}: {e}")
         
-        # Aggregate and rank by frequency
-        field_counts = Counter()
-        field_examples = {}
-        field_descriptions = {}
-        field_types = {}
-        
-        for suggestion in all_suggestions:
-            name = suggestion.field_name.lower().replace(" ", "_")
-            field_counts[name] += 1
-            
-            if name not in field_examples:
-                field_examples[name] = suggestion.example_value
-                field_descriptions[name] = suggestion.description
-                field_types[name] = suggestion.data_type
+        # Semantic Unification
+        unified_fields = self.unify_fields(all_suggestions)
         
         # Build FieldDefinition list
         definitions = []
-        for name, count in field_counts.most_common():
-            if count >= min_frequency:
+        for uf in unified_fields:
+            if uf.frequency >= min_frequency:
                 # Map string type to FieldType enum
                 type_map = {
                     "text": FieldType.TEXT,
@@ -194,16 +250,18 @@ PAPER CONTENT:
                     "boolean": FieldType.BOOLEAN,
                     "list_text": FieldType.LIST_TEXT,
                 }
-                field_type = type_map.get(field_types.get(name, "text"), FieldType.TEXT)
+                field_type = type_map.get(uf.field_type, FieldType.TEXT)
                 
                 definitions.append(FieldDefinition(
-                    name=name,
-                    description=field_descriptions.get(name, ""),
+                    name=uf.canonical_name,
+                    description=f"{uf.description} (Merged: {', '.join(uf.synonyms_merged)})",
                     field_type=field_type,
-                    required=count >= sample_size,  # Required if in all papers
+                    required=uf.frequency >= sample_size,
                     include_quote=True,
                 ))
         
+        # Sort by frequency (implied by order of processing often, but stability is good)
+        # Here we just return them as the LLM ordered them (usually relevance or frequency)
         return definitions
 
 

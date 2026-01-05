@@ -1,0 +1,21 @@
+EXAMPLES:
+
+--- Example 1 (Standard Case) ---
+Input: "A 63 year old female presented for incidentally discovered pulmonary nodules. She denied any respiratory complaints including dyspnea or cough. CT scan showed innumerable diffusely distributed nodules up to 4mm."
+Output:
+{
+  "patient_age": "63",
+  "patient_sex": "Female",
+  "presenting_symptoms": "Asymptomatic",
+  "imaging_findings": "Innumerable and diffusely distributed nodules up to 4mm",
+  "treatment": "Observation"
+}
+
+--- Example 2 (Complex Histopathology) ---
+Input: "Transbronchial biopsies revealed cellular proliferations of meningothelial-like cells associated with venules. IHC was positive for vimentin and EMA, negative for cytokeratin."
+Output:
+{
+  "histopathology": "Minute Pulmonary Meningothelial-like Nodules",
+  "immunohistochemistry": "Positive for vimentin/EMA, negative for cytokeratin",
+  "diagnostic_method": "Transbronchial biopsy"
+}

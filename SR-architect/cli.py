@@ -12,54 +12,16 @@ from pathlib import Path
 from typing import Optional, List
 import json
 
+import concurrent.futures
+import threading
+
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.table import Table
 from rich.panel import Panel
 
-# Add parent to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
-
-from core.parser import DocumentParser, ParsedDocument
-from core.schema_builder import (
-    build_extraction_model,
-    get_case_report_schema,
-    get_rct_schema,
-    get_observational_schema,
-    interactive_schema_builder,
-    FieldDefinition,
-    PREDEFINED_SCHEMAS,
-)
-from core.extractor import StructuredExtractor
-from core.vectorizer import ChromaVectorStore
-from core.audit_logger import AuditLogger
-
-app = typer.Typer(
-    name="sr-architect",
-    help="Systematic Review Data Extraction Pipeline",
-    add_completion=False,
-)
-console = Console()
-
-
-def load_env():
-    """Load environment variables."""
-    env_paths = [
-        Path.cwd() / ".env",
-        Path(__file__).parent / ".env",
-        Path.home() / "Projects" / ".env",
-    ]
-    for env_path in env_paths:
-        if env_path.exists():
-            with open(env_path) as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        key, _, value = line.partition("=")
-                        os.environ.setdefault(key.strip(), value.strip().strip("'\""))
-            break
-
+# ...
 
 @app.command()
 def extract(
@@ -73,6 +35,14 @@ def extract(
     vectorize: bool = typer.Option(True, "--vectorize/--no-vectorize", help="Store vectors in ChromaDB"),
     verbose: bool = typer.Option(False, "-v", "--verbose", help="Verbose output"),
     resume: bool = typer.Option(False, "--resume", help="Resume from checkpoint if available"),
+    # Hierarchical extraction options
+    hierarchical: bool = typer.Option(False, "-H", "--hierarchical", help="Use hierarchical extraction with validation"),
+    theme: Optional[str] = typer.Option(None, "-t", "--theme", help="Meta-analysis theme for relevance filtering (required with --hierarchical)"),
+    threshold: float = typer.Option(0.9, "--threshold", help="Minimum accuracy+consistency score for validation"),
+    max_iter: int = typer.Option(3, "--max-iter", help="Maximum checker feedback iterations"),
+    # Optimization & Generalization
+    workers: int = typer.Option(1, "--workers", "-w", help="Number of parallel workers (default: 1)"),
+    examples: Optional[str] = typer.Option(None, "--examples", "-e", help="Path to few-shot examples text file"),
 ):
     """
     Extract structured data from PDFs for systematic review.
@@ -128,9 +98,43 @@ def extract(
     # Build dynamic model
     ExtractionModel = build_extraction_model(fields, "SRExtractionModel")
     
+    # Validate hierarchical mode requirements
+    if hierarchical and not theme:
+        console.print("[red]Error: --theme is required when using --hierarchical mode[/red]")
+        console.print("[dim]Example: --hierarchical --theme 'patient outcomes in treatment X'[/dim]")
+        raise typer.Exit(1)
+    
     # Initialize components
     parser = DocumentParser()
-    extractor = StructuredExtractor(provider=provider, model=model)
+    
+    # Load examples if provided
+    examples_content = None
+    if examples:
+        try:
+            examples_content = Path(examples).read_text()
+            console.print(f"[green]Loaded few-shot examples from {examples}[/green]")
+        except Exception as e:
+            console.print(f"[yellow]Could not load examples from {examples}: {e}[/yellow]")
+
+    # Initialize appropriate extractor based on mode
+    if hierarchical:
+        console.print(f"\n[bold magenta]🔬 Hierarchical Extraction Mode[/bold magenta]")
+        console.print(f"  Theme: {theme}")
+        console.print(f"  Threshold: {threshold}")
+        console.print(f"  Max iterations: {max_iter}\n")
+        
+        pipeline = HierarchicalExtractionPipeline(
+            provider=provider,
+            model=model,
+            score_threshold=threshold,
+            max_iterations=max_iter,
+            verbose=verbose,
+            examples=examples_content,
+        )
+        extractor = None  # Not used in hierarchical mode
+    else:
+        pipeline = None
+        extractor = StructuredExtractor(provider=provider, model=model, examples=examples_content)
     
     output_path = Path(output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -157,9 +161,117 @@ def extract(
         if state_manager.exists() and not resume:
             console.print("[dim]Previous state found. Use --resume to continue from checkpoint.[/dim]")
     
-    # Process PDFs
+    # Filter files to process
+    files_to_process = [p for p in pdf_files if state.should_process(p.name)]
+    if len(files_to_process) < len(pdf_files):
+        console.print(f"[dim]Skipping {len(pdf_files) - len(files_to_process)} already processed files[/dim]")
+
     results = []
     
+    # Locks for thread safety
+    state_lock = threading.Lock()
+    log_lock = threading.Lock()
+    
+    def process_pdf(pdf_path, progress_task):
+        """Process a single PDF in a thread-safe manner."""
+        start_time = time.time()
+        
+        try:
+            # Parse PDF
+            doc = parser.parse_pdf(str(pdf_path))
+            
+            # Get extraction context
+            context = doc.get_extraction_context()
+            
+            if len(context) < MIN_CONTEXT_CHARS:
+                with log_lock:
+                    logger.log_skipped(pdf_path.name, f"Insufficient text ({len(context)} chars)")
+                with state_lock:
+                    state.mark_skipped(pdf_path.name)
+                    state_manager.save(state)
+                progress.advance(progress_task)
+                return None
+            
+            extracted_dict = {}
+            
+            # === HIERARCHICAL MODE ===
+            if hierarchical and pipeline:
+                pipeline_result = pipeline.extract_document(doc, ExtractionModel, theme)
+                extracted_dict = pipeline_result.final_data
+                
+                # Metadata
+                extracted_dict["__pipeline_accuracy_score"] = pipeline_result.final_accuracy_score
+                extracted_dict["__pipeline_consistency_score"] = pipeline_result.final_consistency_score
+                extracted_dict["__pipeline_overall_score"] = pipeline_result.final_overall_score
+                extracted_dict["__pipeline_iterations"] = pipeline_result.iterations
+                extracted_dict["__pipeline_passed_validation"] = pipeline_result.passed_validation
+                if pipeline_result.warnings:
+                    extracted_dict["__pipeline_warnings"] = "; ".join(pipeline_result.warnings)
+                
+                # Save evidence
+                evidence_dir = output_path.parent / "evidence"
+                with log_lock: # Ensure directory creation is safe-ish
+                    evidence_file = pipeline_result.save_evidence_json(str(evidence_dir))
+                
+                if verbose:
+                    console.print(f"    Evidence saved: {evidence_file}")
+                
+                 # Store vectors
+                vectors_stored = 0
+                if vector_store:
+                    # ChromaDB writes might need locking or separate client? 
+                    # Assuming basic thread safety or sequential writing if issues arise
+                    vectors_stored = vector_store.add_chunks_from_parsed_doc(doc, extracted_dict)
+
+                with log_lock:
+                    logger.log_success(
+                        filename=pdf_path.name,
+                        chunks=len(doc.chunks),
+                        vectors=vectors_stored,
+                        model=pipeline.extractor.model,
+                        extracted=extracted_dict,
+                        duration=time.time() - start_time,
+                    )
+
+            # === STANDARD MODE ===
+            else:
+                extracted = extractor.extract(context, ExtractionModel, filename=pdf_path.name)
+                extracted_dict = extracted.model_dump()
+                
+                vectors_stored = 0
+                if vector_store:
+                    vectors_stored = vector_store.add_chunks_from_parsed_doc(doc, extracted_dict)
+                
+                with log_lock:
+                    logger.log_success(
+                        filename=pdf_path.name,
+                        chunks=len(doc.chunks),
+                        vectors=vectors_stored,
+                        model=extractor.model,
+                        extracted=extracted_dict,
+                        duration=time.time() - start_time,
+                    )
+            
+            # Update state
+            with state_lock:
+                state.mark_completed(pdf_path.name)
+                state_manager.save(state)
+            
+            progress.advance(progress_task)
+            return extracted_dict
+
+        except Exception as e:
+            duration = time.time() - start_time
+            with log_lock:
+                logger.log_error(pdf_path.name, str(e), duration)
+            with state_lock:
+                state.mark_failed(pdf_path.name, str(e))
+                state_manager.save(state)
+            console.print(f"[red]✗ {pdf_path.name}: {e}[/red]")
+            progress.advance(progress_task)
+            return None
+
+    # Execute
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -167,66 +279,21 @@ def extract(
         TaskProgressColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task("Processing PDFs...", total=len(pdf_files))
+        task = progress.add_task("Processing PDFs...", total=len(files_to_process))
         
-        for pdf_path in pdf_files:
-            # Skip if already processed (resume mode)
-            if not state.should_process(pdf_path.name):
-                progress.advance(task)
-                continue
-            
-            start_time = time.time()
-            progress.update(task, description=f"Processing: {pdf_path.name[:40]}...")
-            
-            try:
-                # Parse PDF
-                doc = parser.parse_pdf(str(pdf_path))
-                
-                # Get extraction context
-                context = doc.get_extraction_context()
-                
-                if len(context) < 100:
-                    logger.log_skipped(pdf_path.name, "Insufficient text extracted")
-                    state.mark_skipped(pdf_path.name)
-                    state_manager.save(state)
-                    progress.advance(task)
-                    continue
-                
-                # Extract structured data
-                extracted = extractor.extract(context, ExtractionModel, filename=pdf_path.name)
-                extracted_dict = extracted.model_dump()
-                
-                # Store vectors
-                vectors_stored = 0
-                if vector_store:
-                    vectors_stored = vector_store.add_chunks_from_parsed_doc(doc, extracted_dict)
-                
-                # Log success
-                duration = time.time() - start_time
-                logger.log_success(
-                    filename=pdf_path.name,
-                    chunks=len(doc.chunks),
-                    vectors=vectors_stored,
-                    model=extractor.model,
-                    extracted=extracted_dict,
-                    duration=duration,
-                )
-                
-                results.append(extracted_dict)
-                state.mark_completed(pdf_path.name)
-                state_manager.save(state)  # Checkpoint after each paper
-                
-                if verbose:
-                    console.print(f"[green]✓ {pdf_path.name}[/green] ({duration:.1f}s)")
-            
-            except Exception as e:
-                duration = time.time() - start_time
-                logger.log_error(pdf_path.name, str(e), duration)
-                state.mark_failed(pdf_path.name, str(e))
-                state_manager.save(state)
-                console.print(f"[red]✗ {pdf_path.name}: {e}[/red]")
-            
-            progress.advance(task)
+        if workers > 1:
+            console.print(f"[cyan]🚀 Parallel Execution: {workers} workers[/cyan]")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+                futures = [executor.submit(process_pdf, p, task) for p in files_to_process]
+                for future in concurrent.futures.as_completed(futures):
+                    result = future.result()
+                    if result: results.append(result)
+        else:
+            # Sequential fallback
+            for pdf_path in files_to_process:
+                progress.update(task, description=f"Processing: {pdf_path.name[:40]}...")
+                result = process_pdf(pdf_path, task)
+                if result: results.append(result)
     
     # Save results to CSV
     if results:

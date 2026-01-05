@@ -117,52 +117,26 @@ Respond with a JSON object matching this schema:
         self.provider = provider
         self.model = model or "anthropic/claude-sonnet-4-20250514"
         self._client = None
+        
+        from core.utils import get_logger
+        self.logger = get_logger("ScreenerAgent")
     
-    def _load_env(self):
-        """Load environment variables."""
-        env_paths = [
-            Path.cwd() / ".env",
-            Path(__file__).parent.parent / ".env",
-            Path.home() / "Projects" / ".env",
-        ]
-        for env_path in env_paths:
-            if env_path.exists():
-                with open(env_path) as f:
-                    for line in f:
-                        line = line.strip()
-                        if line and not line.startswith("#") and "=" in line:
-                            key, _, value = line.partition("=")
-                            os.environ.setdefault(key.strip(), value.strip().strip("'\""))
-                break
-    
-    def _get_client(self):
-        """Initialize Instructor-patched client."""
+    @property
+    def client(self):
+        """Initialize and return the Instructor-patched client."""
         if self._client is not None:
             return self._client
         
-        self._load_env()
+        from core.utils import get_llm_client
         
-        try:
-            import instructor
-            from openai import OpenAI
-        except ImportError:
-            raise ImportError("Install: pip install instructor openai")
-        
-        api_key = os.getenv("OPENROUTER_API_KEY")
-        if not api_key:
-            raise ValueError("OPENROUTER_API_KEY not set")
-        
-        client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=api_key,
+        self._client = get_llm_client(
+            provider=self.provider,
         )
-        
-        self._client = instructor.from_openai(client)
         return self._client
     
     def screen_abstract(self, paper: Paper) -> ScreeningDecision:
         """
-        Screen a single paper based on title and abstract.
+        Screen a single paper based on Title and Abstract.
         
         Args:
             paper: Paper to screen
@@ -170,7 +144,7 @@ Respond with a JSON object matching this schema:
         Returns:
             ScreeningDecision with include/exclude and reason
         """
-        client = self._get_client()
+        client = self.client
         
         # Build exclusion criteria text
         exclusion_text = "\n".join(
@@ -232,7 +206,7 @@ Respond with a JSON object matching this schema:
             if paper["status"] != PaperStatus.PENDING.value:
                 continue
             
-            print(f"[Screener] Screening {i+1}/{len(papers)}: {paper['pmid']}")
+            self.logger.info(f"Screening {i+1}/{len(papers)}: {paper['pmid']}")
             
             decision = self.screen_abstract(paper)
             results[paper["pmid"]] = decision

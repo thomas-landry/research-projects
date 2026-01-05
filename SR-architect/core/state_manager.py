@@ -6,7 +6,7 @@ Enables extraction to resume from where it left off after crashes or interruptio
 """
 
 import json
-import pickle
+
 from pathlib import Path
 from typing import Set, Dict, List, Any, Optional
 from dataclasses import dataclass, field, asdict
@@ -44,7 +44,8 @@ class PipelineState:
     
     def __post_init__(self):
         if not self.session_id:
-            self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+            # Use ISO format without colons for filesystem-safe session ID
+            self.session_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         if not self.started_at:
             self.started_at = datetime.now().isoformat()
     

@@ -9,6 +9,10 @@ import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
 
 
 @dataclass
@@ -44,8 +48,10 @@ class ParsedDocument:
     def abstract(self) -> str:
         """Extract abstract text."""
         for chunk in self.chunks:
-            if "abstract" in chunk.section.lower():
-                return chunk.text
+            # Guard against None section or text
+            section = chunk.section or ""
+            if "abstract" in section.lower():
+                return chunk.text or ""
         return ""
     
     @property
@@ -53,9 +59,9 @@ class ParsedDocument:
         """Extract methods section text."""
         method_chunks = []
         for chunk in self.chunks:
-            section_lower = chunk.section.lower()
+            section_lower = (chunk.section or "").lower()
             if any(term in section_lower for term in ["method", "material", "patient", "study design"]):
-                method_chunks.append(chunk.text)
+                method_chunks.append(chunk.text or "")
         return "\n\n".join(method_chunks)
     
     @property
@@ -63,9 +69,9 @@ class ParsedDocument:
         """Extract results section text."""
         result_chunks = []
         for chunk in self.chunks:
-            section_lower = chunk.section.lower()
+            section_lower = (chunk.section or "").lower()
             if "result" in section_lower or "finding" in section_lower:
-                result_chunks.append(chunk.text)
+                result_chunks.append(chunk.text or "")
         return "\n\n".join(result_chunks)
     
     def get_extraction_context(self, max_chars: int = 15000) -> str:
@@ -156,9 +162,9 @@ class DocumentParser:
                 
                 if hasattr(chunk, 'meta') and chunk.meta:
                     headings = chunk.meta.get('headings', [])
-                    if headings:
-                        section = headings[0] if len(headings) > 0 else ""
-                        subsection = headings[1] if len(headings) > 1 else ""
+                    # Safely access headings with explicit bounds checking
+                    section = headings[0] if isinstance(headings, list) and len(headings) > 0 else ""
+                    subsection = headings[1] if isinstance(headings, list) and len(headings) > 1 else ""
                 
                 # Determine chunk type
                 chunk_type = "text"
@@ -229,13 +235,170 @@ class DocumentParser:
         
         return chunks
     
-    def parse_folder(self, folder_path: str, pattern: str = "*.pdf") -> List[ParsedDocument]:
+    def parse_file(self, file_path: str) -> ParsedDocument:
         """
-        Parse all PDFs in a folder.
+        Parse a file based on its extension.
+        
+        Supported: .pdf, .html, .htm, .md, .markdown, .txt
+        """
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {file_path}")
+            
+        ext = path.suffix.lower()
+        
+        if ext == ".pdf":
+            return self.parse_pdf(file_path)
+        elif ext in [".html", ".htm"]:
+            return self.parse_html(file_path)
+        elif ext in [".md", ".markdown"]:
+            return self.parse_markdown(file_path)
+        elif ext == ".txt":
+            return self.parse_text(file_path)
+        else:
+            raise ValueError(f"Unsupported file extension: {ext}")
+
+    def parse_html(self, html_path: str) -> ParsedDocument:
+        """Parse an HTML file, extracting sections from headers."""
+        if BeautifulSoup is None:
+            raise ImportError("BeautifulSoup4 not installed. Run: pip install beautifulsoup4")
+            
+        path = Path(html_path)
+        with open(path, "r", encoding="utf-8") as f:
+            soup = BeautifulSoup(f, "html.parser")
+            
+        # Remove scripts and styles
+        for script in soup(["script", "style", "nav", "footer", "header"]):
+            script.decompose()
+            
+        chunks = []
+        current_section = "Introduction"
+        current_subsection = ""
+        
+        # Iterate over elements to build chunks
+        # This is a simplified heuristic: H1/H2 start sections, P adds text
+        elements = soup.find_all(['h1', 'h2', 'h3', 'p', 'table'])
+        
+        for el in elements:
+            text = el.get_text(separator=" ", strip=True)
+            if not text:
+                continue
+                
+            if el.name in ['h1', 'h2']:
+                current_section = text
+                current_subsection = ""
+            elif el.name == 'h3':
+                current_subsection = text
+            elif el.name == 'table':
+                # Basic table text extraction
+                chunks.append(DocumentChunk(
+                    text=text,
+                    section=current_section,
+                    subsection=current_subsection,
+                    chunk_type="table",
+                    source_file=path.name
+                ))
+            else: # p
+                # paragraphs
+                chunks.append(DocumentChunk(
+                    text=text,
+                    section=current_section,
+                    subsection=current_subsection,
+                    source_file=path.name
+                ))
+                
+        # Consolidate tiny chunks? (Optional optimization)
+        
+        full_text = soup.get_text(separator="\n\n")
+        
+        return ParsedDocument(
+            filename=path.name,
+            chunks=chunks,
+            full_text=full_text,
+            metadata={"source": "html"}
+        )
+
+    def parse_markdown(self, md_path: str) -> ParsedDocument:
+        """Parse a Markdown file using header structure."""
+        import re
+        path = Path(md_path)
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+            
+        lines = text.split('\n')
+        chunks = []
+        current_section = "Introduction"
+        current_subsection = ""
+        current_text = []
+        
+        for line in lines:
+            # Check for headers
+            if line.startswith('# '):
+                # Save previous chunk if exists
+                if current_text:
+                    chunks.append(DocumentChunk(
+                        text="\n".join(current_text).strip(),
+                        section=current_section,
+                        subsection=current_subsection,
+                        source_file=path.name
+                    ))
+                    current_text = []
+                current_section = line[2:].strip()
+                current_subsection = ""
+                
+            elif line.startswith('## '):
+                if current_text:
+                    chunks.append(DocumentChunk(
+                        text="\n".join(current_text).strip(),
+                        section=current_section,
+                        subsection=current_subsection,
+                        source_file=path.name
+                    ))
+                    current_text = []
+                current_subsection = line[3:].strip()
+                
+            elif line.strip():
+                current_text.append(line)
+        
+        # Last chunk
+        if current_text:
+             chunks.append(DocumentChunk(
+                text="\n".join(current_text).strip(),
+                section=current_section,
+                subsection=current_subsection,
+                source_file=path.name
+            ))
+            
+        return ParsedDocument(
+            filename=path.name,
+            chunks=chunks,
+            full_text=text,
+            metadata={"source": "markdown"}
+        )
+
+    def parse_text(self, txt_path: str) -> ParsedDocument:
+        """Parse a plain text file."""
+        path = Path(txt_path)
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+            
+        chunks = self._simple_chunk(text, path.name)
+        
+        return ParsedDocument(
+            filename=path.name,
+            chunks=chunks,
+            full_text=text,
+            metadata={"source": "text"}
+        )
+
+    def parse_folder(self, folder_path: str, extensions: List[str] = None) -> List[ParsedDocument]:
+        """
+        Parse all supported files in a folder.
         
         Args:
-            folder_path: Path to folder containing PDFs
-            pattern: Glob pattern for PDF files
+            folder_path: Path to folder
+            extensions: List of extensions to include (e.g. ['.pdf', '.html'])
+                        Default: all supported
             
         Returns:
             List of ParsedDocument objects
@@ -243,16 +406,19 @@ class DocumentParser:
         folder = Path(folder_path)
         if not folder.exists():
             raise FileNotFoundError(f"Folder not found: {folder_path}")
-        
-        pdf_files = list(folder.glob(pattern))
+            
+        if extensions is None:
+            extensions = [".pdf", ".html", ".htm", ".md", ".markdown", ".txt"]
+            
         documents = []
         
-        for pdf_path in pdf_files:
-            try:
-                doc = self.parse_pdf(str(pdf_path))
-                documents.append(doc)
-            except Exception as e:
-                print(f"Error parsing {pdf_path.name}: {e}")
+        for file_path in folder.iterdir():
+            if file_path.suffix.lower() in extensions:
+                try:
+                    doc = self.parse_file(str(file_path))
+                    documents.append(doc)
+                except Exception as e:
+                    print(f"Error parsing {file_path.name}: {e}")
         
         return documents
 

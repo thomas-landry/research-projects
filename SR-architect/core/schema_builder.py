@@ -133,17 +133,17 @@ def get_rct_schema() -> List[FieldDefinition]:
 def get_case_report_schema() -> List[FieldDefinition]:
     """Schema for Case Reports/Series (e.g., for DPM systematic review)."""
     return [
-        FieldDefinition("case_count", "Number of cases reported", FieldType.INTEGER),
-        FieldDefinition("patient_age", "Patient age(s) in years", FieldType.TEXT),
-        FieldDefinition("patient_sex", "Patient sex/gender", FieldType.TEXT),
-        FieldDefinition("presenting_symptoms", "Initial presenting symptoms", FieldType.TEXT),
-        FieldDefinition("diagnostic_method", "Method used for diagnosis", FieldType.TEXT),
-        FieldDefinition("imaging_findings", "CT/X-ray/imaging findings", FieldType.TEXT),
-        FieldDefinition("histopathology", "Histopathological findings", FieldType.TEXT),
-        FieldDefinition("immunohistochemistry", "IHC markers/results", FieldType.TEXT, required=False),
-        FieldDefinition("treatment", "Treatment provided", FieldType.TEXT, required=False),
-        FieldDefinition("outcome", "Patient outcome/follow-up", FieldType.TEXT),
-        FieldDefinition("comorbidities", "Associated conditions/comorbidities", FieldType.TEXT, required=False),
+        FieldDefinition("case_count", "Number of cases reported (integer)", FieldType.INTEGER),
+        FieldDefinition("patient_age", "Patient age(s) in years (if multiple, list all e.g., '65, 42')", FieldType.TEXT),
+        FieldDefinition("patient_sex", "Patient sex/gender (if multiple, list all e.g., 'Male, Female')", FieldType.TEXT),
+        FieldDefinition("presenting_symptoms", "Initial presenting symptoms (use 'Asymptomatic' if incidental/screening finding)", FieldType.TEXT),
+        FieldDefinition("diagnostic_method", "Method used for diagnosis (e.g., biopsy type, imaging)", FieldType.TEXT),
+        FieldDefinition("imaging_findings", "CT/X-ray/imaging findings (detailed description)", FieldType.TEXT),
+        FieldDefinition("histopathology", "Histopathological findings (expand abbreviations, e.g., 'Minute Pulmonary Meningothelial-like Nodules' instead of 'MPMNs')", FieldType.TEXT),
+        FieldDefinition("immunohistochemistry", "IHC markers/results (positive/negative stains)", FieldType.TEXT, required=False),
+        FieldDefinition("treatment", "Treatment provided (include 'Observation' if no active treatment)", FieldType.TEXT, required=False),
+        FieldDefinition("outcome", "Patient outcome/follow-up status (stable, resolved, died)", FieldType.TEXT),
+        FieldDefinition("comorbidities", "Associated conditions/comorbidities (list important ones)", FieldType.TEXT, required=False),
     ]
 
 

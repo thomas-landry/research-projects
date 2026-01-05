@@ -23,8 +23,8 @@ SR-Architect automates the most time-consuming part of systematic reviews: **dat
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐         │
-│   │   PDFs   │───▶│  PARSER  │───▶│ EXTRACTOR│───▶│   CSV    │         │
-│   │ (papers) │    │ (Docling)│    │(Instructor)   │ (output) │         │
+│   │ INPUTS   │───▶│  PARSER  │───▶│ EXTRACTOR│───▶│   CSV    │         │
+│   │(PDF/HTML)│    │(Docling+)│    │(Instructor)   │ (output) │         │
 │   └──────────┘    └────┬─────┘    └────┬─────┘    └──────────┘         │
 │                        │               │                                 │
 │                        ▼               ▼                                 │
@@ -189,31 +189,30 @@ The interactive builder will:
 
 ---
 
-## 🤖 Multi-Agent Architecture (Future)
+## 🤖 Multi-Agent Architecture
 
-The pipeline is designed for multi-agent expansion:
+The pipeline is built on a specialized agentic architecture:
 
-### Agent 1: Screener
-- **Input**: Abstract text
-- **Task**: Decide inclusion/exclusion based on criteria
-- **Output**: Boolean + reasoning
+### Agent 1: Screener (`ScreeningDecision`)
+- **Status**: Implemented (`agents/screener.py`)
+- **Input**: Abstracts
+- **Task**: Intelligent inclusion/exclusion based on PICO criteria
 
-### Agent 2: Extractor (Current)
-- **Input**: Full-text sections (Abstract, Methods, Results)
-- **Task**: Extract structured data per schema
-- **Output**: Pydantic model instance
+### Agent 2: Extractor (`StructuredExtractor`)
+- **Status**: Core Implementation (`core/extractor.py`)
+- **Task**: Extracts structured data with self-proving quotes
 
-### Agent 3: Auditor
-- **Input**: Extracted data + source text
-- **Task**: Verify extraction accuracy, flag uncertainties
-- **Output**: Confidence scores, correction suggestions
+### Agent 3: Auditor (`ExtractionChecker`)
+- **Status**: Implemented (`core/extraction_checker.py`)
+- **Task**: Validates extractions against source text and logic rules
 
-### Agent 4: Synthesizer
-- **Input**: All extracted data
-- **Task**: Identify patterns, generate summary statistics
-- **Output**: Synthesis narrative, forest plot data
+### Agent 4: Synthesizer (`SynthesizerAgent`)
+- **Status**: Implemented (`agents/synthesizer.py`)
+- **Task**: Aggregates extracted data into meta-analysis reports
+- **Output**: Markdown narrative + statistical summaries
 
----
+### Pipeline: `HierarchicalExtractionPipeline`
+- Orchestrates the entire flow: Parsing -> Screening -> Extraction -> Validation -> Retry Loop
 
 ## 📊 Output Files
 

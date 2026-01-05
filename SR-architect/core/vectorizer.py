@@ -6,9 +6,28 @@ Stores document chunks with embeddings for RAG and semantic retrieval.
 """
 
 import os
+import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
+import chromadb
+from chromadb.utils import embedding_functions
+
+
+def _sanitize_metadata_value(value: Any) -> Any:
+    """Sanitize a value for safe storage in ChromaDB metadata."""
+    if value is None:
+        return None
+    if isinstance(value, (int, float, bool)):
+        return value
+    if isinstance(value, str):
+        # Limit string length and remove control characters
+        sanitized = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', str(value))
+        return sanitized[:1000]  # Limit to 1000 chars
+    if isinstance(value, (list, dict)):
+        # Convert to string with length limit
+        return str(value)[:1000]
+    return str(value)[:1000]
 
 
 def load_env():
@@ -132,6 +151,10 @@ class ChromaVectorStore:
         
         return len(documents)
     
+
+
+
+
     def add_chunks_from_parsed_doc(
         self,
         doc,  # ParsedDocument
@@ -162,12 +185,13 @@ class ChromaVectorStore:
             # Add extracted data to metadata (for filtering)
             if extracted_data:
                 for key, value in extracted_data.items():
-                    if value is not None and not key.endswith("_quote"):
-                        # Convert to string for ChromaDB (it prefers primitives)
-                        if isinstance(value, (list, dict)):
-                            metadata[key] = str(value)
-                        else:
-                            metadata[key] = value
+                    # Skip internal fields and quote fields
+                    if key.startswith("_") or key.endswith("_quote"):
+                        continue
+                    
+                    sanitized = _sanitize_metadata_value(value)
+                    if sanitized is not None:
+                        metadata[key] = sanitized
             
             doc_id = f"{doc.filename}_{i}"
             
@@ -214,13 +238,18 @@ class ChromaVectorStore:
         
         # Format results
         formatted = []
-        if results and results['documents']:
-            for i in range(len(results['documents'][0])):
+        if results:
+            ids = results.get('ids', [[]])[0]
+            docs = results.get('documents', [[]])[0]
+            metas = results.get('metadatas', [[]])[0]
+            dists = results.get('distances', [[]])[0]
+            
+            for i in range(len(ids)):
                 formatted.append({
-                    "id": results['ids'][0][i],
-                    "text": results['documents'][0][i],
-                    "metadata": results['metadatas'][0][i] if results['metadatas'] else {},
-                    "distance": results['distances'][0][i] if results['distances'] else None,
+                    "id": ids[i] if i < len(ids) else None,
+                    "text": docs[i] if i < len(docs) else "",
+                    "metadata": metas[i] if i < len(metas) else {},
+                    "distance": dists[i] if i < len(dists) else None,
                 })
         
         return formatted
