@@ -320,7 +320,7 @@ You will receive text and must output:
                 print(f"Warning: Text truncated from {len(text)} to {EVIDENCE_CONTEXT_CHARS} chars for evidence extraction")
 
             evidence_messages = [
-                {"role": "system", "content": self.SELF_PROVING_PROMPT},
+                {"role": "system", "content": self.self_proving_prompt},
                 {"role": "user", "content": f"""Based on this text:
 {evidence_context}
 

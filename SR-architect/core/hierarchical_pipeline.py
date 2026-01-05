@@ -205,6 +205,8 @@ class HierarchicalExtractionPipeline:
         if not context.strip():
             raise ValueError("Cannot build extraction context: no valid chunks available")
         
+        return context
+
     def extract_document(
         self,
         document: ParsedDocument,
@@ -261,8 +263,6 @@ class HierarchicalExtractionPipeline:
                     revision_prompts=revision_prompts if revision_prompts else None,
                 )
             except Exception as e:
-                import traceback
-                traceback.print_exc()
                 warnings.append(f"Extraction failed on iteration {iteration + 1}: {str(e)}")
                 self._log(f"    ERROR: {str(e)}")
                 continue
