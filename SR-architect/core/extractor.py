@@ -123,6 +123,10 @@ Extract the requested fields according to the provided schema."""
         }
         
         from core.utils import get_logger
+        self.logger = get_logger("StructuredExtractor")
+        
+        # Build dynamic system prompt
+        self.system_prompt = self.SYSTEM_PROMPT_TEMPLATE
         if examples:
             self.system_prompt += "\n\n" + examples
             

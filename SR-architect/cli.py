@@ -21,7 +21,50 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskPr
 from rich.table import Table
 from rich.panel import Panel
 
-# ...
+# Add parent to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from core.parser import DocumentParser, ParsedDocument
+from core.schema_builder import (
+    build_extraction_model,
+    get_case_report_schema,
+    get_rct_schema,
+    get_observational_schema,
+    interactive_schema_builder,
+    FieldDefinition,
+    PREDEFINED_SCHEMAS,
+)
+from core.extractor import StructuredExtractor
+from core.vectorizer import ChromaVectorStore
+from core.audit_logger import AuditLogger
+from core.hierarchical_pipeline import HierarchicalExtractionPipeline
+
+app = typer.Typer(
+    name="sr-architect",
+    help="Systematic Review Data Extraction Pipeline",
+    add_completion=False,
+)
+console = Console()
+MIN_CONTEXT_CHARS = 100  # Minimum chars required for extraction
+
+
+def load_env():
+    """Load environment variables."""
+    env_paths = [
+        Path.cwd() / ".env",
+        Path(__file__).parent / ".env",
+        Path.home() / "Projects" / ".env",
+    ]
+    for env_path in env_paths:
+        if env_path.exists():
+            with open(env_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        key, _, value = line.partition("=")
+                        os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+            break
+
 
 @app.command()
 def extract(
