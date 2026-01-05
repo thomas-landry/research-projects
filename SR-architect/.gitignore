@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# Output directories (can be large)
+output/vector_store/
+*.lance
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
