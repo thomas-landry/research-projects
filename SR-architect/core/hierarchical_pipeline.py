@@ -205,10 +205,47 @@ class HierarchicalExtractionPipeline:
         if not context.strip():
             raise ValueError("Cannot build extraction context: no valid chunks available")
         
-        return context
-
-    # ... (skipping unchanged parts) ...
-
+    def extract_document(
+        self,
+        document: ParsedDocument,
+        schema: Type[T],
+        theme: str,
+    ) -> PipelineResult:
+        """Full extraction with validation loop."""
+        timestamp = datetime.now().isoformat()
+        warnings: List[str] = []
+        
+        self._log(f"Starting extraction for: {document.filename}")
+        
+        # === Stage 1: Content Filtering ===
+        self._log("Stage 1: Filtering content (removing affiliations, references)...")
+        filter_result = self.content_filter.filter_chunks(document.chunks)
+        filtered_chunks = filter_result.filtered_chunks
+        
+        if not filtered_chunks:
+            warnings.append("All chunks were filtered out - using original chunks")
+            filtered_chunks = document.chunks
+            
+        # === Stage 2: Relevance Classification ===
+        self._log("Stage 2: Classifying chunk relevance...")
+        schema_fields = list(schema.model_fields.keys()) if hasattr(schema, 'model_fields') else []
+        relevant_chunks, relevance_results = self.relevance_classifier.get_relevant_chunks(
+            filtered_chunks, theme, schema_fields
+        )
+        relevance_stats = self.relevance_classifier.get_classification_summary(relevance_results)
+        
+        if not relevant_chunks:
+            warnings.append("No chunks classified as relevant - using all filtered chunks")
+            relevant_chunks = filtered_chunks
+            
+        # === Stage 3: Extraction with Feedback Loop ===
+        context = self._build_context(relevant_chunks)
+        revision_prompts: List[str] = []
+        iteration_history: List[IterationRecord] = []
+        
+        best_result: Optional[ExtractionWithEvidence] = None
+        best_check: Optional[CheckerResult] = None
+        
         for iteration in range(self.max_iterations):
             self._log(f"  Iteration {iteration + 1}/{self.max_iterations}...")
             
