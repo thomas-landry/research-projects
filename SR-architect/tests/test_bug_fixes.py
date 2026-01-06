@@ -51,6 +51,40 @@ def test_parser_empty_headings_list():
         assert len(doc.chunks) == 1
         assert doc.chunks[0].section == ""
 
+# BUG-011: DocMeta object attribute access (not dict)
+def test_parser_docmeta_object_not_dict():
+    """Test that chunk.meta as DocMeta object (not dict) is handled correctly"""
+    # Simulate DocMeta as an object with headings attribute
+    class MockDocMeta:
+        headings = ["Introduction", "Methods"]
+    
+    class MockChunk:
+        text = "Sample content"
+        meta = MockDocMeta()
+        page = 1
+    
+    parser = DocumentParser()
+    mock_converter = MagicMock()
+    mock_chunker = MagicMock()
+    parser._converter = mock_converter
+    parser._chunker = mock_chunker
+    
+    mock_doc = MagicMock()
+    mock_converter.convert.return_value.document = mock_doc
+    mock_doc.export_to_markdown.return_value = "Full text"
+    
+    chunk1 = MockChunk()
+    parser._chunker.chunk.return_value = [chunk1]
+    
+    with patch.object(DocumentParser, '_ensure_docling'):
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
+            doc = parser.parse_pdf(f.name)
+    
+    # Should extract headings from object via getattr, not .get()
+    assert len(doc.chunks) == 1
+    assert doc.chunks[0].section == "Introduction"
+    assert doc.chunks[0].subsection == "Methods"
+
 # BUG-002: Empty Context Extraction
 def test_hierarchical_pipeline_empty_chunks():
     """Test extraction with zero relevant chunks"""
@@ -59,7 +93,7 @@ def test_hierarchical_pipeline_empty_chunks():
     class DummySchema(BaseModel):
         field1: str
     
-    pipeline = HierarchicalExtractionPipeline(api_key="mock")
+    pipeline = HierarchicalExtractionPipeline()
     
     # Document with no chunks
     doc = ParsedDocument(filename="test.pdf", chunks=[])

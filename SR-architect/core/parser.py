@@ -161,7 +161,8 @@ class DocumentParser:
                 subsection = ""
                 
                 if hasattr(chunk, 'meta') and chunk.meta:
-                    headings = chunk.meta.get('headings', [])
+                    # DocMeta is an object, not a dict - use getattr() instead of .get()
+                    headings = getattr(chunk.meta, 'headings', None) or []
                     # Safely access headings with explicit bounds checking
                     section = headings[0] if isinstance(headings, list) and len(headings) > 0 else ""
                     subsection = headings[1] if isinstance(headings, list) and len(headings) > 1 else ""
