@@ -207,6 +207,7 @@ Input Fields:
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             response_model=DiscoveryResult,
+            extra_body={"usage": {"include": True}}
         )
         
         # Record usage
@@ -252,6 +253,7 @@ Input Fields:
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 response_model=UnificationResult,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage

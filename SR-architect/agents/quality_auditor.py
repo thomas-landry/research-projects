@@ -107,6 +107,7 @@ class QualityAuditorAgent:
                     model=self.model,
                     messages=[{"role": "user", "content": prompt}],
                     response_model=FieldAudit,
+                    extra_body={"usage": {"include": True}}
                 )
                 
                 # Record usage
@@ -173,6 +174,8 @@ class QualityAuditorAgent:
                     model=self.model,
                     messages=[{"role": "user", "content": prompt}],
                     response_model=FieldAudit,
+                    max_retries=2,
+                    extra_body={"usage": {"include": True}}
                 )
                 
                 # Record usage

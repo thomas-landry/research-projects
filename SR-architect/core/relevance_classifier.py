@@ -194,6 +194,7 @@ For each chunk, provide:
                         {"role": "user", "content": user_prompt},
                     ],
                     response_model=RelevanceResponse,
+                    extra_body={"usage": {"include": True}}
                 )
                 
                 # Record usage
@@ -281,6 +282,7 @@ For each chunk, provide:
                         {"role": "user", "content": user_prompt},
                     ],
                     response_model=RelevanceResponse,
+                    extra_body={"usage": {"include": True}}
                 )
                 
                 # Record usage

@@ -208,6 +208,8 @@ Extract the requested fields according to the provided schema."""
                 model=self.model,
                 messages=messages,
                 response_model=schema,
+                max_retries=2,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage
@@ -264,6 +266,8 @@ Extract the requested fields according to the provided schema."""
                 model=self.model,
                 messages=messages,
                 response_model=schema,
+                max_retries=2,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage
@@ -420,6 +424,7 @@ You will receive text and must output:
                 model=self.model,
                 messages=messages,
                 response_model=schema,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage
@@ -462,8 +467,9 @@ Provide evidence citations for each extracted value. For each field that has a n
             
             evidence_result, completion_ev = self.client.chat.completions.create_with_completion(
                 model=self.model,
-                messages=evidence_messages,
-                response_model=EvidenceResponse,
+                messages=[{"role": "user", "content": evidence_prompt}],
+                response_model=EvidenceList,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage

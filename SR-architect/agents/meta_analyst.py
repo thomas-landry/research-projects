@@ -92,6 +92,7 @@ class MetaAnalystAgent:
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 response_model=MetaAnalysisFeasibility,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage

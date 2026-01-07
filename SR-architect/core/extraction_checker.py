@@ -233,11 +233,10 @@ Provide scores, issues, and specific revision suggestions."""
         try:
             response, completion = client.chat.completions.create_with_completion(
                 model=self.model,
-                messages=[
-                    {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt},
-                ],
-                response_model=CheckerResponse,
+                messages=[{"role": "user", "content": prompt}],
+                response_model=CheckerResult,
+                max_retries=2,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage
@@ -320,11 +319,10 @@ Provide scores, issues, and specific revision suggestions."""
         try:
             response, completion = await client.chat.completions.create_with_completion(
                 model=self.model,
-                messages=[
-                    {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt},
-                ],
-                response_model=CheckerResponse,
+                messages=[{"role": "user", "content": prompt}],
+                response_model=CheckerResult,
+                max_retries=2,
+                extra_body={"usage": {"include": True}}
             )
             
             # Record usage

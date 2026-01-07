@@ -42,6 +42,8 @@ class UsageRecord:
     cost_usd: float
     filename: Optional[str] = None
     operation: str = "extraction"
+    tier: Optional[str] = None
+    field: Optional[str] = None
 
 
 @dataclass
@@ -100,6 +102,29 @@ class TokenTracker:
         # Cache model pricing
         self._pricing_cache: Dict[str, Dict[str, float]] = {}
         
+    def estimate_tokens(self, text: str, model: str = "gpt-4o") -> int:
+        """
+        Estimate token count using tiktoken if available.
+        """
+        try:
+            import tiktoken
+            # Map openrouter models to tiktoken encodings
+            if "claude" in model:
+                # Claude doesn't have public tiktoken, approx with cl100k_base or just chars
+                # But tiktoken is better than char div.
+                encoding = tiktoken.get_encoding("cl100k_base")
+            else:
+                try:
+                    encoding = tiktoken.encoding_for_model(model)
+                except KeyError:
+                    encoding = tiktoken.get_encoding("cl100k_base")
+            return len(encoding.encode(text))
+        except ImportError:
+            # Fallback
+            return len(text) // 4
+        except Exception:
+            return len(text) // 4
+
     def get_model_pricing(self, model: str) -> Dict[str, float]:
         """
         Get pricing for a model (per 1M tokens).
@@ -177,10 +202,12 @@ class TokenTracker:
     
     def record_usage(
         self,
-        usage: Dict[str, int],
+        usage: Dict[str, Any],
         model: str,
         filename: Optional[str] = None,
         operation: str = "extraction",
+        tier: Optional[str] = None,
+        field: Optional[str] = None,
     ) -> UsageRecord:
         """
         Record token usage from an API response.
@@ -190,6 +217,8 @@ class TokenTracker:
             model: Model used
             filename: Source document
             operation: Type of operation
+            tier: Extraction tier (e.g. 'tier1', 'tier2')
+            field: Specific field being extracted
             
         Returns:
             The created usage record
@@ -198,7 +227,13 @@ class TokenTracker:
         completion_tokens = usage.get("completion_tokens", 0)
         total_tokens = usage.get("total_tokens", prompt_tokens + completion_tokens)
         
-        cost = self.calculate_cost(prompt_tokens, completion_tokens, model)
+        # Check for direct cost from API response (e.g. OpenRouter 'cost' field)
+        if "cost" in usage:
+            cost = float(usage["cost"])
+        elif "cost_usd" in usage:
+            cost = float(usage["cost_usd"])
+        else:
+            cost = self.calculate_cost(prompt_tokens, completion_tokens, model)
         
         record = UsageRecord(
             timestamp=datetime.now().isoformat(),
@@ -209,6 +244,8 @@ class TokenTracker:
             cost_usd=cost,
             filename=filename,
             operation=operation,
+            tier=tier,
+            field=field,
         )
         
         self.records.append(record)
