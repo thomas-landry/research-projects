@@ -270,7 +270,7 @@ def extract(
         # For now, let's warn that vectorization is pending update.
         console.print(f"\n[yellow]Note: Vectorization is currently disabled in batch mode.[/yellow]")
     
-    console.print(f"\n[dim]Audit log: {logger.log_file}[/dim]")
+    console.print(f"\n[dim]Log file: {log_file}[/dim]")
 
 
 @app.command()

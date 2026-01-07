@@ -1,0 +1,499 @@
+{
+  "timestamp": "2026-01-06T23:22:32.382519",
+  "processed_files": [
+    "Seo et al. - 2019 - An Alternative Approach of Diagnosing Diffuse Pulmonary Meningotheliomatosis (DPMs) with Transbronch.pdf",
+    "Liu et al. - 2024 - Primary pulmonary meningioma and minute pulmonary meningothelial-like nodules Rare pulmonary nodula.pdf",
+    "Murata et al. - 2023 - A Rare Case of Diffuse Bilateral Minute Pulmonary Meningothelial-like Nodules Increasing over the Sh.pdf"
+  ],
+  "failed_files": [],
+  "results": {
+    "Liu et al. - 2024 - Primary pulmonary meningioma and minute pulmonary meningothelial-like nodules Rare pulmonary nodula.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "In this editorial, we comment on an article by Ruan et al published in a recent issue of the World Journal of Clinical Case",
+        "patient_age": "Middle-aged or older",
+        "patient_age_quote": "Patients with PPMs are mainly middle-aged or older women",
+        "patient_sex": "Female",
+        "patient_sex_quote": "Patients with PPMs are mainly middle-aged or older women",
+        "presenting_symptoms": "No obvious symptoms, some atypical respiratory symptoms",
+        "presenting_symptoms_quote": "Patients with PPMs and MPMNs usually present with no obvious symptoms, other than some atypical respiratory symptoms, although this can depend on tumor size, location, and accompanying diseases",
+        "diagnostic_method": "Histopathological examination",
+        "diagnostic_method_quote": "Thus, pathological examination is the most accurate method of diagnosis of PPM",
+        "imaging_findings": "Round homogeneous mass with well-demarcated borders, can appear with ground-glass opacity and cyst-like structures or calcifications. Size ranges from 0.4 to 6 cm for benign tumors (median: 2 cm) and 1.5 to 15 cm for malignant tumors (median: 6.4 cm). Distribution frequently subpleural (89.1%) or intrapulmonary (10.9%)",
+        "imaging_findings_quote": "PPM nodules usually manifest as a round homogeneous mass with well-demarcated borders on imaging examinations. PPMs can appear with ground-glass opacity and cyst-like structures or calcifications, depending on the changes in the lesion",
+        "histopathology": "Typically categorized as epithelial, fibrous or transitional with spindle cells in whirlpool arrangements. Psammoma bodies and pseudonuclear inclusions present. No mitoses or necrosis in benign PPMs",
+        "histopathology_quote": "In histopathological analyses, PPMs are typically categorized as epithelial, fibrous or transitional. Further, they often exhibit spindle cells in whirlpool arrangements, while psammoma bodies can also be observed. Pseudonuclear inclusions have also been reported in PPM histopathology. No mitoses or necrosis has been identified in benign PPMs",
+        "immunohistochemistry": "Positive for vimentin, epithelial cell membrane antigen, and progesterone receptor (PR). Variable staining for S100, cytokeratin (CK), and CD34. Negative for thyroid transcription factor-1 and neuroendocrine markers",
+        "immunohistochemistry_quote": "Positive immunohistochemical staining for vimentin, epithelial cell membrane antigen, and progesterone receptor (PR) is common in most cases of PPM and MPMN, whereas markers such as S100, cytokeratin (CK), and CD34 may exhibit variable or inconsistent staining results. The expression of thyroid transcription factor-1 and neuroendocrine markers, such as synaptophysin and chromogranin, are negative",
+        "treatment": "Wedge resection or lobectomy; conservative monitoring for smaller nodules",
+        "treatment_quote": "Therefore, the major therapeutic method for PPM is surgery, such as wedge resection or lobectomy. It has also been suggested that a conservative approach, using close medical monitoring, is the best option for patients when the location, size, and number of smaller nodules challenge the accessibility for biopsy or resection",
+        "outcome": "Favorable prognosis for benign cases, poor prognosis for malignant cases with potential for recurrence/metastasis",
+        "outcome_quote": "The vast majority of PPMs are benign, well-circumscribed and solitary, with a favorable prognosis. Malignant PPMs are prone to recurrence or metastasis, leading to a poor prognosis",
+        "comorbidities": "May have synchronous lung cancer-related lesions",
+        "comorbidities_quote": "approximately 90% of patients with MPMNs have synchronous lung cancer-related lesions, including atypical adenomatous hyperplasia, adenocarcinoma in situ , minimally invasive adenocarcinoma, and invasive adenocarcinoma",
+        "filename": "Liu et al. - 2024 - Primary pulmonary meningioma and minute pulmonary meningothelial-like nodules Rare pulmonary nodula.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "This appears to be a review article/editorial rather than a primary case report. The information extracted represents general characteristics of PPMs rather than a specific case. Many details are provided about the typical presentation and features of these tumors."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "1",
+          "exact_quote": "In this editorial, we comment on an article by Ruan et al published in a recent issue of the World Journal of Clinical Case",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "Middle-aged or older",
+          "exact_quote": "Patients with PPMs are mainly middle-aged or older women",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "Patients with PPMs are mainly middle-aged or older women",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "No obvious symptoms, some atypical respiratory symptoms",
+          "exact_quote": "Patients with PPMs and MPMNs usually present with no obvious symptoms, other than some atypical respiratory symptoms, although this can depend on tumor size, location, and accompanying diseases",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Histopathological examination",
+          "exact_quote": "Thus, pathological examination is the most accurate method of diagnosis of PPM",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "Round homogeneous mass with well-demarcated borders, can appear with ground-glass opacity and cyst-like structures or calcifications. Size ranges from 0.4 to 6 cm for benign tumors (median: 2 cm) and 1.5 to 15 cm for malignant tumors (median: 6.4 cm). Distribution frequently subpleural (89.1%) or intrapulmonary (10.9%)",
+          "exact_quote": "PPM nodules usually manifest as a round homogeneous mass with well-demarcated borders on imaging examinations. PPMs can appear with ground-glass opacity and cyst-like structures or calcifications, depending on the changes in the lesion... The size of benign PPM tumors ranges from 0.4 to 6 cm in diameter (median: 2 cm), whereas malignant PPM tumors range in size from 1.5 to 15 cm in diameter (median: 6.4 cm)",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Typically categorized as epithelial, fibrous or transitional with spindle cells in whirlpool arrangements. Psammoma bodies and pseudonuclear inclusions present. No mitoses or necrosis in benign PPMs",
+          "exact_quote": "In histopathological analyses, PPMs are typically categorized as epithelial, fibrous or transitional. Further, they often exhibit spindle cells in whirlpool arrangements, while psammoma bodies can also be observed. Pseudonuclear inclusions have also been reported in PPM histopathology. No mitoses or necrosis has been identified in benign PPMs",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "Positive for vimentin, epithelial cell membrane antigen, and progesterone receptor (PR). Variable staining for S100, cytokeratin (CK), and CD34. Negative for thyroid transcription factor-1 and neuroendocrine markers",
+          "exact_quote": "Positive immunohistochemical staining for vimentin, epithelial cell membrane antigen, and progesterone receptor (PR) is common in most cases of PPM and MPMN, whereas markers such as S100, cytokeratin (CK), and CD34 may exhibit variable or inconsistent staining results. The expression of thyroid transcription factor-1 and neuroendocrine markers, such as synaptophysin and chromogranin, are negative",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "Wedge resection or lobectomy; conservative monitoring for smaller nodules",
+          "exact_quote": "Therefore, the major therapeutic method for PPM is surgery, such as wedge resection or lobectomy. It has also been suggested that a conservative approach, using close medical monitoring, is the best option for patients when the location, size, and number of smaller nodules challenge the accessibility for biopsy or resection",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "Favorable prognosis for benign cases, poor prognosis for malignant cases with potential for recurrence/metastasis",
+          "exact_quote": "The vast majority of PPMs are benign, well-circumscribed and solitary, with a favorable prognosis. Malignant PPMs are prone to recurrence or metastasis, leading to a poor prognosis",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "May have synchronous lung cancer-related lesions",
+          "exact_quote": "approximately 90% of patients with MPMNs have synchronous lung cancer-related lesions, including atypical adenomatous hyperplasia, adenocarcinoma in situ , minimally invasive adenocarcinoma, and invasive adenocarcinoma",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        }
+      ],
+      "validation": {
+        "accuracy_score": 0.0,
+        "consistency_score": 0.0,
+        "overall_score": 0.0,
+        "passed": false,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.0,
+          "consistency": 0.0,
+          "overall": 0.0,
+          "issues": 4
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 76,
+          "filtered_chunks": 69,
+          "removed_chunks": 7,
+          "original_chars": 27152,
+          "filtered_chars": 18335,
+          "removed_chars": 8817,
+          "estimated_original_tokens": 6788,
+          "estimated_filtered_tokens": 4583,
+          "estimated_tokens_saved": 2204,
+          "reduction_percentage": 32.5
+        },
+        "relevance": {
+          "total_chunks": 69,
+          "relevant_chunks": 16,
+          "irrelevant_chunks": 53,
+          "relevance_rate": 23.2,
+          "avg_confidence": 0.59
+        }
+      },
+      "warnings": [
+        "Reached max iterations (1) without passing validation"
+      ],
+      "source_filename": "Liu et al. - 2024 - Primary pulmonary meningioma and minute pulmonary meningothelial-like nodules Rare pulmonary nodula.pdf",
+      "extraction_timestamp": "2026-01-06T23:22:32.386549"
+    },
+    "Seo et al. - 2019 - An Alternative Approach of Diagnosing Diffuse Pulmonary Meningotheliomatosis (DPMs) with Transbronch.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "Herein we describe the first reported case of DPM diagnosed via transbronchial lung cryobiopsy (TBLCB)",
+        "patient_age": "75",
+        "patient_age_quote": "A 75-yearold woman",
+        "patient_sex": "Female",
+        "patient_sex_quote": "A 75-yearold woman",
+        "presenting_symptoms": "mild exertional dyspnea and cough",
+        "presenting_symptoms_quote": "presented for mild exertional dyspnea and cough",
+        "diagnostic_method": "transbronchial lung cryobiopsy (TBLCB)",
+        "diagnostic_method_quote": "She underwent bronchoscopy with lavage, which was negative for infection, and TBLCB of the right middle and lower lobes with a mean biopsy area of 30mm 2",
+        "imaging_findings": "multiple bilateral pulmonary nodules, numerous bilateral pulmonary micronodules",
+        "imaging_findings_quote": "\"multiple bilateral pulmonary nodules on chest computed tomography (CT) scan\" and \"Chest CT angiogram ruled out thromboembolic disease and re-demonstrated numerous bilateral pulmonary micronodules unchanged from prior imaging\"",
+        "histopathology": "meningothelial-like nodules occurring in close proximity consistent with diffuse minute pulmonary meningothelial-like nodules (MPMNs)",
+        "histopathology_quote": "Histology demonstrated meningothelial-like nodules occurring in close proximity consistent with diffuse minute pulmonary meningothelial-like nodules (MPMNs), known as DPM",
+        "immunohistochemistry": "positive for epithelial membrane antigen and negative for synaptophysin and chromogranin",
+        "immunohistochemistry_quote": "The immunohistochemical profile was positive for epithelial membrane antigen and negative for synaptophysin and chromogranin",
+        "treatment": "endobronchial blockade for 24 hours, ICU admission",
+        "treatment_quote": "There was moderate postoperative endobronchial bleeding requiring endobronchial blockade for 24 hours. The patient was admitted to the intensive care unit",
+        "outcome": "did not require chest tube, hemodynamic support, or prolonged hospitalization",
+        "outcome_quote": "did not require a chest tube, hemodynamic support, or a prolonged hospitalization",
+        "comorbidities": "late-onset asthma and giant cell arteritis on chronic low dose prednisone",
+        "comorbidities_quote": "She carried a history of late-onset asthma and giant cell arteritis on chronic low dose prednisone",
+        "filename": "Seo et al. - 2019 - An Alternative Approach of Diagnosing Diffuse Pulmonary Meningotheliomatosis (DPMs) with Transbronch.pdf",
+        "extraction_confidence": 0.95,
+        "extraction_notes": "All major clinical details were clearly stated in the text with direct quotes available. The only procedural complication (moderate postoperative endobronchial bleeding) was included in the treatment section since it required intervention."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": 1,
+          "exact_quote": "Herein we describe the first reported case of DPM diagnosed via transbronchial lung cryobiopsy (TBLCB)",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "75",
+          "exact_quote": "A 75-yearold woman",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "A 75-yearold woman",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "mild exertional dyspnea and cough",
+          "exact_quote": "presented for mild exertional dyspnea and cough",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "transbronchial lung cryobiopsy (TBLCB)",
+          "exact_quote": "She underwent bronchoscopy with lavage, which was negative for infection, and TBLCB of the right middle and lower lobes with a mean biopsy area of 30mm 2",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "multiple bilateral pulmonary nodules, numerous bilateral pulmonary micronodules",
+          "exact_quote": "multiple bilateral pulmonary nodules on chest computed tomography (CT) scan and [...] Chest CT angiogram ruled out thromboembolic disease and re-demonstrated numerous bilateral pulmonary micronodules unchanged from prior imaging",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.95
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "meningothelial-like nodules occurring in close proximity consistent with diffuse minute pulmonary meningothelial-like nodules (MPMNs)",
+          "exact_quote": "Histology demonstrated meningothelial-like nodules occurring in close proximity consistent with diffuse minute pulmonary meningothelial-like nodules (MPMNs), known as DPM",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "positive for epithelial membrane antigen and negative for synaptophysin and chromogranin",
+          "exact_quote": "The immunohistochemical profile was positive for epithelial membrane antigen and negative for synaptophysin and chromogranin",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "endobronchial blockade for 24 hours, ICU admission",
+          "exact_quote": "There was moderate postoperative endobronchial bleeding requiring endobronchial blockade for 24 hours. The patient was admitted to the intensive care unit",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "did not require chest tube, hemodynamic support, or prolonged hospitalization",
+          "exact_quote": "did not require a chest tube, hemodynamic support, or a prolonged hospitalization",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "late-onset asthma and giant cell arteritis on chronic low dose prednisone",
+          "exact_quote": "She carried a history of late-onset asthma and giant cell arteritis on chronic low dose prednisone",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 0.0,
+        "consistency_score": 0.0,
+        "overall_score": 0.0,
+        "passed": false,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.0,
+          "consistency": 0.0,
+          "overall": 0.0,
+          "issues": 1
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 4,
+          "filtered_chunks": 4,
+          "removed_chunks": 0,
+          "original_chars": 3122,
+          "filtered_chars": 3122,
+          "removed_chars": 0,
+          "estimated_original_tokens": 780,
+          "estimated_filtered_tokens": 780,
+          "estimated_tokens_saved": 0,
+          "reduction_percentage": 0.0
+        },
+        "relevance": {
+          "total_chunks": 4,
+          "relevant_chunks": 1,
+          "irrelevant_chunks": 3,
+          "relevance_rate": 25.0,
+          "avg_confidence": 0.6
+        }
+      },
+      "warnings": [
+        "Reached max iterations (1) without passing validation"
+      ],
+      "source_filename": "Seo et al. - 2019 - An Alternative Approach of Diagnosing Diffuse Pulmonary Meningotheliomatosis (DPMs) with Transbronch.pdf",
+      "extraction_timestamp": "2026-01-06T23:24:17.000938"
+    },
+    "Murata et al. - 2023 - A Rare Case of Diffuse Bilateral Minute Pulmonary Meningothelial-like Nodules Increasing over the Sh.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "A 54-year-old woman was referred to our hospital...",
+        "patient_age": "54",
+        "patient_age_quote": "A 54-year-old woman was referred to our hospital",
+        "patient_sex": "Female",
+        "patient_sex_quote": "A 54-year-old woman was referred to our hospital",
+        "presenting_symptoms": "Asymptomatic",
+        "presenting_symptoms_quote": "\"No clinical symptoms were present\" and \"The patient... denied any other symptoms\"",
+        "diagnostic_method": "Transbronchial lung biopsy followed by surgical lung biopsy",
+        "diagnostic_method_quote": "\"the patient underwent a transbronchial lung biopsy\" and \"Therefore, the patient underwent a surgical lung biopsy. Surgical lung biopsies were performed from the right middle lobe S4 and right lower lobe S6.\"",
+        "imaging_findings": "Multiple bilateral lung nodules up to 5mm in diameter, randomly distributed throughout both lungs, some with central lucency appearing ring-shaped. Number of nodules increased over time.",
+        "imaging_findings_quote": "Thin-section chest CT confirmed the presence of innumerable disseminated minute nodules measuring up to 5 mm in diameter. The nodules were randomly distributed throughout both lungs, and there were no significant differences between the lobes. Some of the nodules showed central lucency and appeared ring-shaped",
+        "histopathology": "Spindle-shaped cells with lightly acidic vesicles and round nuclei proliferated along the alveolar septum",
+        "histopathology_quote": "Histological findings showed spindle-shaped cells with lightly acidic vesicles, and round nuclei proliferated along the alveolar septum.",
+        "immunohistochemistry": "Negative for cytokeratin AE1/AE3, positive for vimentin and progesterone receptors",
+        "immunohistochemistry_quote": "Immunohistochemical staining of the cells was negative for cytokeratin AE1/AE3 and positive for vimentin and progesterone receptors",
+        "treatment": "No treatment required",
+        "treatment_quote": "no treatment was required",
+        "outcome": "Stable with no symptoms, normal pulmonary function",
+        "outcome_quote": "The patient remained asymptomatic, pulmonary function test results were normal",
+        "comorbidities": "Cholelithiasis and hypercholesterolemia",
+        "comorbidities_quote": "The patient had cholelithiasis and hypercholesterolemia",
+        "filename": "Murata et al. - 2023 - A Rare Case of Diffuse Bilateral Minute Pulmonary Meningothelial-like Nodules Increasing over the Sh.pdf",
+        "extraction_confidence": 0.95,
+        "extraction_notes": "All key information was clearly stated in the text with multiple supporting quotes. The case was well documented with detailed clinical, imaging, and pathological findings."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "1",
+          "exact_quote": "A 54-year-old woman was referred to our hospital because computed tomography (CT) revealed multiple lung nodules during a health checkup.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "54",
+          "exact_quote": "A 54-year-old woman was referred to our hospital",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "A 54-year-old woman was referred to our hospital",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "Asymptomatic",
+          "exact_quote": "No clinical symptoms were present. However, the nodes proliferated, and multiple lung metastases could not be ruled out",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Transbronchial lung biopsy followed by surgical lung biopsy",
+          "exact_quote": "the patient underwent a transbronchial lung biopsy... Therefore, the patient underwent a surgical lung biopsy. Surgical lung biopsies were performed from the right middle lobe S4 and right lower lobe S6.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "Multiple bilateral lung nodules up to 5mm in diameter, randomly distributed throughout both lungs, some with central lucency appearing ring-shaped. Number of nodules increased over time.",
+          "exact_quote": "Thin-section chest CT confirmed the presence of innumerable disseminated minute nodules measuring up to 5 mm in diameter. The nodules were randomly distributed throughout both lungs, and there were no significant differences between the lobes. Some of the nodules showed central lucency and appeared ring-shaped",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Spindle-shaped cells with lightly acidic vesicles and round nuclei proliferated along the alveolar septum",
+          "exact_quote": "Histological findings showed spindle-shaped cells with lightly acidic vesicles, and round nuclei proliferated along the alveolar septum.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "Negative for cytokeratin AE1/AE3, positive for vimentin and progesterone receptors",
+          "exact_quote": "Immunohistochemical staining of the cells was negative for cytokeratin AE1/AE3 and positive for vimentin and progesterone receptors",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "No treatment required",
+          "exact_quote": "no treatment was required",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "Stable with no symptoms, normal pulmonary function",
+          "exact_quote": "The patient remained asymptomatic, pulmonary function test results were normal",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "Cholelithiasis and hypercholesterolemia",
+          "exact_quote": "The patient had cholelithiasis and hypercholesterolemia",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 0.0,
+        "consistency_score": 0.0,
+        "overall_score": 0.0,
+        "passed": false,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.0,
+          "consistency": 0.0,
+          "overall": 0.0,
+          "issues": 1
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 40,
+          "filtered_chunks": 33,
+          "removed_chunks": 7,
+          "original_chars": 15568,
+          "filtered_chars": 12848,
+          "removed_chars": 2720,
+          "estimated_original_tokens": 3892,
+          "estimated_filtered_tokens": 3212,
+          "estimated_tokens_saved": 680,
+          "reduction_percentage": 17.5
+        },
+        "relevance": {
+          "total_chunks": 33,
+          "relevant_chunks": 16,
+          "irrelevant_chunks": 17,
+          "relevance_rate": 48.5,
+          "avg_confidence": 0.69
+        }
+      },
+      "warnings": [
+        "Reached max iterations (1) without passing validation"
+      ],
+      "source_filename": "Murata et al. - 2023 - A Rare Case of Diffuse Bilateral Minute Pulmonary Meningothelial-like Nodules Increasing over the Sh.pdf",
+      "extraction_timestamp": "2026-01-06T23:24:59.383780"
+    }
+  },
+  "extraction_stats": {
+    "total": 3,
+    "success": 3,
+    "failed": 0
+  }
+}
