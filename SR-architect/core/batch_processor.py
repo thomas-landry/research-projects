@@ -1,4 +1,5 @@
 import asyncio
+import threading
 from typing import List, Type, TypeVar, Optional, Callable, Dict, Any
 from .parser import ParsedDocument
 from .state_manager import StateManager
@@ -9,6 +10,32 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 T = TypeVar("T")
 
 logger = utils.get_logger(__name__)
+
+class CircuitBreaker:
+    """
+    Circuit breaker to stop processing or switch modes after consecutive failures.
+    """
+    def __init__(self, threshold: int = 3):
+        self.threshold = threshold
+        self.failure_count = 0
+        self.is_open = False
+        self._lock = threading.Lock()
+        
+    def record_failure(self):
+        with self._lock:
+            self.failure_count += 1
+            if self.failure_count >= self.threshold:
+                self.is_open = True
+            
+    def record_success(self):
+        with self._lock:
+            self.failure_count = 0
+            self.is_open = False
+        
+    def reset(self):
+        with self._lock:
+            self.failure_count = 0
+            self.is_open = False
 
 class BatchExecutor:
     """
@@ -35,6 +62,7 @@ class BatchExecutor:
         self.state_manager = state_manager
         self.max_workers = max_workers
         self.resource_manager = resource_manager
+        self.circuit_breaker = CircuitBreaker(threshold=3)
 
     def process_batch(
         self,
@@ -80,16 +108,22 @@ class BatchExecutor:
         
         # Define worker function
         def _execute_single(doc: ParsedDocument):
+            if self.circuit_breaker.is_open:
+                return (doc.filename, "Circuit breaker open", "skipped")
+                
             try:
                 # Call the pipeline's single-document extract method
                 # Note: Assuming pipeline is thread-safe or stateless enough
                 result = self.pipeline.extract_document(doc, schema, theme)
+                self.circuit_breaker.record_success()
                 return (doc.filename, result, "success")
             except MemoryError:
                 logger.error(f"OOM processing {doc.filename}")
+                self.circuit_breaker.record_failure()
                 return (doc.filename, {"error": "Out of memory", "error_type": "MemoryError"}, "failed")
             except Exception as e:
                 logger.error(f"Error processing {doc.filename}: {e}", exc_info=True)
+                self.circuit_breaker.record_failure()
                 return (doc.filename, str(e), "failed")
 
         # Execute
@@ -116,6 +150,8 @@ class BatchExecutor:
                         logger.info(f"✓ Completed {filename}")
                         if callback:
                             callback(filename, serialized, "success")
+                    elif status == "skipped":
+                        logger.warning(f"Skipped {filename}: {data}")
                     else:
                         error_payload = data if isinstance(data, dict) else {"error": str(data)}
                         self.state_manager.update_result(filename, error_payload, status="failed")
@@ -181,9 +217,14 @@ class BatchExecutor:
         semaphore = asyncio.Semaphore(effective_limit)
 
         async def _execute_single_async(doc: ParsedDocument):
+            if self.circuit_breaker.is_open:
+                logger.warning(f"Circuit breaker open - skipping {doc.filename}")
+                return None
+
             async with semaphore:
                 try:
                     result = await self.pipeline.extract_document_async(doc, schema, theme)
+                    self.circuit_breaker.record_success()
                     
                     # Process result
                     if hasattr(result, 'to_dict'):
@@ -200,6 +241,7 @@ class BatchExecutor:
                     return result
                 except MemoryError:
                     logger.error(f"OOM processing {doc.filename}")
+                    self.circuit_breaker.record_failure()
                     error_payload = {"error": "Out of memory", "error_type": "MemoryError"}
                     self.state_manager.update_result(doc.filename, error_payload, status="failed")
                     if callback:
@@ -207,6 +249,7 @@ class BatchExecutor:
                     return None
                 except Exception as e:
                     logger.error(f"Error processing {doc.filename}: {e}", exc_info=True)
+                    self.circuit_breaker.record_failure()
                     self.state_manager.update_result(doc.filename, {"error": str(e)}, status="failed")
                     logger.error(f"✗ Failed {doc.filename}")
                     if callback:
@@ -220,4 +263,3 @@ class BatchExecutor:
         # Reload state to get full results set
         final_state = self.state_manager.load()
         return list(final_state.results.values())
-
