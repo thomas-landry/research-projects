@@ -120,6 +120,31 @@ class ChromaVectorStore:
             metadata={"hnsw:space": "cosine"}  # Use cosine similarity
         )
     
+    def close(self):
+        """
+        Close the ChromaDB client and release resources.
+        (MEM-002 fix)
+        """
+        if self._client is not None:
+            try:
+                # ChromaDB PersistentClient doesn't have explicit close,
+                # but we can dereference to allow garbage collection
+                self._collection = None
+                self._embedding_fn = None
+                self._client = None
+            except Exception:
+                pass
+    
+    def __enter__(self):
+        """Context manager entry."""
+        self._ensure_initialized()
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - closes resources."""
+        self.close()
+        return False
+    
     def add_documents(
         self,
         documents: List[VectorDocument],

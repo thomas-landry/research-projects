@@ -76,6 +76,9 @@ class PubMedFetcher:
         self.api_key = api_key
         self._last_request_time = 0.0
         
+        # MEM-004 fix: Use session for connection pooling
+        self._session = requests.Session()
+        
     def _rate_limit(self):
         """Apply rate limiting between requests."""
         elapsed = time.time() - self._last_request_time
@@ -137,7 +140,7 @@ class PubMedFetcher:
             if self.api_key:
                 params["api_key"] = self.api_key
                 
-            response = requests.get(PUBMED_SUMMARY_URL, params=params, timeout=10)
+            response = self._session.get(PUBMED_SUMMARY_URL, params=params, timeout=10)
             response.raise_for_status()
             
             data = response.json()
@@ -202,7 +205,7 @@ class PubMedFetcher:
             if self.api_key:
                 params["api_key"] = self.api_key
                 
-            response = requests.get(PUBMED_SEARCH_URL, params=params, timeout=10)
+            response = self._session.get(PUBMED_SEARCH_URL, params=params, timeout=10)
             response.raise_for_status()
             
             data = response.json()

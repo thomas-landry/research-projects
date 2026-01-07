@@ -247,6 +247,75 @@ class HierarchicalExtractionPipeline:
             raise ValueError("Cannot build extraction context: no valid chunks available")
         
         return context
+    
+    def _filter_and_classify(
+        self, 
+        document: ParsedDocument, 
+        theme: str, 
+        schema_fields: List[str]
+    ) -> tuple:
+        """
+        Stage 1 & 2: Filter content and classify relevance.
+        
+        Args:
+            document: Parsed document to process
+            theme: Extraction theme
+            schema_fields: List of schema field names
+            
+        Returns:
+            Tuple of (relevant_chunks, filter_stats, relevance_stats, warnings)
+        """
+        warnings = []
+        
+        # Stage 1: Filter
+        filter_result = self.content_filter.filter_chunks(document.chunks)
+        filtered_chunks = filter_result.filtered_chunks
+        
+        if not filtered_chunks:
+            warnings.append("All chunks were filtered out - using original chunks")
+            filtered_chunks = document.chunks
+        
+        # Stage 2: Classify relevance
+        relevant_chunks, relevance_results = self.relevance_classifier.get_relevant_chunks(
+            filtered_chunks, theme, schema_fields
+        )
+        relevance_stats = self.relevance_classifier.get_classification_summary(relevance_results)
+        
+        if not relevant_chunks:
+            warnings.append("No chunks classified as relevant - using all filtered chunks")
+            relevant_chunks = filtered_chunks
+            
+        return relevant_chunks, filter_result.token_stats, relevance_stats, warnings
+    
+    def _apply_audit_penalty(
+        self, 
+        check_result: "CheckerResult", 
+        extraction_data: Dict[str, Any], 
+        evidence_dicts: List[Dict]
+    ) -> "CheckerResult":
+        """
+        Apply quality audit penalties to check result.
+        
+        Args:
+            check_result: Current checker result
+            extraction_data: Extracted data dict
+            evidence_dicts: List of evidence dicts
+            
+        Returns:
+            Modified check_result with audit penalties applied
+        """
+        audit_report = self.quality_auditor.audit_extraction(extraction_data, evidence_dicts)
+        
+        if not audit_report.passed:
+            check_result.overall_score *= 0.8  # Penalty
+            check_result.passed = False
+            for audit in audit_report.audits:
+                if not audit.is_correct:
+                    check_result.issues.append(f"Audit failed for {audit.field_name}: {audit.explanation}")
+                    check_result.suggestions.append(f"For {audit.field_name}: {audit.explanation}")
+        
+        return check_result
+
 
     def extract_document(
         self,

@@ -1,0 +1,119 @@
+{
+  "start_time": "2026-01-07T11:22:21.481834",
+  "end_time": "2026-01-07T11:22:21.833500",
+  "baseline_mb": 6.389617919921875e-05,
+  "peak_mb": 0.40747928619384766,
+  "final_mb": 0.1360454559326172,
+  "growth_mb": 0.13598155975341797,
+  "snapshots": [
+    {
+      "label": "baseline",
+      "timestamp": "2026-01-07T11:22:21.481834",
+      "current_mb": 6.389617919921875e-05,
+      "peak_mb": 0.00020599365234375,
+      "diff_mb": 0.0
+    },
+    {
+      "label": "parser_init",
+      "timestamp": "2026-01-07T11:22:21.521187",
+      "current_mb": 0.0014314651489257812,
+      "peak_mb": 0.0031099319458007812,
+      "diff_mb": 0.0013675689697265625
+    },
+    {
+      "label": "parsed_Luvison et al. - 201",
+      "timestamp": "2026-01-07T11:22:21.560395",
+      "current_mb": 0.10515022277832031,
+      "peak_mb": 0.12864112854003906,
+      "diff_mb": 0.10371875762939453
+    },
+    {
+      "label": "parsed_Virk et al. - 2023 -",
+      "timestamp": "2026-01-07T11:22:21.598548",
+      "current_mb": 0.14224529266357422,
+      "peak_mb": 0.1558980941772461,
+      "diff_mb": 0.037095069885253906
+    },
+    {
+      "label": "parsed_Kuroki et al. - 2002",
+      "timestamp": "2026-01-07T11:22:21.636892",
+      "current_mb": 0.20052528381347656,
+      "peak_mb": 0.2219371795654297,
+      "diff_mb": 0.058279991149902344
+    },
+    {
+      "label": "pipeline_init",
+      "timestamp": "2026-01-07T11:22:21.682258",
+      "current_mb": 0.2761402130126953,
+      "peak_mb": 0.40747928619384766,
+      "diff_mb": 0.07561492919921875
+    },
+    {
+      "label": "content_filtered",
+      "timestamp": "2026-01-07T11:22:21.721124",
+      "current_mb": 0.2771730422973633,
+      "peak_mb": 0.40747928619384766,
+      "diff_mb": 0.0010328292846679688
+    },
+    {
+      "label": "after_cleanup",
+      "timestamp": "2026-01-07T11:22:21.795142",
+      "current_mb": 0.13566112518310547,
+      "peak_mb": 0.40747928619384766,
+      "diff_mb": -0.1415119171142578
+    }
+  ],
+  "top_allocations": [
+    {
+      "file": "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/json/decoder.py:361",
+      "size_mb": 0.03564262390136719,
+      "count": 87
+    },
+    {
+      "file": "<frozen importlib._bootstrap_external>:784",
+      "size_mb": 0.02702045440673828,
+      "count": 232
+    },
+    {
+      "file": "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pydantic/main.py:250",
+      "size_mb": 0.02175140380859375,
+      "count": 109
+    },
+    {
+      "file": "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/re/_compiler.py:764",
+      "size_mb": 0.00933074951171875,
+      "count": 24
+    },
+    {
+      "file": "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/dataclasses.py:498",
+      "size_mb": 0.008900642395019531,
+      "count": 72
+    },
+    {
+      "file": "/Users/thomaslandry/Projects/research-projects/SR-architect/core/token_tracker.py:35",
+      "size_mb": 0.0032024383544921875,
+      "count": 12
+    },
+    {
+      "file": "/Users/thomaslandry/Projects/research-projects/SR-architect/core/token_tracker.py:62",
+      "size_mb": 0.0029478073120117188,
+      "count": 11
+    },
+    {
+      "file": "/Users/thomaslandry/Projects/research-projects/SR-architect/core/token_tracker.py:50",
+      "size_mb": 0.0020933151245117188,
+      "count": 10
+    },
+    {
+      "file": "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/dataclasses.py:403",
+      "size_mb": 0.0020599365234375,
+      "count": 18
+    },
+    {
+      "file": "/Users/thomaslandry/Projects/research-projects/SR-architect/tests/profile_memory.py:112",
+      "size_mb": 0.00196075439453125,
+      "count": 7
+    }
+  ],
+  "leak_warnings": []
+}

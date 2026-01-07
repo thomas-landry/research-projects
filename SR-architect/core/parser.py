@@ -111,12 +111,16 @@ class DocumentParser:
     # Parser priority chain
     PARSER_CHAIN = ["docling", "pymupdf", "pdfplumber"]
     
+    # Default max cache entries (MEM-001 fix)
+    DEFAULT_MAX_CACHE_SIZE = 100
+    
     def __init__(
         self, 
         use_ocr: bool = False, 
         cache_dir: str = ".cache/parsed_docs",
         use_imrad: bool = False,
         extract_tables: bool = True,
+        max_cache_size: int = DEFAULT_MAX_CACHE_SIZE,
     ):
         """
         Initialize the parser.
@@ -126,11 +130,13 @@ class DocumentParser:
             cache_dir: Directory to store parsed document objects
             use_imrad: Whether to apply IMRAD section parsing
             extract_tables: Whether to extract tables separately
+            max_cache_size: Maximum number of cached parsed documents (LRU eviction)
         """
         self.use_ocr = use_ocr
         self.cache_dir = Path(cache_dir)
         self.use_imrad = use_imrad
         self.extract_tables = extract_tables
+        self.max_cache_size = max_cache_size
         self.logger = get_logger("DocumentParser")
         self._converter = None
         self._chunker = None
@@ -140,6 +146,9 @@ class DocumentParser:
         if not self.cache_dir.exists():
             self.cache_dir.mkdir(parents=True, exist_ok=True)
         
+        # Evict old cache entries if over limit
+        self._evict_cache_if_needed()
+        
         # Lazy-load IMRAD parser if enabled
         if self.use_imrad:
             try:
@@ -147,6 +156,31 @@ class DocumentParser:
                 self._imrad_parser = IMRADParser()
             except ImportError:
                 self.logger.warning("IMRADParser not available")
+    
+    def _evict_cache_if_needed(self):
+        """
+        Evict oldest cache entries if over max_cache_size limit.
+        Uses LRU eviction based on file modification time.
+        (MEM-001 fix)
+        """
+        if not self.cache_dir.exists():
+            return
+            
+        cache_files = list(self.cache_dir.glob("*.json"))
+        if len(cache_files) <= self.max_cache_size:
+            return
+            
+        # Sort by modification time (oldest first)
+        cache_files.sort(key=lambda f: f.stat().st_mtime)
+        
+        # Evict oldest entries
+        to_evict = len(cache_files) - self.max_cache_size
+        for cache_file in cache_files[:to_evict]:
+            try:
+                cache_file.unlink()
+                self.logger.debug(f"Evicted cache entry: {cache_file.name}")
+            except Exception as e:
+                self.logger.warning(f"Failed to evict cache {cache_file}: {e}")
     
     def _get_cache_path(self, file_path: Path) -> Path:
         """Generate a unique cache path based on file content hash."""
