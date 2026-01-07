@@ -134,6 +134,22 @@ OUTPUT: Update README.md, create CHANGELOG.md
 | 2026-01-05T16:40 | Senior Dev | QA Agent | Fixed BUG-011 (DocMeta), added regression test, all 29 tests pass |
 | 2026-01-05T16:44 | Senior Dev | Orchestrator | Phase 3 integration complete |
 | 2026-01-05T16:55 | Researcher | Orchestrator | Analysis complete. Core fields 100% fill. Rec: Use Enums for standardization. |
+| 2026-01-07T11:25 | Docs Agent | All Agents | **Known Test Failures**: 2 pre-existing failures logged (TEST-001, TEST-002). See Known Issues section. |
+
+---
+
+## 🚨 Known Issues
+
+> **Maintained by**: Docs Agent  
+> **Last Updated**: 2026-01-07T11:29
+
+| ID | File | Test | Status | Description |
+|----|------|------|--------|-------------|
+| TEST-001 | `tests/test_config.py` | `test_settings_defaults` | ⚠️ OPEN | Assertion `WORKERS == 1` fails; actual value is `4`. Config default mismatch. |
+| TEST-002 | `tests/test_phase2_components.py` | `TestPubMedFetcher::test_fetch_by_pmid_not_found` | ⚠️ OPEN | Test asserts `is None` but receives cached article object. Cache interfering with "not found" test. |
+
+**Priority**: Low (not blocking pipeline functionality)
+**Next Owner**: Senior Dev Agent
 
 ---
 

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Memory Profiler**: New `tests/profile_memory.py` using `tracemalloc` for baseline tracking.
+- **Cache Eviction**: LRU cache eviction in `DocumentParser` (max 100 entries).
+- **ChromaDB Cleanup**: `close()` method and context manager for `ChromaVectorStore`.
+- **Session Reuse**: `requests.Session()` in `PubMedFetcher` for connection pooling.
+
+### Changed
+- **Refactored**: Extracted `_filter_and_classify()` and `_apply_audit_penalty()` helpers in `HierarchicalExtractionPipeline`.
+
+### Known Issues
+- **TEST-001**: `test_settings_defaults` fails - WORKERS config expected 1, actual 4.
+- **TEST-002**: `test_fetch_by_pmid_not_found` fails - cache returns object instead of None.
+
 ## [1.0.0] - 2026-01-05
 
 ### Added
