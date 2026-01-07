@@ -19,6 +19,6 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Interactive Polish & Safety' (Protocol in workflow.md) ffe8dc8
 
 ## Phase 4: API Refactoring & Generalization
-- [ ] Task: Refactor extraction logic into a clean `ExtractionService` API.
+- [x] Task: Refactor extraction logic into a clean `ExtractionService` API. e68f2cb
 - [ ] Task: Verify adaptive discovery on a secondary dataset (non-DPM).
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: API Refactoring & Generalization' (Protocol in workflow.md)
