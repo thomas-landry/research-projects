@@ -20,5 +20,5 @@
 
 ## Phase 4: API Refactoring & Generalization
 - [x] Task: Refactor extraction logic into a clean `ExtractionService` API. e68f2cb
-- [ ] Task: Verify adaptive discovery on a secondary dataset (non-DPM).
+- [x] Task: Verify adaptive discovery on a secondary dataset (non-DPM). 4d9841e
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: API Refactoring & Generalization' (Protocol in workflow.md)
