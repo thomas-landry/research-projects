@@ -1,0 +1,8 @@
+{
+    "id": "production_bugs_20260106",
+    "type": "bug_discovery",
+    "status": "active",
+    "created": "2026-01-06T23:09:00-08:00",
+    "updated": "2026-01-06T23:09:00-08:00",
+    "description": "Discover and fix production bugs causing test failures and token waste"
+}
