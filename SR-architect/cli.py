@@ -290,6 +290,8 @@ def extract(
         # Future improvement: Add callback to BatchExecutor for UI updates.
         
     import csv
+    failed_files = []
+    
     with open(output_path, "w", newline="") as f:
         # Get field names from model
         fieldnames = list(ExtractionModel.model_fields.keys())
@@ -308,6 +310,8 @@ def extract(
                 row = {k: v for k, v in extracted_data.items() if k in fieldnames}
                 writer.writerow(row)
                 f.flush()
+            else:
+                failed_files.append((filename, str(data)))
 
         if hierarchical:
             # Use asyncio for hierarchical mode
@@ -331,6 +335,10 @@ def extract(
             )
     
     # Final summary with cost
+    if failed_files:
+        error_msg = "\n".join([f"• [bold red]{f}[/bold red]: {err[:100]}..." if len(err) > 100 else f"• [bold red]{f}[/bold red]: {err}" for f, err in failed_files])
+        console.print(Panel(error_msg, title="[bold red]Extraction Failures[/bold red]", border_style="red"))
+
     console.print(f"\n[bold green]✓ Extraction complete. Results saved to {output}[/bold green]")
     
     summary = tracker.get_session_summary()
