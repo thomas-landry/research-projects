@@ -10,7 +10,6 @@ These files are the foundation of the extraction and review pipelines.
 | `core/hierarchical_pipeline.py` | **Main Extraction Engine**. Orchestrates filtering, classification, extraction, validation. | `utils`, `extractor`, `checker`, `filter` |
 | `core/batch_processor.py` | **Parallel Executor**. Handles threading and state updates for batch jobs. | `state_manager`, `hierarchical_pipeline` |
 | `core/extractor.py` | **LLM Interface**. Wraps Instructor for structured output. | `utils`, `token_tracker` |
-| `core/validator.py` | **Validation Logic**. (Check if this exists or is `extraction_checker.py`) | |
 | `core/extraction_checker.py` | **LLM Validator**. checks accuracy/consistency of extractions. | `extractor`, `utils` |
 | `core/state_manager.py` | **Persistence**. JSON/Pydantic state for extraction jobs. | |
 | `core/prisma_state.py` | **Domain Model**. TypedDicts/Enums for PRISMA compliance. | |
@@ -43,13 +42,7 @@ Autonomous agents performing specific lifecycle tasks.
 | `core/vectorizer.py` | ChromaDB wrapper for semantic search. |
 | `core/audit_logger.py` | Structured logging for audits. |
 | `core/parser.py` | PDF parsing (Docling/PyMuPDF). |
-
-## 🔴 Deprecated / Redundant (Candidates for Deletion)
-| File | Reason for Deprecation | Replacement |
-|------|------------------------|-------------|
-| `core/extraction_orchestrator.py` | Superseded by `HierarchicalExtractionPipeline` + `cli.py` logic. | `cli.py` / `batch_processor.py` |
-| `core/confidence_router.py` | Superseded by LLM-based `ExtractionChecker`. | `core/extraction_checker.py` |
-| `agents/multi_agent.py` | Empty stubs / unused code. | N/A |
+| `core/pubmed_fetcher.py`| PubMed API client with caching and session reuse. |
 
 ## ⚪️ Future / Experimental (Inactive but Valuable)
 | File | Role | Recommendation |

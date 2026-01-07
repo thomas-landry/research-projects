@@ -114,18 +114,35 @@ For 84 DPM papers:
 
 ---
 
-## Memory Optimization
+---
 
-For very large reviews (500+ papers):
+### 5. Memory Optimization (Phase 7 Implemented)
+
+**Bottleneck**: Long-running batch processes and uncached objects causing memory bloat.
+
+**Optimizations (Active)**:
+
+1.  **Parser Cache Eviction** (MEM-001):
+    - `DocumentParser` now uses LRU eviction.
+    - Default `max_cache_size=100` keeps disk footprint manageable.
+
+2.  **ChromaDB Resource Management** (MEM-002):
+    - `ChromaVectorStore` implements context manager protocol (`with store: ...`).
+    - Explicit `close()` method to release client handlers.
+
+3.  **Connection Pooling** (MEM-004):
+    - `PubMedFetcher` uses `requests.Session()` to reuse TCP connections.
+    - Reduces overhead for high-volume fetching.
+
+4.  **Batch Processing**:
+    - `BatchExecutor` handles parallel execution with proper cleanup.
+    - **Recommendation**: For >100 papers, restart process every 100 docs or use strict batching.
 
 ```python
-# Process in chunks to avoid OOM
-CHUNK_SIZE = 50
-
-for i in range(0, len(pdf_files), CHUNK_SIZE):
-    chunk = pdf_files[i:i+CHUNK_SIZE]
-    process_chunk(chunk)
-    gc.collect()  # Force garbage collection
+# Best practice for batch processing
+with BatchExecutor(workers=4) as executor:
+    executor.process_batch(items)
+    # Context manager ensures cleanup
 ```
 
 ---
