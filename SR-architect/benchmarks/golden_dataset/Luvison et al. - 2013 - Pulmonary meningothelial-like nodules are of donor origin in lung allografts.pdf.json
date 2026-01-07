@@ -1,0 +1,143 @@
+{
+  "final_data": {
+    "case_count": 18,
+    "case_count_quote": "From July 1995 to August 2007, 18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT",
+    "patient_age": "Not reported",
+    "patient_age_quote": null,
+    "patient_sex": "Male",
+    "patient_sex_quote": "18 patients (9 males)",
+    "presenting_symptoms": "Pulmonary hypertension",
+    "presenting_symptoms_quote": "All patients had a degree of pulmonary hypertension to satisfy at least two of the given criteria",
+    "diagnostic_method": "Pulmonary vascular resistance measurement, transpulmonary gradient measurement, pulmonary systolic pressure measurement",
+    "diagnostic_method_quote": "pulmonary vascular resistance (PVR) 4 6 units/m 2, transpulmonary gradient 4 15 mm Hg, or pulmonary systolic pressure 4 60 mm Hg.",
+    "imaging_findings": "Not reported",
+    "imaging_findings_quote": null,
+    "histopathology": "Not reported",
+    "histopathology_quote": null,
+    "immunohistochemistry": "Not reported",
+    "immunohistochemistry_quote": null,
+    "treatment": "Heterotopic heart transplantation",
+    "treatment_quote": "18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT with anastomosis of the donor pulmonary artery to the recipient right atrium",
+    "outcome": "Not reported",
+    "outcome_quote": null,
+    "comorbidities": "Restrictive cardiomyopathy (8), idiopathic dilated cardiomyopathy (3), ischemic cardiomyopathy (2), cardiomyopathy after anthracycline chemotherapy (1), left ventricular dysfunction after sub-aortic membrane resection (1), corrected transposition of great arteries with right isomerism (1), ventricular septal defect (1)",
+    "comorbidities_quote": "The etiologic indication for HHT was restrictive cardiomyopathy in 8, idiopathic dilated cardiomyopathy in 3, and ischemic cardiomyopathy in 2. In addition, 1 patient each presented with cardiomyopathy arising after anthracycline chemotherapy; severe left ventricular dysfunction after resection of a sub-aortic membrane, corrected transposition of great arteries with right isomerism; ventricular septal defect",
+    "filename": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+    "extraction_confidence": 0.9,
+    "extraction_notes": "The text clearly describes 18 patients, with 9 explicitly stated as male. The sex of the remaining 9 patients is not specified, so I've listed only the confirmed male count. The diagnostic criteria and methods are well-documented through specific measurements. The comorbidities are clearly listed with specific counts."
+  },
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": "18",
+      "exact_quote": "From July 1995 to August 2007, 18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Male",
+      "exact_quote": "18 patients (9 males)",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "Pulmonary hypertension",
+      "exact_quote": "All patients had a degree of pulmonary hypertension to satisfy at least two of the given criteria",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Pulmonary vascular resistance measurement, transpulmonary gradient measurement, pulmonary systolic pressure measurement",
+      "exact_quote": "pulmonary vascular resistance (PVR) 4 6 units/m 2, transpulmonary gradient 4 15 mm Hg, or pulmonary systolic pressure 4 60 mm Hg.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "Heterotopic heart transplantation",
+      "exact_quote": "18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT with anastomosis of the donor pulmonary artery to the recipient right atrium",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "Restrictive cardiomyopathy (8), idiopathic dilated cardiomyopathy (3), ischemic cardiomyopathy (2), cardiomyopathy after anthracycline chemotherapy (1), left ventricular dysfunction after sub-aortic membrane resection (1), corrected transposition of great arteries with right isomerism (1), ventricular septal defect (1)",
+      "exact_quote": "The etiologic indication for HHT was restrictive cardiomyopathy in 8, idiopathic dilated cardiomyopathy in 3, and ischemic cardiomyopathy in 2. In addition, 1 patient each presented with cardiomyopathy arising after anthracycline chemotherapy; severe left ventricular dysfunction after resection of a sub-aortic membrane, corrected transposition of great arteries with right isomerism; ventricular septal defect",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "final_accuracy_score": 1.0,
+  "final_consistency_score": 1.0,
+  "final_overall_score": 0.8,
+  "passed_validation": false,
+  "iterations": 3,
+  "iteration_history": [
+    {
+      "iteration_number": 1,
+      "accuracy_score": 0.9,
+      "consistency_score": 0.9,
+      "overall_score": 0.7200000000000002,
+      "issues_count": 4,
+      "suggestions": [
+        "Check and adjust 'patient_sex' to ensure female count is verified or accurately reflects the provided information.",
+        "Revise 'diagnostic_method' to ensure alignment with the description of methods related to pulmonary hypertension criteria if needed.",
+        "For patient_sex: The extracted value states '9 males, 9 females' but the quote only mentions '9 males' and does not provide information about the number or sex of the remaining patients.",
+        "For diagnostic_method: The extracted value 'Clinical evaluation of pulmonary vascular resistance criteria' does not have any direct support or reference in the provided source quote. The quote mentions a general condition about pulmonary hypertension and criteria but not specifically about clinical evaluation or pulmonary vascular resistance."
+      ]
+    },
+    {
+      "iteration_number": 2,
+      "accuracy_score": 1.0,
+      "consistency_score": 1.0,
+      "overall_score": 0.8,
+      "issues_count": 1,
+      "suggestions": [
+        "For patient_sex: The extracted value 'Male' suggests a single male patient, but the quote '18 patients (9 males)' indicates more than one male patient. Therefore, the extracted value does not match the information in the quote."
+      ]
+    },
+    {
+      "iteration_number": 3,
+      "accuracy_score": 1.0,
+      "consistency_score": 1.0,
+      "overall_score": 0.8,
+      "issues_count": 1,
+      "suggestions": [
+        "For patient_sex: The extracted value indicates both '9 Males' and '9 Females', summing to 18 patients. However, the quote only mentions '9 males' without reference to females."
+      ]
+    }
+  ],
+  "content_filter_stats": {
+    "original_chunks": 39,
+    "filtered_chunks": 20,
+    "removed_chunks": 19,
+    "original_chars": 15876,
+    "filtered_chars": 5779,
+    "removed_chars": 10097,
+    "estimated_original_tokens": 3969,
+    "estimated_filtered_tokens": 1444,
+    "estimated_tokens_saved": 2524,
+    "reduction_percentage": 63.6
+  },
+  "relevance_stats": {
+    "total_chunks": 20,
+    "relevant_chunks": 6,
+    "irrelevant_chunks": 14,
+    "relevance_rate": 30.0,
+    "avg_confidence": 0.62
+  },
+  "warnings": [
+    "Reached max iterations (3) without passing validation"
+  ],
+  "source_filename": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+  "extraction_timestamp": "2026-01-06T21:23:51.898878"
+}

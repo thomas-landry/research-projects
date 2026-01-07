@@ -1,0 +1,143 @@
+{
+  "final_data": {
+    "case_count": 1,
+    "case_count_quote": "We present a case of a 57-year-old woman",
+    "patient_age": "57",
+    "patient_age_quote": "We present a case of a 57-year-old woman",
+    "patient_sex": "Female",
+    "patient_sex_quote": "We present a case of a 57-year-old woman",
+    "presenting_symptoms": "chronic cough",
+    "presenting_symptoms_quote": "a 57-year-old woman with a history of chronic cough",
+    "diagnostic_method": "Wedge resections from right upper and lower lobes",
+    "diagnostic_method_quote": "Wedge resections from the right upper and right lower lobes were obtained",
+    "imaging_findings": "bilateral multiple ground-glass nodules",
+    "imaging_findings_quote": "CT imaging findings of bilateral multiple ground-glass nodules",
+    "histopathology": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic, with background of emphysematous change and focal foreign body giant cell reaction",
+    "histopathology_quote": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic. This appeared in a background of emphysematous change and focal foreign body giant cell reaction to non-polarizable material.",
+    "immunohistochemistry": "diffusely positive for vimentin, EMA, and PR; CD163 highlighted increased cells that were S100 and CD1a negative; negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1",
+    "immunohistochemistry_quote": "Immunohistochemical stains were diffusely positive for vimentin, EMA , and PR, and CD163 highlighted increased cells that were S100 and CD1a negative. Additionally, the ovoid/spindle cells were negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1.",
+    "treatment": null,
+    "treatment_quote": null,
+    "outcome": "Not reported",
+    "outcome_quote": null,
+    "comorbidities": null,
+    "comorbidities_quote": null,
+    "filename": "Forsythe et al. - 2022 - Diffuse Pulmonary Meningotheliomatosis A Case Report 1.pdf",
+    "extraction_confidence": 0.9,
+    "extraction_notes": "This appears to be a clear case report of diffuse pulmonary meningotheliomatosis (DPM) with well-documented clinical, imaging, and pathological findings. The outcome is not explicitly stated in the provided text."
+  },
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": 1,
+      "exact_quote": "We present a case of a 57-year-old woman",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "57",
+      "exact_quote": "We present a case of a 57-year-old woman",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "We present a case of a 57-year-old woman",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "chronic cough",
+      "exact_quote": "a 57-year-old woman with a history of chronic cough",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Wedge resections from right upper and lower lobes",
+      "exact_quote": "Wedge resections from the right upper and right lower lobes were obtained",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "bilateral multiple ground-glass nodules",
+      "exact_quote": "CT imaging findings of bilateral multiple ground-glass nodules",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic, with background of emphysematous change and focal foreign body giant cell reaction",
+      "exact_quote": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic. This appeared in a background of emphysematous change and focal foreign body giant cell reaction to non-polarizable material.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "diffusely positive for vimentin, EMA, and PR; CD163 highlighted increased cells that were S100 and CD1a negative; negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1",
+      "exact_quote": "Immunohistochemical stains were diffusely positive for vimentin, EMA , and PR, and CD163 highlighted increased cells that were S100 and CD1a negative. Additionally, the ovoid/spindle cells were negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "outcome",
+      "extracted_value": "Not reported",
+      "exact_quote": "",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 0.9230769230769231,
+    "consistency_score": 1.0,
+    "overall_score": 0.9538461538461539,
+    "passed": true,
+    "iterations": 1
+  },
+  "iteration_history": [
+    {
+      "iteration": 1,
+      "accuracy": 0.9230769230769231,
+      "consistency": 1.0,
+      "overall": 0.9538461538461539,
+      "issues": 2
+    }
+  ],
+  "stats": {
+    "content_filter": {
+      "original_chunks": 95,
+      "filtered_chunks": 95,
+      "removed_chunks": 0,
+      "original_chars": 9429,
+      "filtered_chars": 9429,
+      "removed_chars": 0,
+      "estimated_original_tokens": 2357,
+      "estimated_filtered_tokens": 2357,
+      "estimated_tokens_saved": 0,
+      "reduction_percentage": 0.0
+    },
+    "relevance": {
+      "total_chunks": 95,
+      "relevant_chunks": 41,
+      "irrelevant_chunks": 54,
+      "relevance_rate": 43.2,
+      "avg_confidence": 0.67
+    }
+  },
+  "warnings": [],
+  "source_filename": "Forsythe et al. - 2022 - Diffuse Pulmonary Meningotheliomatosis A Case Report 1.pdf",
+  "extraction_timestamp": "2026-01-06T21:49:52.490666"
+}

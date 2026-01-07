@@ -1,0 +1,157 @@
+{
+  "final_data": {
+    "case_count": 1,
+    "case_count_quote": "A 63 year old female presented for incidentally discovered pulmonary nodules.",
+    "patient_age": "63",
+    "patient_age_quote": "A 63 year old female presented",
+    "patient_sex": "Female",
+    "patient_sex_quote": "A 63 year old female presented",
+    "presenting_symptoms": "No respiratory complaints including dyspnea, cough or sputum production",
+    "presenting_symptoms_quote": "she denied any respiratory complaints including dyspnea, cough or sputum production",
+    "diagnostic_method": "Transbronchial biopsy",
+    "diagnostic_method_quote": "transbronchial biopsies revealed many meningothelial like bodies confirming the diagnosis of Diffuse Pulmonary Meningotheliomatosis",
+    "imaging_findings": "Innumerable and diffusely distributed nodules up to 4mm in a military type pattern, no mediastinal or hilar adenopathy",
+    "imaging_findings_quote": "CT scan of the chest with contrast showed innumerable and diffusely distributed nodules up to 4mm in a military type pattern. There was no mediastinal or hilar adenopathy",
+    "histopathology": "Many meningothelial like bodies",
+    "histopathology_quote": "transbronchial biopsies revealed many meningothelial like bodies",
+    "immunohistochemistry": null,
+    "immunohistochemistry_quote": null,
+    "treatment": null,
+    "treatment_quote": null,
+    "outcome": "No abnormalities suggestive of underlying malignancy on PET/CT",
+    "outcome_quote": "Positron Emission Tomography/Computed Tomography (PET/CT) scan of our patient did not reveal abnormalities suggestive of underlying malignancy",
+    "comorbidities": "10 pack-year smoking history and occupational chemical fume exposure",
+    "comorbidities_quote": "Medical, social and family history was remarkable for a 10 pack-year smoking history and occupational chemical fume exposure, working in a compounding pharmacy",
+    "filename": "Gleason - 2016 - Meningotheliomatosis A Rare Cause of Diffuse Miliary Pattern Pulmonary Opacities.pdf",
+    "extraction_confidence": 0.9,
+    "extraction_notes": "Most information is clearly stated in the text. The military/miliary distinction in imaging findings is preserved as written in the source text. No specific treatment is mentioned in the text so that field is omitted. Immunohistochemistry results are not mentioned."
+  },
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": 1,
+      "exact_quote": "A 63 year old female presented for incidentally discovered pulmonary nodules.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "63",
+      "exact_quote": "A 63 year old female presented",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "A 63 year old female presented",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "No respiratory complaints including dyspnea, cough or sputum production",
+      "exact_quote": "she denied any respiratory complaints including dyspnea, cough or sputum production",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Transbronchial biopsy",
+      "exact_quote": "transbronchial biopsies revealed many meningothelial like bodies confirming the diagnosis of Diffuse Pulmonary Meningotheliomatosis",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "Innumerable and diffusely distributed nodules up to 4mm in a military type pattern, no mediastinal or hilar adenopathy",
+      "exact_quote": "CT scan of the chest with contrast showed innumerable and diffusely distributed nodules up to 4mm in a military type pattern. There was no mediastinal or hilar adenopathy",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Many meningothelial like bodies",
+      "exact_quote": "transbronchial biopsies revealed many meningothelial like bodies",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "outcome",
+      "extracted_value": "No abnormalities suggestive of underlying malignancy on PET/CT",
+      "exact_quote": "Positron Emission Tomography/Computed Tomography (PET/CT) scan of our patient did not reveal abnormalities suggestive of underlying malignancy",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "10 pack-year smoking history and occupational chemical fume exposure",
+      "exact_quote": "Medical, social and family history was remarkable for a 10 pack-year smoking history and occupational chemical fume exposure, working in a compounding pharmacy",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "overall_score": 1.0,
+    "passed": true,
+    "iterations": 3
+  },
+  "iteration_history": [
+    {
+      "iteration": 1,
+      "accuracy": 0.9,
+      "consistency": 1.0,
+      "overall": 0.7520000000000001,
+      "issues": 4
+    },
+    {
+      "iteration": 2,
+      "accuracy": 0.9,
+      "consistency": 0.9,
+      "overall": 0.7200000000000002,
+      "issues": 4
+    },
+    {
+      "iteration": 3,
+      "accuracy": 1.0,
+      "consistency": 1.0,
+      "overall": 1.0,
+      "issues": 0
+    }
+  ],
+  "stats": {
+    "content_filter": {
+      "original_chunks": 23,
+      "filtered_chunks": 22,
+      "removed_chunks": 1,
+      "original_chars": 3264,
+      "filtered_chars": 3077,
+      "removed_chars": 187,
+      "estimated_original_tokens": 816,
+      "estimated_filtered_tokens": 769,
+      "estimated_tokens_saved": 46,
+      "reduction_percentage": 5.7
+    },
+    "relevance": {
+      "total_chunks": 22,
+      "relevant_chunks": 5,
+      "irrelevant_chunks": 17,
+      "relevance_rate": 22.7,
+      "avg_confidence": 0.59
+    }
+  },
+  "warnings": [],
+  "source_filename": "Gleason - 2016 - Meningotheliomatosis A Rare Cause of Diffuse Miliary Pattern Pulmonary Opacities.pdf",
+  "extraction_timestamp": "2026-01-06T21:48:03.599654"
+}

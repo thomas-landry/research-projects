@@ -11,10 +11,12 @@
 ## AI & Data Extraction
 *   **Structured Output:** Instructor (with Pydantic)
     *   *Rationale:* Ensures LLM outputs conform to strictly typed schemas with validation.
-*   **PDF Parsing:** Docling (IBM)
-    *   *Rationale:* High-fidelity parsing of academic PDFs, including tables and multi-column layouts.
+*   **Multi-Format Parsing:** Docling (IBM) + Text
+    *   *Rationale:* High-fidelity parsing of academic PDFs and flexible support for plain text files.
 *   **LLM Orchestration:** Custom Agentic Workflow
     *   *Rationale:* specialized agents (Screener, Extractor, Auditor) for high-accuracy evidence synthesis.
+*   **Extraction API:** ExtractionService
+    *   *Rationale:* High-level Python API that encapsulates the entire pipeline for modularity and easy integration.
 
 ## Data & Storage
 *   **Vector Store:** ChromaDB

@@ -1,0 +1,143 @@
+{
+  "final_data": {
+    "case_count": 25,
+    "case_count_quote": "Literature describing DPM is very limited, with only 25 cases documented through 2016.",
+    "patient_age": "45",
+    "patient_age_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+    "patient_sex": "Female",
+    "patient_sex_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+    "presenting_symptoms": "occasional bouts of dyspnea",
+    "presenting_symptoms_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+    "diagnostic_method": "open biopsy of the right lung",
+    "diagnostic_method_quote": "An open biopsy of the right lung was performed and pathological examination revealed meningothelial nodules",
+    "imaging_findings": "innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa",
+    "imaging_findings_quote": "A high-resolution chest CT scan revealed innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa, suggestive of lymphangioleiomyomatosis (LAM).",
+    "histopathology": "meningothelial nodules with cavitating diffuse pulmonary meningotheliomatosis",
+    "histopathology_quote": "pathological examination revealed meningothelial nodules, with histologic findings supporting the diagnosis of cavitating diffuse pulmonary meningotheliomatosis.",
+    "immunohistochemistry": "Not reported",
+    "immunohistochemistry_quote": null,
+    "treatment": "budesonide/formoterol as needed",
+    "treatment_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+    "outcome": "Not reported",
+    "outcome_quote": null,
+    "comorbidities": "hypothyroidism and hyperlipidemia",
+    "comorbidities_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+    "filename": "Torrech Santos et al. - 2023 - Diffuse Cavitating Pulmonary Meningotheliomatosis A Rare and Elusive Pathology.pdf",
+    "extraction_confidence": 0.9,
+    "extraction_notes": "The case is well-documented with clear patient demographics, symptoms, diagnostic methods, and findings. No specific outcome was reported beyond the initial diagnosis and management. The patient's clinical course and long-term outcomes were not mentioned."
+  },
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": "25",
+      "exact_quote": "Literature describing DPM is very limited, with only 25 cases documented through 2016.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "45",
+      "exact_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "occasional bouts of dyspnea",
+      "exact_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "open biopsy of the right lung",
+      "exact_quote": "An open biopsy of the right lung was performed and pathological examination revealed meningothelial nodules",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa",
+      "exact_quote": "A high-resolution chest CT scan revealed innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa, suggestive of lymphangioleiomyomatosis (LAM).",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "meningothelial nodules with cavitating diffuse pulmonary meningotheliomatosis",
+      "exact_quote": "pathological examination revealed meningothelial nodules, with histologic findings supporting the diagnosis of cavitating diffuse pulmonary meningotheliomatosis.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "budesonide/formoterol as needed",
+      "exact_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "hypothyroidism and hyperlipidemia",
+      "exact_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "overall_score": 1.0,
+    "passed": true,
+    "iterations": 1
+  },
+  "iteration_history": [
+    {
+      "iteration": 1,
+      "accuracy": 1.0,
+      "consistency": 1.0,
+      "overall": 1.0,
+      "issues": 0
+    }
+  ],
+  "stats": {
+    "content_filter": {
+      "original_chunks": 5,
+      "filtered_chunks": 5,
+      "removed_chunks": 0,
+      "original_chars": 2862,
+      "filtered_chars": 2862,
+      "removed_chars": 0,
+      "estimated_original_tokens": 715,
+      "estimated_filtered_tokens": 715,
+      "estimated_tokens_saved": 0,
+      "reduction_percentage": 0.0
+    },
+    "relevance": {
+      "total_chunks": 5,
+      "relevant_chunks": 1,
+      "irrelevant_chunks": 4,
+      "relevance_rate": 20.0,
+      "avg_confidence": 0.58
+    }
+  },
+  "warnings": [],
+  "source_filename": "Torrech Santos et al. - 2023 - Diffuse Cavitating Pulmonary Meningotheliomatosis A Rare and Elusive Pathology.pdf",
+  "extraction_timestamp": "2026-01-06T21:50:35.259290"
+}

@@ -99,8 +99,13 @@ class BatchExecutor:
                         # For now, we assume PipelineResult has a model_dump or dict method, 
                         # or we store the result.final_data
                         
-                        # Use model_dump if available (Pydantic V2) or dict()
-                        serialized = data.model_dump() if hasattr(data, 'model_dump') else data.__dict__
+                        # Use to_dict() if available, then model_dump(), then __dict__
+                        if hasattr(data, 'to_dict'):
+                            serialized = data.to_dict()
+                        elif hasattr(data, 'model_dump'):
+                            serialized = data.model_dump()
+                        else:
+                            serialized = data.__dict__
                         
                         self.state_manager.update_result(filename, serialized, status="success")
                         logger.info(f"✓ Completed {filename}")
@@ -167,7 +172,13 @@ class BatchExecutor:
                     result = await self.pipeline.extract_document_async(doc, schema, theme)
                     
                     # Process result
-                    serialized = result.model_dump() if hasattr(result, 'model_dump') else result.__dict__
+                    if hasattr(result, 'to_dict'):
+                        serialized = result.to_dict()
+                    elif hasattr(result, 'model_dump'):
+                        serialized = result.model_dump()
+                    else:
+                        serialized = result.__dict__
+
                     self.state_manager.update_result(doc.filename, serialized, status="success")
                     logger.info(f"✓ Completed {doc.filename}")
                     if callback:

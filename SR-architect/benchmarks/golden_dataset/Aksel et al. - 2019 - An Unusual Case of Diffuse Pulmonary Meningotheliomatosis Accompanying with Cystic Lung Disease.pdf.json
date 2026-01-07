@@ -1,0 +1,143 @@
+{
+  "final_data": {
+    "case_count": 1,
+    "case_count_quote": "A 63-years-old male patient was admitted to our hospital",
+    "patient_age": "63",
+    "patient_age_quote": "A 63-years-old male patient was admitted to our hospital",
+    "patient_sex": "Male",
+    "patient_sex_quote": "A 63-years-old male patient was admitted to our hospital",
+    "presenting_symptoms": "cough and mild exertional dyspnea",
+    "presenting_symptoms_quote": "A 63-years-old male patient was admitted to our hospital with cough and mild exertional dyspnea",
+    "diagnostic_method": "surgical wedge resection after nondiagnostic bronchoscopy",
+    "diagnostic_method_quote": "Bronchoscopy was nondiagnostic which led to a diagnostic surgical procedure. The patient underwent diagnostic right lower lobe and middle lobe wedge resections.",
+    "imaging_findings": "bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung; micronodules smaller than 1 mm",
+    "imaging_findings_quote": "Thorax HRCT scan revealed bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung suggesting lymphangioleiomyomatosis radiologically . [...] When HRCT findings were reviewed, micronodules smaller than 1 mm were identified.",
+    "histopathology": "diffuse meningotheliomatosis",
+    "histopathology_quote": "Histopathological examination revealed diffuse meningotheliomatosis unexpectedly.",
+    "immunohistochemistry": null,
+    "immunohistochemistry_quote": null,
+    "treatment": "symptomatic treatment",
+    "treatment_quote": "Although the patient only received symptomatic treatment",
+    "outcome": "stable - no changes in CT findings over 3 years",
+    "outcome_quote": "there were no changes in thorax CT findings through the three years follow up",
+    "comorbidities": null,
+    "comorbidities_quote": null,
+    "filename": "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf",
+    "extraction_confidence": 0.9,
+    "extraction_notes": "All key information was clearly stated in the text. The only uncertainty might be around the complete details of the symptomatic treatment, which were not specified."
+  },
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": "1",
+      "exact_quote": "A 63-years-old male patient was admitted to our hospital",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "63",
+      "exact_quote": "A 63-years-old male patient was admitted to our hospital",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Male",
+      "exact_quote": "A 63-years-old male patient was admitted to our hospital",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "cough and mild exertional dyspnea",
+      "exact_quote": "A 63-years-old male patient was admitted to our hospital with cough and mild exertional dyspnea",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "surgical wedge resection after nondiagnostic bronchoscopy",
+      "exact_quote": "Bronchoscopy was nondiagnostic which led to a diagnostic surgical procedure. The patient underwent diagnostic right lower lobe and middle lobe wedge resections.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung; micronodules smaller than 1 mm",
+      "exact_quote": "Thorax HRCT scan revealed bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung suggesting lymphangioleiomyomatosis radiologically . [...] When HRCT findings were reviewed, micronodules smaller than 1 mm were identified.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "diffuse meningotheliomatosis",
+      "exact_quote": "Histopathological examination revealed diffuse meningotheliomatosis unexpectedly.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "symptomatic treatment",
+      "exact_quote": "Although the patient only received symptomatic treatment",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "outcome",
+      "extracted_value": "stable - no changes in CT findings over 3 years",
+      "exact_quote": "there were no changes in thorax CT findings through the three years follow up",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "overall_score": 1.0,
+    "passed": true,
+    "iterations": 1
+  },
+  "iteration_history": [
+    {
+      "iteration": 1,
+      "accuracy": 1.0,
+      "consistency": 1.0,
+      "overall": 1.0,
+      "issues": 0
+    }
+  ],
+  "stats": {
+    "content_filter": {
+      "original_chunks": 10,
+      "filtered_chunks": 10,
+      "removed_chunks": 0,
+      "original_chars": 2047,
+      "filtered_chars": 2047,
+      "removed_chars": 0,
+      "estimated_original_tokens": 511,
+      "estimated_filtered_tokens": 511,
+      "estimated_tokens_saved": 0,
+      "reduction_percentage": 0.0
+    },
+    "relevance": {
+      "total_chunks": 10,
+      "relevant_chunks": 2,
+      "irrelevant_chunks": 8,
+      "relevance_rate": 20.0,
+      "avg_confidence": 0.58
+    }
+  },
+  "warnings": [],
+  "source_filename": "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf",
+  "extraction_timestamp": "2026-01-06T21:51:20.292876"
+}

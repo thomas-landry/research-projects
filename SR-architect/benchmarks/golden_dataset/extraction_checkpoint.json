@@ -1,0 +1,1543 @@
+{
+  "timestamp": "2026-01-06T20:38:12.956888",
+  "processed_files": [
+    "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf",
+    "Torrech Santos et al. - 2023 - Diffuse Cavitating Pulmonary Meningotheliomatosis A Rare and Elusive Pathology.pdf",
+    "Healy et al. - 2023 - Diffuse pulmonary meningotheliomatosis a rare cause of multiple pulmonary nodules.pdf",
+    "Gleason - 2016 - Meningotheliomatosis A Rare Cause of Diffuse Miliary Pattern Pulmonary Opacities.pdf",
+    "Maasdorp et al. - 2020 - Diffuse pulmonary meningotheliomatosis \u2013 A Case Report.pdf",
+    "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+    "Gleason et al. - 2017 - Diffuse pulmonary meningotheliomatosis A literature review of a rare diffuse parenchymal lung disea 1.pdf",
+    "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+    "Forsythe et al. - 2022 - Diffuse Pulmonary Meningotheliomatosis A Case Report 1.pdf"
+  ],
+  "failed_files": [],
+  "results": {
+    "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf": {
+      "final_data": {
+        "case_count": 18,
+        "case_count_quote": "From July 1995 to August 2007, 18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT",
+        "patient_age": "Not reported",
+        "patient_age_quote": null,
+        "patient_sex": "Male",
+        "patient_sex_quote": "18 patients (9 males)",
+        "presenting_symptoms": "Pulmonary hypertension",
+        "presenting_symptoms_quote": "All patients had a degree of pulmonary hypertension to satisfy at least two of the given criteria",
+        "diagnostic_method": "Pulmonary vascular resistance measurement, transpulmonary gradient measurement, pulmonary systolic pressure measurement",
+        "diagnostic_method_quote": "pulmonary vascular resistance (PVR) 4 6 units/m 2, transpulmonary gradient 4 15 mm Hg, or pulmonary systolic pressure 4 60 mm Hg.",
+        "imaging_findings": "Not reported",
+        "imaging_findings_quote": null,
+        "histopathology": "Not reported",
+        "histopathology_quote": null,
+        "immunohistochemistry": "Not reported",
+        "immunohistochemistry_quote": null,
+        "treatment": "Heterotopic heart transplantation",
+        "treatment_quote": "18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT with anastomosis of the donor pulmonary artery to the recipient right atrium",
+        "outcome": "Not reported",
+        "outcome_quote": null,
+        "comorbidities": "Restrictive cardiomyopathy (8), idiopathic dilated cardiomyopathy (3), ischemic cardiomyopathy (2), cardiomyopathy after anthracycline chemotherapy (1), left ventricular dysfunction after sub-aortic membrane resection (1), corrected transposition of great arteries with right isomerism (1), ventricular septal defect (1)",
+        "comorbidities_quote": "The etiologic indication for HHT was restrictive cardiomyopathy in 8, idiopathic dilated cardiomyopathy in 3, and ischemic cardiomyopathy in 2. In addition, 1 patient each presented with cardiomyopathy arising after anthracycline chemotherapy; severe left ventricular dysfunction after resection of a sub-aortic membrane, corrected transposition of great arteries with right isomerism; ventricular septal defect",
+        "filename": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "The text clearly describes 18 patients, with 9 explicitly stated as male. The sex of the remaining 9 patients is not specified, so I've listed only the confirmed male count. The diagnostic criteria and methods are well-documented through specific measurements. The comorbidities are clearly listed with specific counts."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "18",
+          "exact_quote": "From July 1995 to August 2007, 18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Male",
+          "exact_quote": "18 patients (9 males)",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "Pulmonary hypertension",
+          "exact_quote": "All patients had a degree of pulmonary hypertension to satisfy at least two of the given criteria",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Pulmonary vascular resistance measurement, transpulmonary gradient measurement, pulmonary systolic pressure measurement",
+          "exact_quote": "pulmonary vascular resistance (PVR) 4 6 units/m 2, transpulmonary gradient 4 15 mm Hg, or pulmonary systolic pressure 4 60 mm Hg.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "Heterotopic heart transplantation",
+          "exact_quote": "18 patients (9 males) with irreversibly high pulmonary vascular resistance (PVR) underwent HHT with anastomosis of the donor pulmonary artery to the recipient right atrium",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "Restrictive cardiomyopathy (8), idiopathic dilated cardiomyopathy (3), ischemic cardiomyopathy (2), cardiomyopathy after anthracycline chemotherapy (1), left ventricular dysfunction after sub-aortic membrane resection (1), corrected transposition of great arteries with right isomerism (1), ventricular septal defect (1)",
+          "exact_quote": "The etiologic indication for HHT was restrictive cardiomyopathy in 8, idiopathic dilated cardiomyopathy in 3, and ischemic cardiomyopathy in 2. In addition, 1 patient each presented with cardiomyopathy arising after anthracycline chemotherapy; severe left ventricular dysfunction after resection of a sub-aortic membrane, corrected transposition of great arteries with right isomerism; ventricular septal defect",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "final_accuracy_score": 1.0,
+      "final_consistency_score": 1.0,
+      "final_overall_score": 0.8,
+      "passed_validation": false,
+      "iterations": 3,
+      "iteration_history": [
+        {
+          "iteration_number": 1,
+          "accuracy_score": 0.9,
+          "consistency_score": 0.9,
+          "overall_score": 0.7200000000000002,
+          "issues_count": 4,
+          "suggestions": [
+            "Check and adjust 'patient_sex' to ensure female count is verified or accurately reflects the provided information.",
+            "Revise 'diagnostic_method' to ensure alignment with the description of methods related to pulmonary hypertension criteria if needed.",
+            "For patient_sex: The extracted value states '9 males, 9 females' but the quote only mentions '9 males' and does not provide information about the number or sex of the remaining patients.",
+            "For diagnostic_method: The extracted value 'Clinical evaluation of pulmonary vascular resistance criteria' does not have any direct support or reference in the provided source quote. The quote mentions a general condition about pulmonary hypertension and criteria but not specifically about clinical evaluation or pulmonary vascular resistance."
+          ]
+        },
+        {
+          "iteration_number": 2,
+          "accuracy_score": 1.0,
+          "consistency_score": 1.0,
+          "overall_score": 0.8,
+          "issues_count": 1,
+          "suggestions": [
+            "For patient_sex: The extracted value 'Male' suggests a single male patient, but the quote '18 patients (9 males)' indicates more than one male patient. Therefore, the extracted value does not match the information in the quote."
+          ]
+        },
+        {
+          "iteration_number": 3,
+          "accuracy_score": 1.0,
+          "consistency_score": 1.0,
+          "overall_score": 0.8,
+          "issues_count": 1,
+          "suggestions": [
+            "For patient_sex: The extracted value indicates both '9 Males' and '9 Females', summing to 18 patients. However, the quote only mentions '9 males' without reference to females."
+          ]
+        }
+      ],
+      "content_filter_stats": {
+        "original_chunks": 39,
+        "filtered_chunks": 20,
+        "removed_chunks": 19,
+        "original_chars": 15876,
+        "filtered_chars": 5779,
+        "removed_chars": 10097,
+        "estimated_original_tokens": 3969,
+        "estimated_filtered_tokens": 1444,
+        "estimated_tokens_saved": 2524,
+        "reduction_percentage": 63.6
+      },
+      "relevance_stats": {
+        "total_chunks": 20,
+        "relevant_chunks": 6,
+        "irrelevant_chunks": 14,
+        "relevance_rate": 30.0,
+        "avg_confidence": 0.62
+      },
+      "warnings": [
+        "Reached max iterations (3) without passing validation"
+      ],
+      "source_filename": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+      "extraction_timestamp": "2026-01-06T21:23:51.898878"
+    },
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "Here, we present a case of diagnostic dilemma in a patient with a history of malignancy and immunosuppression presenting with diffuse pulmonary meningotheliomatosis (DPM).",
+        "patient_age": "61",
+        "patient_age_quote": "A 61-year-old female",
+        "patient_sex": "Female",
+        "patient_sex_quote": "A 61-year-old female",
+        "presenting_symptoms": "Asymptomatic",
+        "presenting_symptoms_quote": "diagnosed with diffuse pulmonary nodules incidentally via CT angiogram chest during inpatient admission for COVID-19 infection",
+        "diagnostic_method": "CT angiogram chest, bronchoscopy with bronchioalveolar lavage (BAL) with transbronchial cryo biopsy",
+        "diagnostic_method_quote": "diagnosed with diffuse pulmonary nodules incidentally via CT angiogram chest... The patient eventually underwent bronchoscopy with bronchioalveolar lavage (BAL) with transbronchial cryo biopsy of lung nodules",
+        "imaging_findings": "numerous sub 6 mm bilateral centrilobular GGNs and solid pulmonary nodules with mild upper lobe predominance",
+        "imaging_findings_quote": "CT scan chest 1 year later showed numerous sub 6 mm bilateral centrilobular GGNs and solid pulmonary nodules with mild upper lobe predominance",
+        "histopathology": "Minute pulmonary meningothelial-like nodules (MPMNs)",
+        "histopathology_quote": "which showed MPMNs with further immunostaining negative for malignancy",
+        "immunohistochemistry": "negative for malignancy",
+        "immunohistochemistry_quote": "which showed MPMNs with further immunostaining negative for malignancy",
+        "treatment": "close follow-up with serial CT scans",
+        "treatment_quote": "a decision was made for close follow-up with serial CT scans",
+        "outcome": "Stable",
+        "outcome_quote": "given the complexity of the case, lack of symptoms, and stability of nodules",
+        "comorbidities": "ductal hyperplasia of the breast, common variable immunodeficiency syndrome (CVID), asthma, obstructive sleep apnea, and thyroid follicular cancer",
+        "comorbidities_quote": "history of ductal hyperplasia of the breast, common variable immunode /uniFB01 ciency syndrome (CVID), asthma, obstructive sleep apnea, and thyroid follicular cancer",
+        "filename": "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+        "extraction_confidence": 0.95,
+        "extraction_notes": "The case is well-documented with clear details about patient characteristics, diagnostic methods, and findings. The only slight uncertainty comes from interpreting the outcome as \"stable\" based on the context of stability of nodules mentioned in the text."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": 1,
+          "exact_quote": "Here, we present a case of diagnostic dilemma in a patient with a history of malignancy and immunosuppression presenting with diffuse pulmonary meningotheliomatosis (DPM).",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "61",
+          "exact_quote": "A 61-year-old female",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "A 61-year-old female",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "Asymptomatic",
+          "exact_quote": "diagnosed with diffuse pulmonary nodules incidentally via CT angiogram chest during inpatient admission for COVID-19 infection",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "CT angiogram chest, bronchoscopy with bronchioalveolar lavage (BAL) with transbronchial cryo biopsy",
+          "exact_quote": "diagnosed with diffuse pulmonary nodules incidentally via CT angiogram chest... The patient eventually underwent bronchoscopy with bronchioalveolar lavage (BAL) with transbronchial cryo biopsy of lung nodules",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "numerous sub 6 mm bilateral centrilobular GGNs and solid pulmonary nodules with mild upper lobe predominance",
+          "exact_quote": "CT scan chest 1 year later showed numerous sub 6 mm bilateral centrilobular GGNs and solid pulmonary nodules with mild upper lobe predominance",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Minute pulmonary meningothelial-like nodules (MPMNs)",
+          "exact_quote": "which showed MPMNs with further immunostaining negative for malignancy",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "negative for malignancy",
+          "exact_quote": "which showed MPMNs with further immunostaining negative for malignancy",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "close follow-up with serial CT scans",
+          "exact_quote": "a decision was made for close follow-up with serial CT scans",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "Stable",
+          "exact_quote": "given the complexity of the case, lack of symptoms, and stability of nodules",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "ductal hyperplasia of the breast, common variable immunodeficiency syndrome (CVID), asthma, obstructive sleep apnea, and thyroid follicular cancer",
+          "exact_quote": "history of ductal hyperplasia of the breast, common variable immunode /uniFB01 ciency syndrome (CVID), asthma, obstructive sleep apnea, and thyroid follicular cancer",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "final_accuracy_score": 0.92,
+      "final_consistency_score": 1.0,
+      "final_overall_score": 0.9520000000000001,
+      "passed_validation": true,
+      "iterations": 1,
+      "iteration_history": [
+        {
+          "iteration_number": 1,
+          "accuracy_score": 0.92,
+          "consistency_score": 1.0,
+          "overall_score": 0.9520000000000001,
+          "issues_count": 1,
+          "suggestions": [
+            "Re-evaluate the source text for 'presenting symptoms' to confirm whether explicit mention or correct inference of 'Asymptomatic' is present."
+          ]
+        }
+      ],
+      "content_filter_stats": {
+        "original_chunks": 20,
+        "filtered_chunks": 20,
+        "removed_chunks": 0,
+        "original_chars": 4512,
+        "filtered_chars": 4512,
+        "removed_chars": 0,
+        "estimated_original_tokens": 1128,
+        "estimated_filtered_tokens": 1128,
+        "estimated_tokens_saved": 0,
+        "reduction_percentage": 0.0
+      },
+      "relevance_stats": {
+        "total_chunks": 20,
+        "relevant_chunks": 3,
+        "irrelevant_chunks": 17,
+        "relevance_rate": 15.0,
+        "avg_confidence": 0.56
+      },
+      "warnings": [],
+      "source_filename": "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+      "extraction_timestamp": "2026-01-06T21:37:47.839334"
+    },
+    "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+        "patient_age": "55",
+        "patient_age_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+        "patient_sex": "Female",
+        "patient_sex_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+        "presenting_symptoms": "Asymptomatic",
+        "presenting_symptoms_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs",
+        "diagnostic_method": "HRCT, contrast-enhanced chest CT, fiberoptic bronchoscopy with cytology, right upper lobectomy",
+        "diagnostic_method_quote": "Both highresolution CT (HRCT) and routine contrast-enhanced chest CT were obtained... Fiberoptic bronchoscopy was performed with cytologic examination... A right upper lobectomy was performed",
+        "imaging_findings": "2-cm spiculated nodule in right upper lobe with inhomogeneous enhancement, irregular border and surrounding ground-glass opacity. Additional tiny nodules (1-3 mm) of ground-glass attenuation in right upper lobe. Post-operative CT showed numerous small nodules of ground-glass attenuation in random distribution with peripheral lung zone predominance.",
+        "imaging_findings_quote": "The nodule was seen in the right upper lobe and showed inhomogeneous enhancement and an irregular border with fine spiculation. The nodule was surrounded by a zone of ground-glass opacity... tiny nodules of ground-glass (1-3 mm in diameter) attenuation in the right upper lobe... The scans revealed numerous small nodules of ground-glass attenuation... These lesions presented in a random distribution but had a tendency to be located in the peripheral lung zone.",
+        "histopathology": "Well-differentiated adenocarcinoma (papillary subtype) and minute pulmonary meningothelial-like nodules consisting of cellular proliferations of meningothelial-like cells with round to oval nuclei and indistinct cell borders, associated with venules, expanding alveolar walls with stromal fibrosis",
+        "histopathology_quote": "The pathologic diagnosis of the main tumor was well-differentiated adenocarcinoma, papillary subtype... The small nodules seen elsewhere in the right upper lobe were found to represent minute pulmonary meningothelial-like nodules (MPMNs)... These lesions consisted of cellular proliferations of meningothelial-like cells with round to oval nuclei and indistinct cell borders associated with venules, which expanded the alveolar walls and were accompanied by stromal fibrosis.",
+        "immunohistochemistry": "Historical findings show MPMNs are immunoreactive for epithelial membrane antigen (EMA), vimentin, myosin; negative for cytokeratin, S-100 protein, neuron-specific enolase, and actin",
+        "immunohistochemistry_quote": "Gaffey et al. (2) reported that meningothelial-like nodules were immunoreactive for epithelial membrane antigen (EMA) and vimentin and were negative for cytokeratin, S-100 protein, neuron-specific enolase, and actin... Torikata and Mukai (3) reported positive immunoreactivity for myosin and vimentin in all meningothelial-like nodules.",
+        "treatment": "Right upper lobectomy",
+        "treatment_quote": "A right upper lobectomy was performed with the assumption that the patient had stage IA (T1N0M0) lung cancer.",
+        "outcome": "Stable disease - nodules unchanged at 12 months follow-up",
+        "outcome_quote": "Follow-up CT scan obtained 12 months after right upper lobectomy. Multiple small nodules (white arrows) are again evident and unchanged from HRCT performed 6 months postoperatively.",
+        "comorbidities": "Elevated CEA (16.6 ng/mL)",
+        "comorbidities_quote": "Laboratory evaluation showed an elevated carcinoembryonic antigen (CEA) (16.6 ng/mL; normal value: <4.7 ng/mL).",
+        "filename": "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+        "extraction_confidence": 0.95,
+        "extraction_notes": "All key information is well-documented in the text with clear quotes. The case presentation, diagnostic methods, imaging findings, and pathological findings are thoroughly described with specific details and follow-up information."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": 1,
+          "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "55",
+          "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "Asymptomatic",
+          "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "HRCT, contrast-enhanced chest CT, fiberoptic bronchoscopy with cytology, right upper lobectomy",
+          "exact_quote": "Both highresolution CT (HRCT) and routine contrast-enhanced chest CT were obtained... Fiberoptic bronchoscopy was performed with cytologic examination... A right upper lobectomy was performed",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "2-cm spiculated nodule in right upper lobe with inhomogeneous enhancement, irregular border and surrounding ground-glass opacity. Additional tiny nodules (1-3 mm) of ground-glass attenuation in right upper lobe. Post-operative CT showed numerous small nodules of ground-glass attenuation in random distribution with peripheral lung zone predominance.",
+          "exact_quote": "The nodule was seen in the right upper lobe and showed inhomogeneous enhancement and an irregular border with fine spiculation. The nodule was surrounded by a zone of ground-glass opacity... tiny nodules of ground-glass (1-3 mm in diameter) attenuation in the right upper lobe... The scans revealed numerous small nodules of ground-glass attenuation... These lesions presented in a random distribution but had a tendency to be located in the peripheral lung zone.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Well-differentiated adenocarcinoma (papillary subtype) and minute pulmonary meningothelial-like nodules consisting of cellular proliferations of meningothelial-like cells with round to oval nuclei and indistinct cell borders, associated with venules, expanding alveolar walls with stromal fibrosis",
+          "exact_quote": "The pathologic diagnosis of the main tumor was well-differentiated adenocarcinoma, papillary subtype... The small nodules seen elsewhere in the right upper lobe were found to represent minute pulmonary meningothelial-like nodules (MPMNs)... These lesions consisted of cellular proliferations of meningothelial-like cells with round to oval nuclei and indistinct cell borders associated with venules, which expanded the alveolar walls and were accompanied by stromal fibrosis.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "Historical findings show MPMNs are immunoreactive for epithelial membrane antigen (EMA), vimentin, myosin; negative for cytokeratin, S-100 protein, neuron-specific enolase, and actin",
+          "exact_quote": "Gaffey et al. (2) reported that meningothelial-like nodules were immunoreactive for epithelial membrane antigen (EMA) and vimentin and were negative for cytokeratin, S-100 protein, neuron-specific enolase, and actin... Torikata and Mukai (3) reported positive immunoreactivity for myosin and vimentin in all meningothelial-like nodules.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "Right upper lobectomy",
+          "exact_quote": "A right upper lobectomy was performed with the assumption that the patient had stage IA (T1N0M0) lung cancer.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "Stable disease - nodules unchanged at 12 months follow-up",
+          "exact_quote": "Follow-up CT scan obtained 12 months after right upper lobectomy. Multiple small nodules (white arrows) are again evident and unchanged from HRCT performed 6 months postoperatively.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "Elevated CEA (16.6 ng/mL)",
+          "exact_quote": "Laboratory evaluation showed an elevated carcinoembryonic antigen (CEA) (16.6 ng/mL; normal value: <4.7 ng/mL).",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 1.0,
+        "consistency_score": 0.9090909090909091,
+        "overall_score": 0.9636363636363636,
+        "passed": true,
+        "iterations": 2
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.9,
+          "consistency": 1.0,
+          "overall": 0.7520000000000001,
+          "issues": 6
+        },
+        {
+          "iteration": 2,
+          "accuracy": 1.0,
+          "consistency": 0.9090909090909091,
+          "overall": 0.9636363636363636,
+          "issues": 1
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 20,
+          "filtered_chunks": 19,
+          "removed_chunks": 1,
+          "original_chars": 9682,
+          "filtered_chars": 8655,
+          "removed_chars": 1027,
+          "estimated_original_tokens": 2420,
+          "estimated_filtered_tokens": 2163,
+          "estimated_tokens_saved": 256,
+          "reduction_percentage": 10.6
+        },
+        "relevance": {
+          "total_chunks": 19,
+          "relevant_chunks": 8,
+          "irrelevant_chunks": 11,
+          "relevance_rate": 42.1,
+          "avg_confidence": 0.67
+        }
+      },
+      "warnings": [],
+      "source_filename": "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+      "extraction_timestamp": "2026-01-06T21:42:10.016354"
+    },
+    "Healy et al. - 2023 - Diffuse pulmonary meningotheliomatosis a rare cause of multiple pulmonary nodules.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "This case describes a woman in her 50s who presented with recurrent lower respiratory tract infections.",
+        "patient_age": "50s",
+        "patient_age_quote": "A female patient in her 50s was referred to the specialist respiratory outpatient clinic",
+        "patient_sex": "Female",
+        "patient_sex_quote": "This case describes a woman in her 50s",
+        "presenting_symptoms": "Recurrent lower respiratory tract infections, chronic cough productive of green sputum for 4 months, longstanding dyspnoea on walking up hills, generalized malaise",
+        "presenting_symptoms_quote": "She reported a chronic cough for 4 months, productive of moderate volumes of green sputum. There were no triggers and no diurnal variation. She reported longstanding dyspnoea on walking up hills only. She had generalised malaise but denied haemoptysis, weight loss and night sweats.",
+        "diagnostic_method": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection with biopsies from right upper, middle and lower lobe",
+        "diagnostic_method_quote": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection was performed with biopsies taken from the right upper, middle and lower lobe.",
+        "imaging_findings": "Multiple bilateral pulmonary nodules with upper lobe predominance, 6mm left upper lobe nodule and two 5mm nodules in right upper lobe, background fibrotic ILD with subpleural changes affecting lung apices and right lower lobe, several small calcified granulomata bilaterally",
+        "imaging_findings_quote": "High-resolution CT of the chest revealed background fibrotic ILD with predominantly subpleural changes, affecting the lung apices and right lower lobe. One 6 mm left upper lobe nodule was identified and two 5 mm nodules in the right upper lobe. There was no mediastinal adenopathy but several small, calcified granulomata were noted bilaterally",
+        "histopathology": "Small intraparenchymal minute nodules of bland epithelioid cells without malignancy, with tobacco-related changes including emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, inflammation and respiratory bronchiolitis",
+        "histopathology_quote": "Histopathology revealed small intraparenchymal minute nodules of bland epithelioid cells without any evidence of malignancy. In addition, there were tobacco-related changes of emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, peribronchial inflammation and respiratory bronchiolitis.",
+        "immunohistochemistry": "Positive for CD56 and progesterone receptor, weakly positive for epithelial membrane antigen (EMA) and smooth muscle actin (SMA). Negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+        "immunohistochemistry_quote": "The nodules stained positive for neural cell adhesion molecule (CD56) and progesterone receptor, and epithelial membrane antigen (EMA) and smooth muscle actin (SMA) were weakly positive. Staining was negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+        "treatment": "No specific treatment",
+        "treatment_quote": "There are no specific treatments or recommendations available on how best to approach treatment in the case of DPM.",
+        "outcome": "Stable symptoms with ongoing productive cough, stable spirometry over 4 years with DLCO drop from 76% to 67.6%, stable nodules on 2-year follow-up CT",
+        "outcome_quote": "Her symptoms remain stable with an ongoing productive cough. Spirometry has remained stable over a 4-year period with a drop in DLCO from 76% to 67.6% predicted value. Using the Fleischner Society pulmonary nodule guidelines, repeat CT thorax at a 2-year interval showed stable appearances of previously described lung nodules.",
+        "comorbidities": "Ex-smoker, history of livestock farm work",
+        "comorbidities_quote": "She was an ex-smoker and had worked on a livestock farm for many years.",
+        "filename": "Healy et al. - 2023 - Diffuse pulmonary meningotheliomatosis a rare cause of multiple pulmonary nodules.pdf",
+        "extraction_confidence": 0.95,
+        "extraction_notes": "The case is well-documented with clear clinical details, diagnostic workup, and follow-up information. Most data points are explicitly stated in the text with direct quotes available."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": 1,
+          "exact_quote": "This case describes a woman in her 50s who presented with recurrent lower respiratory tract infections.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "50s",
+          "exact_quote": "A female patient in her 50s was referred to the specialist respiratory outpatient clinic",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "This case describes a woman in her 50s",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "Recurrent lower respiratory tract infections, chronic cough productive of green sputum for 4 months, longstanding dyspnoea on walking up hills, generalized malaise",
+          "exact_quote": "She reported a chronic cough for 4 months, productive of moderate volumes of green sputum. There were no triggers and no diurnal variation. She reported longstanding dyspnoea on walking up hills only. She had generalised malaise but denied haemoptysis, weight loss and night sweats.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection with biopsies from right upper, middle and lower lobe",
+          "exact_quote": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection was performed with biopsies taken from the right upper, middle and lower lobe.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "Multiple bilateral pulmonary nodules with upper lobe predominance, 6mm left upper lobe nodule and two 5mm nodules in right upper lobe, background fibrotic ILD with subpleural changes affecting lung apices and right lower lobe, several small calcified granulomata bilaterally",
+          "exact_quote": "High-resolution CT of the chest revealed background fibrotic ILD with predominantly subpleural changes, affecting the lung apices and right lower lobe. One 6 mm left upper lobe nodule was identified and two 5 mm nodules in the right upper lobe. There was no mediastinal adenopathy but several small, calcified granulomata were noted bilaterally",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Small intraparenchymal minute nodules of bland epithelioid cells without malignancy, with tobacco-related changes including emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, inflammation and respiratory bronchiolitis",
+          "exact_quote": "Histopathology revealed small intraparenchymal minute nodules of bland epithelioid cells without any evidence of malignancy. In addition, there were tobacco-related changes of emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, peribronchial inflammation and respiratory bronchiolitis.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "Positive for CD56 and progesterone receptor, weakly positive for epithelial membrane antigen (EMA) and smooth muscle actin (SMA). Negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+          "exact_quote": "The nodules stained positive for neural cell adhesion molecule (CD56) and progesterone receptor, and epithelial membrane antigen (EMA) and smooth muscle actin (SMA) were weakly positive. Staining was negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "No specific treatment",
+          "exact_quote": "There are no specific treatments or recommendations available on how best to approach treatment in the case of DPM.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "Stable symptoms with ongoing productive cough, stable spirometry over 4 years with DLCO drop from 76% to 67.6%, stable nodules on 2-year follow-up CT",
+          "exact_quote": "Her symptoms remain stable with an ongoing productive cough. Spirometry has remained stable over a 4-year period with a drop in DLCO from 76% to 67.6% predicted value. Using the Fleischner Society pulmonary nodule guidelines, repeat CT thorax at a 2-year interval showed stable appearances of previously described lung nodules.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "Ex-smoker, history of livestock farm work",
+          "exact_quote": "She was an ex-smoker and had worked on a livestock farm for many years.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 1.0,
+        "consistency_score": 1.0,
+        "overall_score": 1.0,
+        "passed": true,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 1.0,
+          "consistency": 1.0,
+          "overall": 1.0,
+          "issues": 0
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 57,
+          "filtered_chunks": 51,
+          "removed_chunks": 6,
+          "original_chars": 24075,
+          "filtered_chars": 20881,
+          "removed_chars": 3194,
+          "estimated_original_tokens": 6018,
+          "estimated_filtered_tokens": 5220,
+          "estimated_tokens_saved": 798,
+          "reduction_percentage": 13.3
+        },
+        "relevance": {
+          "total_chunks": 51,
+          "relevant_chunks": 21,
+          "irrelevant_chunks": 30,
+          "relevance_rate": 41.2,
+          "avg_confidence": 0.66
+        }
+      },
+      "warnings": [],
+      "source_filename": "Healy et al. - 2023 - Diffuse pulmonary meningotheliomatosis a rare cause of multiple pulmonary nodules.pdf",
+      "extraction_timestamp": "2026-01-06T21:48:03.600437"
+    },
+    "Gleason - 2016 - Meningotheliomatosis A Rare Cause of Diffuse Miliary Pattern Pulmonary Opacities.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "A 63 year old female presented for incidentally discovered pulmonary nodules.",
+        "patient_age": "63",
+        "patient_age_quote": "A 63 year old female presented",
+        "patient_sex": "Female",
+        "patient_sex_quote": "A 63 year old female presented",
+        "presenting_symptoms": "No respiratory complaints including dyspnea, cough or sputum production",
+        "presenting_symptoms_quote": "she denied any respiratory complaints including dyspnea, cough or sputum production",
+        "diagnostic_method": "Transbronchial biopsy",
+        "diagnostic_method_quote": "transbronchial biopsies revealed many meningothelial like bodies confirming the diagnosis of Diffuse Pulmonary Meningotheliomatosis",
+        "imaging_findings": "Innumerable and diffusely distributed nodules up to 4mm in a military type pattern, no mediastinal or hilar adenopathy",
+        "imaging_findings_quote": "CT scan of the chest with contrast showed innumerable and diffusely distributed nodules up to 4mm in a military type pattern. There was no mediastinal or hilar adenopathy",
+        "histopathology": "Many meningothelial like bodies",
+        "histopathology_quote": "transbronchial biopsies revealed many meningothelial like bodies",
+        "immunohistochemistry": null,
+        "immunohistochemistry_quote": null,
+        "treatment": null,
+        "treatment_quote": null,
+        "outcome": "No abnormalities suggestive of underlying malignancy on PET/CT",
+        "outcome_quote": "Positron Emission Tomography/Computed Tomography (PET/CT) scan of our patient did not reveal abnormalities suggestive of underlying malignancy",
+        "comorbidities": "10 pack-year smoking history and occupational chemical fume exposure",
+        "comorbidities_quote": "Medical, social and family history was remarkable for a 10 pack-year smoking history and occupational chemical fume exposure, working in a compounding pharmacy",
+        "filename": "Gleason - 2016 - Meningotheliomatosis A Rare Cause of Diffuse Miliary Pattern Pulmonary Opacities.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "Most information is clearly stated in the text. The military/miliary distinction in imaging findings is preserved as written in the source text. No specific treatment is mentioned in the text so that field is omitted. Immunohistochemistry results are not mentioned."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": 1,
+          "exact_quote": "A 63 year old female presented for incidentally discovered pulmonary nodules.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "63",
+          "exact_quote": "A 63 year old female presented",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "A 63 year old female presented",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "No respiratory complaints including dyspnea, cough or sputum production",
+          "exact_quote": "she denied any respiratory complaints including dyspnea, cough or sputum production",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Transbronchial biopsy",
+          "exact_quote": "transbronchial biopsies revealed many meningothelial like bodies confirming the diagnosis of Diffuse Pulmonary Meningotheliomatosis",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "Innumerable and diffusely distributed nodules up to 4mm in a military type pattern, no mediastinal or hilar adenopathy",
+          "exact_quote": "CT scan of the chest with contrast showed innumerable and diffusely distributed nodules up to 4mm in a military type pattern. There was no mediastinal or hilar adenopathy",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Many meningothelial like bodies",
+          "exact_quote": "transbronchial biopsies revealed many meningothelial like bodies",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "No abnormalities suggestive of underlying malignancy on PET/CT",
+          "exact_quote": "Positron Emission Tomography/Computed Tomography (PET/CT) scan of our patient did not reveal abnormalities suggestive of underlying malignancy",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "10 pack-year smoking history and occupational chemical fume exposure",
+          "exact_quote": "Medical, social and family history was remarkable for a 10 pack-year smoking history and occupational chemical fume exposure, working in a compounding pharmacy",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 1.0,
+        "consistency_score": 1.0,
+        "overall_score": 1.0,
+        "passed": true,
+        "iterations": 3
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.9,
+          "consistency": 1.0,
+          "overall": 0.7520000000000001,
+          "issues": 4
+        },
+        {
+          "iteration": 2,
+          "accuracy": 0.9,
+          "consistency": 0.9,
+          "overall": 0.7200000000000002,
+          "issues": 4
+        },
+        {
+          "iteration": 3,
+          "accuracy": 1.0,
+          "consistency": 1.0,
+          "overall": 1.0,
+          "issues": 0
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 23,
+          "filtered_chunks": 22,
+          "removed_chunks": 1,
+          "original_chars": 3264,
+          "filtered_chars": 3077,
+          "removed_chars": 187,
+          "estimated_original_tokens": 816,
+          "estimated_filtered_tokens": 769,
+          "estimated_tokens_saved": 46,
+          "reduction_percentage": 5.7
+        },
+        "relevance": {
+          "total_chunks": 22,
+          "relevant_chunks": 5,
+          "irrelevant_chunks": 17,
+          "relevance_rate": 22.7,
+          "avg_confidence": 0.59
+        }
+      },
+      "warnings": [],
+      "source_filename": "Gleason - 2016 - Meningotheliomatosis A Rare Cause of Diffuse Miliary Pattern Pulmonary Opacities.pdf",
+      "extraction_timestamp": "2026-01-06T21:48:03.599654"
+    },
+    "Gleason et al. - 2017 - Diffuse pulmonary meningotheliomatosis A literature review of a rare diffuse parenchymal lung disea 1.pdf": {
+      "final_data": {
+        "case_count": 25,
+        "case_count_quote": "Of the 25 cases identified 2 were male (8%), and 23 were female (92%).",
+        "patient_age": "37-73",
+        "patient_age_quote": "Ages ranged from 37 to 73 with a median age of 59.5 years at diagnosis.",
+        "patient_sex": "23 Female, 2 Male",
+        "patient_sex_quote": "Of the 25 cases identified 2 were male (8%), and 23 were female (92%).",
+        "presenting_symptoms": "60% asymptomatic with incidental findings, 32% with unexplained respiratory complaints",
+        "presenting_symptoms_quote": "15 (60%) were asymptomatic and imaging abnormalities were discovered incidentally. 8 (32%) had unexplained respiratory complaints.",
+        "diagnostic_method": "Surgical lung biopsy and transbronchial biopsy",
+        "diagnostic_method_quote": "3 (12%) were diagnosed by transbronchial biopsy while the remainder had surgical lung biopsies.",
+        "imaging_findings": "Diffuse bilateral pulmonary nodules",
+        "imaging_findings_quote": "Diffuse pulmonary meningotheliomatosis should be considered in all patients with diffuse bilateral pulmonary nodules on HRCT.",
+        "histopathology": "Meningothelial-like nodules containing small epithelioid cell collections within normal pulmonary parenchyma",
+        "histopathology_quote": "These meningothelial-like nodules are classically encountered as benign solitary pulmonary nodules containing small epithelioid cell collections nestled within normal pulmonary parenchyma.",
+        "immunohistochemistry": "Positive: Vimentin, EMA; Negative: Cytokeratin AE1/AE3, synaptophysin, CAM5.2 low molecular weight keratin, muscle specific actin, s-100 protein, CD34",
+        "immunohistochemistry_quote": "( - ) Cytokeratin AE1/AE3, synaptophysin, CAM5.2 low molecular weight keratin, muscle specific actin, s-100 protein, CD34 (+) Vimentin, EMA",
+        "treatment": "Not reported",
+        "treatment_quote": null,
+        "outcome": "Not reported",
+        "outcome_quote": null,
+        "comorbidities": "44% had history of or active malignancy",
+        "comorbidities_quote": "11 (44%) had history of or active malignancy.",
+        "filename": "Gleason et al. - 2017 - Diffuse pulmonary meningotheliomatosis A literature review of a rare diffuse parenchymal lung disea 1.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "Data extracted primarily from systematic review results section. Strong confidence in demographic and diagnostic information. No specific treatment or outcome data provided in text."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "25",
+          "exact_quote": "Of the 25 cases identified 2 were male (8%), and 23 were female (92%).",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "37-73",
+          "exact_quote": "Ages ranged from 37 to 73 with a median age of 59.5 years at diagnosis.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "23 Female, 2 Male",
+          "exact_quote": "Of the 25 cases identified 2 were male (8%), and 23 were female (92%).",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "60% asymptomatic with incidental findings, 32% with unexplained respiratory complaints",
+          "exact_quote": "15 (60%) were asymptomatic and imaging abnormalities were discovered incidentally. 8 (32%) had unexplained respiratory complaints.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Surgical lung biopsy and transbronchial biopsy",
+          "exact_quote": "3 (12%) were diagnosed by transbronchial biopsy while the remainder had surgical lung biopsies.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "Diffuse bilateral pulmonary nodules",
+          "exact_quote": "Diffuse pulmonary meningotheliomatosis should be considered in all patients with diffuse bilateral pulmonary nodules on HRCT.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Meningothelial-like nodules containing small epithelioid cell collections within normal pulmonary parenchyma",
+          "exact_quote": "These meningothelial-like nodules are classically encountered as benign solitary pulmonary nodules containing small epithelioid cell collections nestled within normal pulmonary parenchyma.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "Positive: Vimentin, EMA; Negative: Cytokeratin AE1/AE3, synaptophysin, CAM5.2 low molecular weight keratin, muscle specific actin, s-100 protein, CD34",
+          "exact_quote": "( - ) Cytokeratin AE1/AE3, synaptophysin, CAM5.2 low molecular weight keratin, muscle specific actin, s-100 protein, CD34 (+) Vimentin, EMA",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "44% had history of or active malignancy",
+          "exact_quote": "11 (44%) had history of or active malignancy.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 0.9,
+        "consistency_score": 0.9,
+        "overall_score": 0.9000000000000001,
+        "passed": true,
+        "iterations": 2
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.9166666666666666,
+          "consistency": 0.9166666666666666,
+          "overall": 0.7333333333333334,
+          "issues": 5
+        },
+        {
+          "iteration": 2,
+          "accuracy": 0.9,
+          "consistency": 0.9,
+          "overall": 0.9000000000000001,
+          "issues": 2
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 70,
+          "filtered_chunks": 68,
+          "removed_chunks": 2,
+          "original_chars": 40503,
+          "filtered_chars": 36306,
+          "removed_chars": 4197,
+          "estimated_original_tokens": 10125,
+          "estimated_filtered_tokens": 9076,
+          "estimated_tokens_saved": 1049,
+          "reduction_percentage": 10.4
+        },
+        "relevance": {
+          "total_chunks": 68,
+          "relevant_chunks": 21,
+          "irrelevant_chunks": 47,
+          "relevance_rate": 30.9,
+          "avg_confidence": 0.62
+        }
+      },
+      "warnings": [],
+      "source_filename": "Gleason et al. - 2017 - Diffuse pulmonary meningotheliomatosis A literature review of a rare diffuse parenchymal lung disea 1.pdf",
+      "extraction_timestamp": "2026-01-06T21:48:03.600340"
+    },
+    "Torrech Santos et al. - 2023 - Diffuse Cavitating Pulmonary Meningotheliomatosis A Rare and Elusive Pathology.pdf": {
+      "final_data": {
+        "case_count": 25,
+        "case_count_quote": "Literature describing DPM is very limited, with only 25 cases documented through 2016.",
+        "patient_age": "45",
+        "patient_age_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+        "patient_sex": "Female",
+        "patient_sex_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+        "presenting_symptoms": "occasional bouts of dyspnea",
+        "presenting_symptoms_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+        "diagnostic_method": "open biopsy of the right lung",
+        "diagnostic_method_quote": "An open biopsy of the right lung was performed and pathological examination revealed meningothelial nodules",
+        "imaging_findings": "innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa",
+        "imaging_findings_quote": "A high-resolution chest CT scan revealed innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa, suggestive of lymphangioleiomyomatosis (LAM).",
+        "histopathology": "meningothelial nodules with cavitating diffuse pulmonary meningotheliomatosis",
+        "histopathology_quote": "pathological examination revealed meningothelial nodules, with histologic findings supporting the diagnosis of cavitating diffuse pulmonary meningotheliomatosis.",
+        "immunohistochemistry": "Not reported",
+        "immunohistochemistry_quote": null,
+        "treatment": "budesonide/formoterol as needed",
+        "treatment_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+        "outcome": "Not reported",
+        "outcome_quote": null,
+        "comorbidities": "hypothyroidism and hyperlipidemia",
+        "comorbidities_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+        "filename": "Torrech Santos et al. - 2023 - Diffuse Cavitating Pulmonary Meningotheliomatosis A Rare and Elusive Pathology.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "The case is well-documented with clear patient demographics, symptoms, diagnostic methods, and findings. No specific outcome was reported beyond the initial diagnosis and management. The patient's clinical course and long-term outcomes were not mentioned."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "25",
+          "exact_quote": "Literature describing DPM is very limited, with only 25 cases documented through 2016.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "45",
+          "exact_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "occasional bouts of dyspnea",
+          "exact_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "open biopsy of the right lung",
+          "exact_quote": "An open biopsy of the right lung was performed and pathological examination revealed meningothelial nodules",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa",
+          "exact_quote": "A high-resolution chest CT scan revealed innumerable bilateral thin-walled pulmonary cysts with thickened interlobular septa, suggestive of lymphangioleiomyomatosis (LAM).",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "meningothelial nodules with cavitating diffuse pulmonary meningotheliomatosis",
+          "exact_quote": "pathological examination revealed meningothelial nodules, with histologic findings supporting the diagnosis of cavitating diffuse pulmonary meningotheliomatosis.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "budesonide/formoterol as needed",
+          "exact_quote": "The patient refers to occasional bouts of dyspnea with no temporal association of years of evolution for which she uses budesonide/formoterol as needed.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "hypothyroidism and hyperlipidemia",
+          "exact_quote": "A 45-year-old female with a past medical history of hypothyroidism and hyperlipidemia",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        }
+      ],
+      "validation": {
+        "accuracy_score": 1.0,
+        "consistency_score": 1.0,
+        "overall_score": 1.0,
+        "passed": true,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 1.0,
+          "consistency": 1.0,
+          "overall": 1.0,
+          "issues": 0
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 5,
+          "filtered_chunks": 5,
+          "removed_chunks": 0,
+          "original_chars": 2862,
+          "filtered_chars": 2862,
+          "removed_chars": 0,
+          "estimated_original_tokens": 715,
+          "estimated_filtered_tokens": 715,
+          "estimated_tokens_saved": 0,
+          "reduction_percentage": 0.0
+        },
+        "relevance": {
+          "total_chunks": 5,
+          "relevant_chunks": 1,
+          "irrelevant_chunks": 4,
+          "relevance_rate": 20.0,
+          "avg_confidence": 0.58
+        }
+      },
+      "warnings": [],
+      "source_filename": "Torrech Santos et al. - 2023 - Diffuse Cavitating Pulmonary Meningotheliomatosis A Rare and Elusive Pathology.pdf",
+      "extraction_timestamp": "2026-01-06T21:50:35.259290"
+    },
+    "Forsythe et al. - 2022 - Diffuse Pulmonary Meningotheliomatosis A Case Report 1.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "We present a case of a 57-year-old woman",
+        "patient_age": "57",
+        "patient_age_quote": "We present a case of a 57-year-old woman",
+        "patient_sex": "Female",
+        "patient_sex_quote": "We present a case of a 57-year-old woman",
+        "presenting_symptoms": "chronic cough",
+        "presenting_symptoms_quote": "a 57-year-old woman with a history of chronic cough",
+        "diagnostic_method": "Wedge resections from right upper and lower lobes",
+        "diagnostic_method_quote": "Wedge resections from the right upper and right lower lobes were obtained",
+        "imaging_findings": "bilateral multiple ground-glass nodules",
+        "imaging_findings_quote": "CT imaging findings of bilateral multiple ground-glass nodules",
+        "histopathology": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic, with background of emphysematous change and focal foreign body giant cell reaction",
+        "histopathology_quote": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic. This appeared in a background of emphysematous change and focal foreign body giant cell reaction to non-polarizable material.",
+        "immunohistochemistry": "diffusely positive for vimentin, EMA, and PR; CD163 highlighted increased cells that were S100 and CD1a negative; negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1",
+        "immunohistochemistry_quote": "Immunohistochemical stains were diffusely positive for vimentin, EMA , and PR, and CD163 highlighted increased cells that were S100 and CD1a negative. Additionally, the ovoid/spindle cells were negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1.",
+        "treatment": null,
+        "treatment_quote": null,
+        "outcome": "Not reported",
+        "outcome_quote": null,
+        "comorbidities": null,
+        "comorbidities_quote": null,
+        "filename": "Forsythe et al. - 2022 - Diffuse Pulmonary Meningotheliomatosis A Case Report 1.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "This appears to be a clear case report of diffuse pulmonary meningotheliomatosis (DPM) with well-documented clinical, imaging, and pathological findings. The outcome is not explicitly stated in the provided text."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": 1,
+          "exact_quote": "We present a case of a 57-year-old woman",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "57",
+          "exact_quote": "We present a case of a 57-year-old woman",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "We present a case of a 57-year-old woman",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "chronic cough",
+          "exact_quote": "a 57-year-old woman with a history of chronic cough",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Wedge resections from right upper and lower lobes",
+          "exact_quote": "Wedge resections from the right upper and right lower lobes were obtained",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "bilateral multiple ground-glass nodules",
+          "exact_quote": "CT imaging findings of bilateral multiple ground-glass nodules",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic, with background of emphysematous change and focal foreign body giant cell reaction",
+          "exact_quote": "discrete areas with variable interstitial expansion of the stroma with ovoid/spindle cells, collagen, elastosis, and mild chronic inflammatory cells, in a somewhat perivascular pattern. Some areas were also cystic. This appeared in a background of emphysematous change and focal foreign body giant cell reaction to non-polarizable material.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "diffusely positive for vimentin, EMA, and PR; CD163 highlighted increased cells that were S100 and CD1a negative; negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1",
+          "exact_quote": "Immunohistochemical stains were diffusely positive for vimentin, EMA , and PR, and CD163 highlighted increased cells that were S100 and CD1a negative. Additionally, the ovoid/spindle cells were negative for desmin, SMM, HMB-45, HHV8, pan-CK, chromogranin, and multiplex SOX10-MART1.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "Not reported",
+          "exact_quote": "",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 0.9230769230769231,
+        "consistency_score": 1.0,
+        "overall_score": 0.9538461538461539,
+        "passed": true,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.9230769230769231,
+          "consistency": 1.0,
+          "overall": 0.9538461538461539,
+          "issues": 2
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 95,
+          "filtered_chunks": 95,
+          "removed_chunks": 0,
+          "original_chars": 9429,
+          "filtered_chars": 9429,
+          "removed_chars": 0,
+          "estimated_original_tokens": 2357,
+          "estimated_filtered_tokens": 2357,
+          "estimated_tokens_saved": 0,
+          "reduction_percentage": 0.0
+        },
+        "relevance": {
+          "total_chunks": 95,
+          "relevant_chunks": 41,
+          "irrelevant_chunks": 54,
+          "relevance_rate": 43.2,
+          "avg_confidence": 0.67
+        }
+      },
+      "warnings": [],
+      "source_filename": "Forsythe et al. - 2022 - Diffuse Pulmonary Meningotheliomatosis A Case Report 1.pdf",
+      "extraction_timestamp": "2026-01-06T21:49:52.490666"
+    },
+    "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "A 63-years-old male patient was admitted to our hospital",
+        "patient_age": "63",
+        "patient_age_quote": "A 63-years-old male patient was admitted to our hospital",
+        "patient_sex": "Male",
+        "patient_sex_quote": "A 63-years-old male patient was admitted to our hospital",
+        "presenting_symptoms": "cough and mild exertional dyspnea",
+        "presenting_symptoms_quote": "A 63-years-old male patient was admitted to our hospital with cough and mild exertional dyspnea",
+        "diagnostic_method": "surgical wedge resection after nondiagnostic bronchoscopy",
+        "diagnostic_method_quote": "Bronchoscopy was nondiagnostic which led to a diagnostic surgical procedure. The patient underwent diagnostic right lower lobe and middle lobe wedge resections.",
+        "imaging_findings": "bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung; micronodules smaller than 1 mm",
+        "imaging_findings_quote": "Thorax HRCT scan revealed bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung suggesting lymphangioleiomyomatosis radiologically . [...] When HRCT findings were reviewed, micronodules smaller than 1 mm were identified.",
+        "histopathology": "diffuse meningotheliomatosis",
+        "histopathology_quote": "Histopathological examination revealed diffuse meningotheliomatosis unexpectedly.",
+        "immunohistochemistry": null,
+        "immunohistochemistry_quote": null,
+        "treatment": "symptomatic treatment",
+        "treatment_quote": "Although the patient only received symptomatic treatment",
+        "outcome": "stable - no changes in CT findings over 3 years",
+        "outcome_quote": "there were no changes in thorax CT findings through the three years follow up",
+        "comorbidities": null,
+        "comorbidities_quote": null,
+        "filename": "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "All key information was clearly stated in the text. The only uncertainty might be around the complete details of the symptomatic treatment, which were not specified."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "1",
+          "exact_quote": "A 63-years-old male patient was admitted to our hospital",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "63",
+          "exact_quote": "A 63-years-old male patient was admitted to our hospital",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Male",
+          "exact_quote": "A 63-years-old male patient was admitted to our hospital",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "cough and mild exertional dyspnea",
+          "exact_quote": "A 63-years-old male patient was admitted to our hospital with cough and mild exertional dyspnea",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "surgical wedge resection after nondiagnostic bronchoscopy",
+          "exact_quote": "Bronchoscopy was nondiagnostic which led to a diagnostic surgical procedure. The patient underwent diagnostic right lower lobe and middle lobe wedge resections.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung; micronodules smaller than 1 mm",
+          "exact_quote": "Thorax HRCT scan revealed bilaterally multiple, uniform, thin-walled cysts ranging between 0.5 and 2.5 cm in diameter, diffusely distributing from apex to basis of the lung suggesting lymphangioleiomyomatosis radiologically . [...] When HRCT findings were reviewed, micronodules smaller than 1 mm were identified.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "diffuse meningotheliomatosis",
+          "exact_quote": "Histopathological examination revealed diffuse meningotheliomatosis unexpectedly.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "symptomatic treatment",
+          "exact_quote": "Although the patient only received symptomatic treatment",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "outcome",
+          "extracted_value": "stable - no changes in CT findings over 3 years",
+          "exact_quote": "there were no changes in thorax CT findings through the three years follow up",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 1.0,
+        "consistency_score": 1.0,
+        "overall_score": 1.0,
+        "passed": true,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 1.0,
+          "consistency": 1.0,
+          "overall": 1.0,
+          "issues": 0
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 10,
+          "filtered_chunks": 10,
+          "removed_chunks": 0,
+          "original_chars": 2047,
+          "filtered_chars": 2047,
+          "removed_chars": 0,
+          "estimated_original_tokens": 511,
+          "estimated_filtered_tokens": 511,
+          "estimated_tokens_saved": 0,
+          "reduction_percentage": 0.0
+        },
+        "relevance": {
+          "total_chunks": 10,
+          "relevant_chunks": 2,
+          "irrelevant_chunks": 8,
+          "relevance_rate": 20.0,
+          "avg_confidence": 0.58
+        }
+      },
+      "warnings": [],
+      "source_filename": "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf",
+      "extraction_timestamp": "2026-01-06T21:51:20.292876"
+    },
+    "Maasdorp et al. - 2020 - Diffuse pulmonary meningotheliomatosis \u2013 A Case Report.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "We describe a case of a 58-year-old female",
+        "patient_age": "58",
+        "patient_age_quote": "We describe a case of a 58-year-old female",
+        "patient_sex": "Female",
+        "patient_sex_quote": "We describe a case of a 58-year-old female",
+        "presenting_symptoms": "dyspnoea on exertion and persistent non-productive coughing for 3 months, dyspepsia and nausea",
+        "presenting_symptoms_quote": "presented with complaints of dyspnoea on exertion and persistent non-productive coughing for 3 months. She also complained of dyspepsia and nausea.",
+        "diagnostic_method": "Thoracoscopic lung biopsy with immunohistochemistry",
+        "diagnostic_method_quote": "Thoracoscopic lung biopsy was performed, with histology revealing pulmonary parenchyma with preserved lung architecture... The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+        "imaging_findings": "diffuse micronodular infiltrates in a miliary pattern bilaterally",
+        "imaging_findings_quote": "Chest X-ray and chest computed tomography (CT) images, however, revealed diffuse micronodular infiltrates in a miliary pattern bilaterally",
+        "histopathology": "Numerous small stellate-shaped nodular lesions throughout lung tissue, comprising islands of epithelioid cells with appearance of arachnoidal cells, showing eosinophilic cytoplasm with bland, uniform and ovoid nuclei, some featuring pseudoinclusions",
+        "histopathology_quote": "Numerous small stellate-shaped nodular lesions were distributed throughout the lung tissue... On higher magnification, the nodules comprised islands of epithelioid cells, with the appearance of arachnoidal cells. The cells showed eosinophilic cytoplasm, accompanied by bland, uniform and ovoid nuclei, some featuring pseudoinclusions.",
+        "immunohistochemistry": "positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+        "immunohistochemistry_quote": "The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+        "treatment": "lamotrigine and donepezil",
+        "treatment_quote": "being on treatment with lamotrigine and donepezil",
+        "outcome": "Not reported",
+        "outcome_quote": null,
+        "comorbidities": "frontal lobe syndrome secondary to previous traumatic brain injury, reflux oesophagitis",
+        "comorbidities_quote": "being on treatment with lamotrigine and donepezil after a diagnosis of frontal lobe syndrome secondary to previous traumatic brain injury... gastroscopy performed as part of the diagnostic investigations for persistent cough found her to have reflux oesophagitis",
+        "filename": "Maasdorp et al. - 2020 - Diffuse pulmonary meningotheliomatosis \u2013 A Case Report.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "While most information is clearly stated in the text, the long-term outcome of the patient after diagnosis is not reported. The treatments mentioned are for comorbidities rather than for the primary condition."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "1",
+          "exact_quote": "We describe a case of a 58-year-old female",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": "58",
+          "exact_quote": "We describe a case of a 58-year-old female",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "Female",
+          "exact_quote": "We describe a case of a 58-year-old female",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "presenting_symptoms",
+          "extracted_value": "dyspnoea on exertion and persistent non-productive coughing for 3 months, dyspepsia and nausea",
+          "exact_quote": "presented with complaints of dyspnoea on exertion and persistent non-productive coughing for 3 months. She also complained of dyspepsia and nausea.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "Thoracoscopic lung biopsy with immunohistochemistry",
+          "exact_quote": "Thoracoscopic lung biopsy was performed, with histology revealing pulmonary parenchyma with preserved lung architecture... The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "diffuse micronodular infiltrates in a miliary pattern bilaterally",
+          "exact_quote": "Chest X-ray and chest computed tomography (CT) images, however, revealed diffuse micronodular infiltrates in a miliary pattern bilaterally",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "Numerous small stellate-shaped nodular lesions throughout lung tissue, comprising islands of epithelioid cells with appearance of arachnoidal cells, showing eosinophilic cytoplasm with bland, uniform and ovoid nuclei, some featuring pseudoinclusions",
+          "exact_quote": "Numerous small stellate-shaped nodular lesions were distributed throughout the lung tissue... On higher magnification, the nodules comprised islands of epithelioid cells, with the appearance of arachnoidal cells. The cells showed eosinophilic cytoplasm, accompanied by bland, uniform and ovoid nuclei, some featuring pseudoinclusions.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": "positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+          "exact_quote": "The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "lamotrigine and donepezil",
+          "exact_quote": "being on treatment with lamotrigine and donepezil",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "frontal lobe syndrome secondary to previous traumatic brain injury, reflux oesophagitis",
+          "exact_quote": "being on treatment with lamotrigine and donepezil after a diagnosis of frontal lobe syndrome secondary to previous traumatic brain injury... gastroscopy performed as part of the diagnostic investigations for persistent cough found her to have reflux oesophagitis",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 1.0,
+        "consistency_score": 1.0,
+        "overall_score": 1.0,
+        "passed": true,
+        "iterations": 2
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.9,
+          "consistency": 1.0,
+          "overall": 0.7520000000000001,
+          "issues": 3
+        },
+        {
+          "iteration": 2,
+          "accuracy": 1.0,
+          "consistency": 1.0,
+          "overall": 1.0,
+          "issues": 0
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 19,
+          "filtered_chunks": 18,
+          "removed_chunks": 1,
+          "original_chars": 6493,
+          "filtered_chars": 5505,
+          "removed_chars": 988,
+          "estimated_original_tokens": 1623,
+          "estimated_filtered_tokens": 1376,
+          "estimated_tokens_saved": 247,
+          "reduction_percentage": 15.2
+        },
+        "relevance": {
+          "total_chunks": 18,
+          "relevant_chunks": 10,
+          "irrelevant_chunks": 8,
+          "relevance_rate": 55.6,
+          "avg_confidence": 0.72
+        }
+      },
+      "warnings": [],
+      "source_filename": "Maasdorp et al. - 2020 - Diffuse pulmonary meningotheliomatosis \u2013 A Case Report.pdf",
+      "extraction_timestamp": "2026-01-06T21:50:43.344717"
+    }
+  },
+  "extraction_stats": {
+    "total": 12,
+    "success": 12,
+    "failed": 0
+  }
+}

@@ -150,7 +150,7 @@ class ExtractionService:
                         # Find the doc in parsed_docs
                         doc = next((d for d in parsed_docs if d.filename == filename), None)
                         if doc:
-                            vector_store.add_document(doc)
+                            vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
                 else:
                     failed_files.append((filename, str(data)))
                 

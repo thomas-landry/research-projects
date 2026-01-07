@@ -1,0 +1,158 @@
+{
+  "final_data": {
+    "case_count": 1,
+    "case_count_quote": "We describe a case of a 58-year-old female",
+    "patient_age": "58",
+    "patient_age_quote": "We describe a case of a 58-year-old female",
+    "patient_sex": "Female",
+    "patient_sex_quote": "We describe a case of a 58-year-old female",
+    "presenting_symptoms": "dyspnoea on exertion and persistent non-productive coughing for 3 months, dyspepsia and nausea",
+    "presenting_symptoms_quote": "presented with complaints of dyspnoea on exertion and persistent non-productive coughing for 3 months. She also complained of dyspepsia and nausea.",
+    "diagnostic_method": "Thoracoscopic lung biopsy with immunohistochemistry",
+    "diagnostic_method_quote": "Thoracoscopic lung biopsy was performed, with histology revealing pulmonary parenchyma with preserved lung architecture... The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+    "imaging_findings": "diffuse micronodular infiltrates in a miliary pattern bilaterally",
+    "imaging_findings_quote": "Chest X-ray and chest computed tomography (CT) images, however, revealed diffuse micronodular infiltrates in a miliary pattern bilaterally",
+    "histopathology": "Numerous small stellate-shaped nodular lesions throughout lung tissue, comprising islands of epithelioid cells with appearance of arachnoidal cells, showing eosinophilic cytoplasm with bland, uniform and ovoid nuclei, some featuring pseudoinclusions",
+    "histopathology_quote": "Numerous small stellate-shaped nodular lesions were distributed throughout the lung tissue... On higher magnification, the nodules comprised islands of epithelioid cells, with the appearance of arachnoidal cells. The cells showed eosinophilic cytoplasm, accompanied by bland, uniform and ovoid nuclei, some featuring pseudoinclusions.",
+    "immunohistochemistry": "positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+    "immunohistochemistry_quote": "The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+    "treatment": "lamotrigine and donepezil",
+    "treatment_quote": "being on treatment with lamotrigine and donepezil",
+    "outcome": "Not reported",
+    "outcome_quote": null,
+    "comorbidities": "frontal lobe syndrome secondary to previous traumatic brain injury, reflux oesophagitis",
+    "comorbidities_quote": "being on treatment with lamotrigine and donepezil after a diagnosis of frontal lobe syndrome secondary to previous traumatic brain injury... gastroscopy performed as part of the diagnostic investigations for persistent cough found her to have reflux oesophagitis",
+    "filename": "Maasdorp et al. - 2020 - Diffuse pulmonary meningotheliomatosis \u2013 A Case Report.pdf",
+    "extraction_confidence": 0.9,
+    "extraction_notes": "While most information is clearly stated in the text, the long-term outcome of the patient after diagnosis is not reported. The treatments mentioned are for comorbidities rather than for the primary condition."
+  },
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": "1",
+      "exact_quote": "We describe a case of a 58-year-old female",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "58",
+      "exact_quote": "We describe a case of a 58-year-old female",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "We describe a case of a 58-year-old female",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "dyspnoea on exertion and persistent non-productive coughing for 3 months, dyspepsia and nausea",
+      "exact_quote": "presented with complaints of dyspnoea on exertion and persistent non-productive coughing for 3 months. She also complained of dyspepsia and nausea.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Thoracoscopic lung biopsy with immunohistochemistry",
+      "exact_quote": "Thoracoscopic lung biopsy was performed, with histology revealing pulmonary parenchyma with preserved lung architecture... The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "diffuse micronodular infiltrates in a miliary pattern bilaterally",
+      "exact_quote": "Chest X-ray and chest computed tomography (CT) images, however, revealed diffuse micronodular infiltrates in a miliary pattern bilaterally",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Numerous small stellate-shaped nodular lesions throughout lung tissue, comprising islands of epithelioid cells with appearance of arachnoidal cells, showing eosinophilic cytoplasm with bland, uniform and ovoid nuclei, some featuring pseudoinclusions",
+      "exact_quote": "Numerous small stellate-shaped nodular lesions were distributed throughout the lung tissue... On higher magnification, the nodules comprised islands of epithelioid cells, with the appearance of arachnoidal cells. The cells showed eosinophilic cytoplasm, accompanied by bland, uniform and ovoid nuclei, some featuring pseudoinclusions.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+      "exact_quote": "The immunohistochemical profile found the nodules to be positive for epithelial membrane antigen (EMA) and progesterone receptor (PR)",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "lamotrigine and donepezil",
+      "exact_quote": "being on treatment with lamotrigine and donepezil",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "frontal lobe syndrome secondary to previous traumatic brain injury, reflux oesophagitis",
+      "exact_quote": "being on treatment with lamotrigine and donepezil after a diagnosis of frontal lobe syndrome secondary to previous traumatic brain injury... gastroscopy performed as part of the diagnostic investigations for persistent cough found her to have reflux oesophagitis",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "overall_score": 1.0,
+    "passed": true,
+    "iterations": 2
+  },
+  "iteration_history": [
+    {
+      "iteration": 1,
+      "accuracy": 0.9,
+      "consistency": 1.0,
+      "overall": 0.7520000000000001,
+      "issues": 3
+    },
+    {
+      "iteration": 2,
+      "accuracy": 1.0,
+      "consistency": 1.0,
+      "overall": 1.0,
+      "issues": 0
+    }
+  ],
+  "stats": {
+    "content_filter": {
+      "original_chunks": 19,
+      "filtered_chunks": 18,
+      "removed_chunks": 1,
+      "original_chars": 6493,
+      "filtered_chars": 5505,
+      "removed_chars": 988,
+      "estimated_original_tokens": 1623,
+      "estimated_filtered_tokens": 1376,
+      "estimated_tokens_saved": 247,
+      "reduction_percentage": 15.2
+    },
+    "relevance": {
+      "total_chunks": 18,
+      "relevant_chunks": 10,
+      "irrelevant_chunks": 8,
+      "relevance_rate": 55.6,
+      "avg_confidence": 0.72
+    }
+  },
+  "warnings": [],
+  "source_filename": "Maasdorp et al. - 2020 - Diffuse pulmonary meningotheliomatosis \u2013 A Case Report.pdf",
+  "extraction_timestamp": "2026-01-06T21:50:43.344717"
+}

@@ -1,0 +1,159 @@
+{
+  "final_data": {
+    "case_count": 1,
+    "case_count_quote": "This case describes a woman in her 50s who presented with recurrent lower respiratory tract infections.",
+    "patient_age": "50s",
+    "patient_age_quote": "A female patient in her 50s was referred to the specialist respiratory outpatient clinic",
+    "patient_sex": "Female",
+    "patient_sex_quote": "This case describes a woman in her 50s",
+    "presenting_symptoms": "Recurrent lower respiratory tract infections, chronic cough productive of green sputum for 4 months, longstanding dyspnoea on walking up hills, generalized malaise",
+    "presenting_symptoms_quote": "She reported a chronic cough for 4 months, productive of moderate volumes of green sputum. There were no triggers and no diurnal variation. She reported longstanding dyspnoea on walking up hills only. She had generalised malaise but denied haemoptysis, weight loss and night sweats.",
+    "diagnostic_method": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection with biopsies from right upper, middle and lower lobe",
+    "diagnostic_method_quote": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection was performed with biopsies taken from the right upper, middle and lower lobe.",
+    "imaging_findings": "Multiple bilateral pulmonary nodules with upper lobe predominance, 6mm left upper lobe nodule and two 5mm nodules in right upper lobe, background fibrotic ILD with subpleural changes affecting lung apices and right lower lobe, several small calcified granulomata bilaterally",
+    "imaging_findings_quote": "High-resolution CT of the chest revealed background fibrotic ILD with predominantly subpleural changes, affecting the lung apices and right lower lobe. One 6 mm left upper lobe nodule was identified and two 5 mm nodules in the right upper lobe. There was no mediastinal adenopathy but several small, calcified granulomata were noted bilaterally",
+    "histopathology": "Small intraparenchymal minute nodules of bland epithelioid cells without malignancy, with tobacco-related changes including emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, inflammation and respiratory bronchiolitis",
+    "histopathology_quote": "Histopathology revealed small intraparenchymal minute nodules of bland epithelioid cells without any evidence of malignancy. In addition, there were tobacco-related changes of emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, peribronchial inflammation and respiratory bronchiolitis.",
+    "immunohistochemistry": "Positive for CD56 and progesterone receptor, weakly positive for epithelial membrane antigen (EMA) and smooth muscle actin (SMA). Negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+    "immunohistochemistry_quote": "The nodules stained positive for neural cell adhesion molecule (CD56) and progesterone receptor, and epithelial membrane antigen (EMA) and smooth muscle actin (SMA) were weakly positive. Staining was negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+    "treatment": "No specific treatment",
+    "treatment_quote": "There are no specific treatments or recommendations available on how best to approach treatment in the case of DPM.",
+    "outcome": "Stable symptoms with ongoing productive cough, stable spirometry over 4 years with DLCO drop from 76% to 67.6%, stable nodules on 2-year follow-up CT",
+    "outcome_quote": "Her symptoms remain stable with an ongoing productive cough. Spirometry has remained stable over a 4-year period with a drop in DLCO from 76% to 67.6% predicted value. Using the Fleischner Society pulmonary nodule guidelines, repeat CT thorax at a 2-year interval showed stable appearances of previously described lung nodules.",
+    "comorbidities": "Ex-smoker, history of livestock farm work",
+    "comorbidities_quote": "She was an ex-smoker and had worked on a livestock farm for many years.",
+    "filename": "Healy et al. - 2023 - Diffuse pulmonary meningotheliomatosis a rare cause of multiple pulmonary nodules.pdf",
+    "extraction_confidence": 0.95,
+    "extraction_notes": "The case is well-documented with clear clinical details, diagnostic workup, and follow-up information. Most data points are explicitly stated in the text with direct quotes available."
+  },
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": 1,
+      "exact_quote": "This case describes a woman in her 50s who presented with recurrent lower respiratory tract infections.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "50s",
+      "exact_quote": "A female patient in her 50s was referred to the specialist respiratory outpatient clinic",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "This case describes a woman in her 50s",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "Recurrent lower respiratory tract infections, chronic cough productive of green sputum for 4 months, longstanding dyspnoea on walking up hills, generalized malaise",
+      "exact_quote": "She reported a chronic cough for 4 months, productive of moderate volumes of green sputum. There were no triggers and no diurnal variation. She reported longstanding dyspnoea on walking up hills only. She had generalised malaise but denied haemoptysis, weight loss and night sweats.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection with biopsies from right upper, middle and lower lobe",
+      "exact_quote": "Video-assisted thoracoscopic surgical (VATS) guided wedge resection was performed with biopsies taken from the right upper, middle and lower lobe.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "Multiple bilateral pulmonary nodules with upper lobe predominance, 6mm left upper lobe nodule and two 5mm nodules in right upper lobe, background fibrotic ILD with subpleural changes affecting lung apices and right lower lobe, several small calcified granulomata bilaterally",
+      "exact_quote": "High-resolution CT of the chest revealed background fibrotic ILD with predominantly subpleural changes, affecting the lung apices and right lower lobe. One 6 mm left upper lobe nodule was identified and two 5 mm nodules in the right upper lobe. There was no mediastinal adenopathy but several small, calcified granulomata were noted bilaterally",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Small intraparenchymal minute nodules of bland epithelioid cells without malignancy, with tobacco-related changes including emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, inflammation and respiratory bronchiolitis",
+      "exact_quote": "Histopathology revealed small intraparenchymal minute nodules of bland epithelioid cells without any evidence of malignancy. In addition, there were tobacco-related changes of emphysema, small airway disease with bronchiectasis, peribronchial metaplasia, peribronchial inflammation and respiratory bronchiolitis.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "Positive for CD56 and progesterone receptor, weakly positive for epithelial membrane antigen (EMA) and smooth muscle actin (SMA). Negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+      "exact_quote": "The nodules stained positive for neural cell adhesion molecule (CD56) and progesterone receptor, and epithelial membrane antigen (EMA) and smooth muscle actin (SMA) were weakly positive. Staining was negative for TTF-1, napsin A, chromogranin, HMB45, S100 and desmin.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "No specific treatment",
+      "exact_quote": "There are no specific treatments or recommendations available on how best to approach treatment in the case of DPM.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "outcome",
+      "extracted_value": "Stable symptoms with ongoing productive cough, stable spirometry over 4 years with DLCO drop from 76% to 67.6%, stable nodules on 2-year follow-up CT",
+      "exact_quote": "Her symptoms remain stable with an ongoing productive cough. Spirometry has remained stable over a 4-year period with a drop in DLCO from 76% to 67.6% predicted value. Using the Fleischner Society pulmonary nodule guidelines, repeat CT thorax at a 2-year interval showed stable appearances of previously described lung nodules.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "Ex-smoker, history of livestock farm work",
+      "exact_quote": "She was an ex-smoker and had worked on a livestock farm for many years.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "overall_score": 1.0,
+    "passed": true,
+    "iterations": 1
+  },
+  "iteration_history": [
+    {
+      "iteration": 1,
+      "accuracy": 1.0,
+      "consistency": 1.0,
+      "overall": 1.0,
+      "issues": 0
+    }
+  ],
+  "stats": {
+    "content_filter": {
+      "original_chunks": 57,
+      "filtered_chunks": 51,
+      "removed_chunks": 6,
+      "original_chars": 24075,
+      "filtered_chars": 20881,
+      "removed_chars": 3194,
+      "estimated_original_tokens": 6018,
+      "estimated_filtered_tokens": 5220,
+      "estimated_tokens_saved": 798,
+      "reduction_percentage": 13.3
+    },
+    "relevance": {
+      "total_chunks": 51,
+      "relevant_chunks": 21,
+      "irrelevant_chunks": 30,
+      "relevance_rate": 41.2,
+      "avg_confidence": 0.66
+    }
+  },
+  "warnings": [],
+  "source_filename": "Healy et al. - 2023 - Diffuse pulmonary meningotheliomatosis a rare cause of multiple pulmonary nodules.pdf",
+  "extraction_timestamp": "2026-01-06T21:48:03.600437"
+}
