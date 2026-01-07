@@ -18,7 +18,7 @@
 - [x] Task: Enhance CLI error reporting using `rich` panels for legibility. 2d74601
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Interactive Polish & Safety' (Protocol in workflow.md) ffe8dc8
 
-## Phase 4: API Refactoring & Generalization
+## Phase 4: API Refactoring & Generalization [checkpoint: f264e84]
 - [x] Task: Refactor extraction logic into a clean `ExtractionService` API. e68f2cb
 - [x] Task: Verify adaptive discovery on a secondary dataset (non-DPM). 4d9841e
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: API Refactoring & Generalization' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: API Refactoring & Generalization' (Protocol in workflow.md) f264e84
