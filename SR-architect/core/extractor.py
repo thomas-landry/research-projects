@@ -467,8 +467,8 @@ Provide evidence citations for each extracted value. For each field that has a n
             
             evidence_result, completion_ev = self.client.chat.completions.create_with_completion(
                 model=self.model,
-                messages=[{"role": "user", "content": evidence_prompt}],
-                response_model=EvidenceList,
+                messages=evidence_messages,
+                response_model=EvidenceResponse,
                 extra_body={"usage": {"include": True}}
             )
             

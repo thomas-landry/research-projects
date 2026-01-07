@@ -1,0 +1,19 @@
+{
+  "filename": "tmpugx9uatm.pdf",
+  "chunks": [
+    {
+      "text": "Sample content",
+      "section": "Introduction",
+      "subsection": "Methods",
+      "chunk_type": "text",
+      "page_number": 1,
+      "source_file": "tmpugx9uatm.pdf"
+    }
+  ],
+  "metadata": {
+    "path": "/var/folders/g5/ljmwhjbx3n984t0tr37x46dh0000gn/T/tmpugx9uatm.pdf",
+    "num_chunks": 1,
+    "parser": "docling"
+  },
+  "full_text": "Full text"
+}

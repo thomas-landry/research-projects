@@ -42,7 +42,6 @@ class IterationRecord:
     consistency_score: float
     overall_score: float
     issues_count: int
-    issues_count: int
     suggestions: List[str]
 
 
@@ -446,7 +445,7 @@ class HierarchicalExtractionPipeline:
         best_check: Optional[CheckerResult] = None
         
         for iteration in range(self.max_iterations):
-            self._log(f"  Iteration {iteration + 1}/{self.max_iterations} (async)...")
+            self.logger.info(f"  Iteration {iteration + 1}/{self.max_iterations} (async)...")
             
             previous_prompts = revision_prompts.copy() if revision_prompts else []
             
