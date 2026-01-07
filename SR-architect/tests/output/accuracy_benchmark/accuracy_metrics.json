@@ -1,0 +1,358 @@
+{
+  "generated": "2026-01-07T08:33:49.898492",
+  "gold_standards_used": 4,
+  "models": {
+    "llama3.1:8b": {
+      "processing_time_s": 389.16,
+      "documents_evaluated": 2,
+      "exact_match_rate": 0.09090909090909091,
+      "key_term_rate": 0.4545454545454546,
+      "semantic_match_rate": 0.22727272727272727,
+      "completeness_rate": 0.6363636363636364,
+      "clinical_accuracy_score": 0.5,
+      "field_stats": {
+        "case_count": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 0,
+          "total": 2
+        },
+        "patient_age": {
+          "exact": 1,
+          "terms": 1,
+          "semantic": 1,
+          "present": 2,
+          "total": 2
+        },
+        "patient_sex": {
+          "exact": 1,
+          "terms": 1,
+          "semantic": 1,
+          "present": 2,
+          "total": 2
+        },
+        "presenting_symptoms": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 1,
+          "total": 2
+        },
+        "diagnostic_method": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 1,
+          "present": 2,
+          "total": 2
+        },
+        "imaging_findings": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 0,
+          "present": 2,
+          "total": 2
+        },
+        "histopathology": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 0,
+          "present": 1,
+          "total": 2
+        },
+        "immunohistochemistry": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 0,
+          "present": 0,
+          "total": 2
+        },
+        "treatment": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 1,
+          "present": 2,
+          "total": 2
+        },
+        "outcome": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 0,
+          "total": 2
+        },
+        "comorbidities": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 1,
+          "present": 2,
+          "total": 2
+        }
+      }
+    },
+    "mistral:latest": {
+      "processing_time_s": 585.17,
+      "documents_evaluated": 3,
+      "exact_match_rate": 0.06060606060606061,
+      "key_term_rate": 0.3333333333333333,
+      "semantic_match_rate": 0.15151515151515152,
+      "completeness_rate": 0.4545454545454546,
+      "clinical_accuracy_score": 0.35353535353535354,
+      "field_stats": {
+        "case_count": {
+          "exact": 1,
+          "terms": 1,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "patient_age": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "patient_sex": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 2,
+          "total": 3
+        },
+        "presenting_symptoms": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "diagnostic_method": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 0,
+          "present": 1,
+          "total": 3
+        },
+        "imaging_findings": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 0,
+          "present": 1,
+          "total": 3
+        },
+        "histopathology": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "immunohistochemistry": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 0,
+          "present": 1,
+          "total": 3
+        },
+        "treatment": {
+          "exact": 1,
+          "terms": 2,
+          "semantic": 1,
+          "present": 2,
+          "total": 3
+        },
+        "outcome": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 2,
+          "total": 3
+        },
+        "comorbidities": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 2,
+          "total": 3
+        }
+      }
+    },
+    "qwen2.5-coder:7b-instruct-q8_0": {
+      "processing_time_s": 415.49,
+      "documents_evaluated": 3,
+      "exact_match_rate": 0.0909090909090909,
+      "key_term_rate": 0.2727272727272727,
+      "semantic_match_rate": 0.12121212121212122,
+      "completeness_rate": 0.24242424242424243,
+      "clinical_accuracy_score": 0.3434343434343434,
+      "field_stats": {
+        "case_count": {
+          "exact": 1,
+          "terms": 1,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "patient_age": {
+          "exact": 1,
+          "terms": 1,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "patient_sex": {
+          "exact": 1,
+          "terms": 1,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "presenting_symptoms": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 0,
+          "total": 3
+        },
+        "diagnostic_method": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 0,
+          "present": 1,
+          "total": 3
+        },
+        "imaging_findings": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 0,
+          "present": 1,
+          "total": 3
+        },
+        "histopathology": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 1,
+          "present": 1,
+          "total": 3
+        },
+        "immunohistochemistry": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 0,
+          "present": 1,
+          "total": 3
+        },
+        "treatment": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 0,
+          "present": 0,
+          "total": 3
+        },
+        "outcome": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 0,
+          "total": 3
+        },
+        "comorbidities": {
+          "exact": 0,
+          "terms": 0,
+          "semantic": 0,
+          "present": 1,
+          "total": 3
+        }
+      }
+    },
+    "anthropic/claude-3.5-sonnet": {
+      "processing_time_s": 99.71,
+      "documents_evaluated": 3,
+      "exact_match_rate": 0.24242424242424243,
+      "key_term_rate": 0.6363636363636364,
+      "semantic_match_rate": 0.5757575757575758,
+      "completeness_rate": 0.787878787878788,
+      "clinical_accuracy_score": 0.6868686868686869,
+      "field_stats": {
+        "case_count": {
+          "exact": 2,
+          "terms": 2,
+          "semantic": 2,
+          "present": 3,
+          "total": 3
+        },
+        "patient_age": {
+          "exact": 2,
+          "terms": 2,
+          "semantic": 2,
+          "present": 2,
+          "total": 3
+        },
+        "patient_sex": {
+          "exact": 2,
+          "terms": 2,
+          "semantic": 2,
+          "present": 3,
+          "total": 3
+        },
+        "presenting_symptoms": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 1,
+          "present": 2,
+          "total": 3
+        },
+        "diagnostic_method": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 2,
+          "present": 2,
+          "total": 3
+        },
+        "imaging_findings": {
+          "exact": 0,
+          "terms": 3,
+          "semantic": 2,
+          "present": 2,
+          "total": 3
+        },
+        "histopathology": {
+          "exact": 0,
+          "terms": 2,
+          "semantic": 1,
+          "present": 2,
+          "total": 3
+        },
+        "immunohistochemistry": {
+          "exact": 1,
+          "terms": 2,
+          "semantic": 2,
+          "present": 2,
+          "total": 3
+        },
+        "treatment": {
+          "exact": 1,
+          "terms": 3,
+          "semantic": 2,
+          "present": 3,
+          "total": 3
+        },
+        "outcome": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 2,
+          "present": 2,
+          "total": 3
+        },
+        "comorbidities": {
+          "exact": 0,
+          "terms": 1,
+          "semantic": 1,
+          "present": 3,
+          "total": 3
+        }
+      }
+    }
+  }
+}

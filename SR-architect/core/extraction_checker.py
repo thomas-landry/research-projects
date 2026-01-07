@@ -9,7 +9,7 @@ for the extractor to iterate until quality thresholds are met.
 import os
 from typing import List, Dict, Any, Optional, Type
 from dataclasses import dataclass
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .parser import DocumentChunk
 
@@ -21,6 +21,16 @@ class Issue(BaseModel):
     severity: str = "medium"  # "low", "medium", "high"
     detail: str
     suggested_fix: Optional[str] = None
+    
+    @field_validator('issue_type', 'field', 'detail', mode='before')
+    @classmethod
+    def coerce_to_string(cls, v):
+        """Handle local LLMs returning lists or other types instead of strings."""
+        if isinstance(v, list):
+            return ", ".join(str(x) for x in v)
+        if v is None:
+            return ""
+        return str(v)
 
 
 class CheckerResponse(BaseModel):
@@ -29,6 +39,35 @@ class CheckerResponse(BaseModel):
     consistency_score: float = Field(ge=0.0, le=1.0, description="Do semantics align with theme?")
     issues: List[Issue] = Field(default_factory=list)
     suggestions: List[str] = Field(default_factory=list, description="Revision prompts for extractor")
+    
+    @field_validator('accuracy_score', 'consistency_score', mode='before')
+    @classmethod
+    def coerce_score_to_float(cls, v):
+        """Handle local LLMs returning None or invalid score values."""
+        if v is None:
+            return 0.0
+        try:
+            score = float(v)
+            return max(0.0, min(1.0, score))  # Clamp to [0, 1]
+        except (ValueError, TypeError):
+            return 0.0
+    
+    @field_validator('suggestions', mode='before')
+    @classmethod
+    def coerce_suggestions_to_strings(cls, v):
+        """Handle local LLMs returning dicts like {'text': '...'} instead of strings."""
+        if not v:
+            return []
+        result = []
+        for item in v:
+            if isinstance(item, dict):
+                # Extract text from dict format
+                result.append(item.get('text', item.get('suggestion', str(item))))
+            elif isinstance(item, str):
+                result.append(item)
+            else:
+                result.append(str(item))
+        return result
 
 
 @dataclass

@@ -1,0 +1,97 @@
+# Extraction Evaluation Configuration
+# Defines key terms, weights, and scoring parameters
+
+version: "1.0"
+
+# Field weights for Clinical Accuracy Score (CAS)
+# Critical = 2x, Important = 1.5x, Context = 1x
+field_weights:
+  # Critical fields - directly affect clinical interpretation
+  patient_age: 2.0
+  patient_sex: 2.0
+  histopathology: 2.0
+  immunohistochemistry: 2.0
+  
+  # Important fields - affect diagnosis and treatment decisions
+  diagnostic_method: 1.5
+  imaging_findings: 1.5
+  treatment: 1.5
+  
+  # Context fields - supplementary information
+  presenting_symptoms: 1.0
+  outcome: 1.0
+  comorbidities: 1.0
+  case_count: 1.0
+
+# Key clinical terms that MUST be present for term-match scoring
+# Each field lists terms; match if ANY gold term appears in extraction
+key_terms:
+  histopathology:
+    - meningothelial
+    - MPMN
+    - adenocarcinoma
+    - nodule
+    - whorled
+    
+  immunohistochemistry:
+    - EMA
+    - vimentin
+    - cytokeratin
+    - TTF-1
+    - CD31
+    - S-100
+    - SMA
+    - actin
+    
+  diagnostic_method:
+    - CT
+    - HRCT
+    - biopsy
+    - bronchoscopy
+    - lobectomy
+    - BAL
+    - FISH
+    - cryo
+    
+  imaging_findings:
+    - nodule
+    - ground-glass
+    - GGN
+    - opacity
+    - spiculated
+    - miliary
+    - centrilobular
+    
+  treatment:
+    - lobectomy
+    - observation
+    - follow-up
+    - conservative
+    - serial CT
+    - resection
+
+# Acceptable aliases (normalized forms map to same value)
+aliases:
+  patient_sex:
+    male: ["m", "male", "man", "gentleman"]
+    female: ["f", "female", "woman", "lady"]
+    
+  case_count:
+    "1": ["1", "one", "single"]
+    "2": ["2", "two", "pair"]
+
+# Thresholds for match tiers
+thresholds:
+  semantic_similarity: 0.5
+  key_term_ratio: 0.3  # At least 30% of gold terms must appear
+
+# Error classification patterns
+error_patterns:
+  missing:
+    - ""
+    - "not reported"
+    - "NR"
+    - "N/A"
+    - "unknown"
+    - "not specified"
+    - "not available"

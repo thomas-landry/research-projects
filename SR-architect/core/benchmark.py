@@ -6,7 +6,7 @@ import time
 import json
 import asyncio
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 from dataclasses import dataclass, field, asdict
 from rich.console import Console
 from rich.table import Table
@@ -41,10 +41,17 @@ class ModelBenchmark:
         self, 
         models: List[str], 
         sample_size: int = 3,
-        provider: str = "ollama"
+        provider: str = "ollama",
+        validator_callback: Optional[Any] = None
     ) -> List[BenchmarkResult]:
         """
         Run benchmark for list of models.
+        
+        Args:
+            models: List of model names
+            sample_size: Number of papers to process
+            provider: LLM provider
+            validator_callback: Function accepting (results_list) -> float (score)
         """
         results = []
         
@@ -85,8 +92,21 @@ class ModelBenchmark:
             total_docs = summary["total_files"]
             success = summary["parsed_files"] - len(summary["failed_files"])
             
-            # Extract validation scores from results (if available in CSV or state)
-            # For now, approximate via simple success rate
+            # Run Validation if callback provided
+            validation_score = 0.0
+            if validator_callback and success > 0:
+                try:
+                    # We need the actual results list. 
+                    # If run_extraction returned just summary, we might need to load from CSV or StateManager
+                    # For now, let's assume we can load the CSV we just wrote
+                    import pandas as pd
+                    csv_path = self.output_dir / f"results_{model.replace(':', '_')}.csv"
+                    if csv_path.exists():
+                        df = pd.read_csv(csv_path)
+                        # Callback expects list of dicts
+                        validation_score = validator_callback(df.to_dict(orient="records"))
+                except Exception as e:
+                    self.console.print(f"[red]Validation failed: {e}[/red]")
             
             res = BenchmarkResult(
                 model_name=model,
@@ -94,11 +114,12 @@ class ModelBenchmark:
                 docs_processed=total_docs,
                 success_count=success,
                 error_rate=len(summary["failed_files"]) / total_docs if total_docs > 0 else 0,
+                validation_score_avg=validation_score,
                 errors=[e[1] for e in summary["failed_files"]]
             )
             results.append(res)
             
-            self.console.print(f"[green]✓ Completed in {duration:.2f}s (Success: {success}/{total_docs})[/green]")
+            self.console.print(f"[green]✓ Completed in {duration:.2f}s (Success: {success}/{total_docs}, Acc: {validation_score:.2f})[/green]")
             
         self._save_report(results)
         return results
@@ -111,12 +132,12 @@ class ModelBenchmark:
             f.write("# Model Benchmark Report\n\n")
             f.write(f"Date: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             
-            f.write("| Model | Time (s) | Success Rate | Errors |\n")
-            f.write("|-------|----------|--------------|--------|\n")
+            f.write("| Model | Time (s) | Success Rate | Val Score | Errors |\n")
+            f.write("|-------|----------|--------------|-----------|--------|\n")
             
             for r in results:
                 success_rate = f"{r.success_count}/{r.docs_processed}"
-                f.write(f"| {r.model_name} | {r.total_time:.2f} | {success_rate} | {len(r.errors)} |\n")
+                f.write(f"| {r.model_name} | {r.total_time:.2f} | {success_rate} | {r.validation_score_avg:.2f} | {len(r.errors)} |\n")
                 
         self.console.print(f"\n[bold]Report saved to {report_path}[/bold]")
 

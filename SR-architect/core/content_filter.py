@@ -223,6 +223,86 @@ class ContentFilter:
         }
         
         return filtered_text, stats
+    
+    def clean_layout(self, text: str) -> str:
+        """
+        Clean layout artifacts from text.
+        
+        Removes:
+        - Page headers/footers (repeated short lines)
+        - Page numbers
+        - Watermarks
+        - Running headers
+        
+        Args:
+            text: Raw document text
+            
+        Returns:
+            Cleaned text
+        """
+        if not text:
+            return text
+            
+        lines = text.split('\n')
+        cleaned_lines = []
+        
+        # Detect repeated lines (likely headers/footers)
+        line_counts: Dict[str, int] = {}
+        for line in lines:
+            stripped = line.strip()
+            if stripped and len(stripped) < 100:  # Short lines only
+                line_counts[stripped] = line_counts.get(stripped, 0) + 1
+        
+        # Lines appearing >3 times are likely headers/footers
+        repeated_lines = {line for line, count in line_counts.items() if count > 3}
+        
+        # Patterns to remove
+        page_number_pattern = re.compile(r'^\s*(?:page\s*)?\d+\s*(?:of\s*\d+)?\s*$', re.IGNORECASE)
+        watermark_patterns = [
+            re.compile(r'^\s*(?:draft|confidential|for review)\s*$', re.IGNORECASE),
+            re.compile(r'^\s*©\s*\d{4}', re.IGNORECASE),  # Copyright
+        ]
+        
+        for line in lines:
+            stripped = line.strip()
+            
+            # Skip empty lines (but keep for paragraph structure)
+            if not stripped:
+                cleaned_lines.append(line)
+                continue
+            
+            # Skip repeated header/footer lines
+            if stripped in repeated_lines:
+                continue
+            
+            # Skip page numbers
+            if page_number_pattern.match(stripped):
+                continue
+            
+            # Skip watermarks
+            skip = False
+            for pattern in watermark_patterns:
+                if pattern.match(stripped):
+                    skip = True
+                    break
+            if skip:
+                continue
+            
+            cleaned_lines.append(line)
+        
+        # Remove excessive blank lines (more than 2 consecutive)
+        result_lines = []
+        blank_count = 0
+        for line in cleaned_lines:
+            if not line.strip():
+                blank_count += 1
+                if blank_count <= 2:
+                    result_lines.append(line)
+            else:
+                blank_count = 0
+                result_lines.append(line)
+        
+        return '\n'.join(result_lines)
 
 
 if __name__ == "__main__":

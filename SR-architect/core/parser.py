@@ -22,6 +22,11 @@ try:
 except ImportError:
     fitz = None
 
+try:
+    import pdfplumber
+except ImportError:
+    pdfplumber = None
+
 from core.text_splitter import split_text_into_chunks
 from core.utils import get_logger
 
@@ -45,6 +50,7 @@ class ParsedDocument(BaseModel):
     chunks: List[DocumentChunk] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
     full_text: str = ""
+    tables: List[Dict[str, Any]] = Field(default_factory=list)  # Extracted tables
     
     @property
     def abstract(self) -> str:
@@ -102,23 +108,45 @@ class ParsedDocument(BaseModel):
 class DocumentParser:
     """Parse academic PDFs using Docling with hierarchical chunking."""
     
-    def __init__(self, use_ocr: bool = False, cache_dir: str = ".cache/parsed_docs"):
+    # Parser priority chain
+    PARSER_CHAIN = ["docling", "pymupdf", "pdfplumber"]
+    
+    def __init__(
+        self, 
+        use_ocr: bool = False, 
+        cache_dir: str = ".cache/parsed_docs",
+        use_imrad: bool = False,
+        extract_tables: bool = True,
+    ):
         """
         Initialize the parser.
         
         Args:
             use_ocr: Whether to use OCR for scanned documents
             cache_dir: Directory to store parsed document objects
+            use_imrad: Whether to apply IMRAD section parsing
+            extract_tables: Whether to extract tables separately
         """
         self.use_ocr = use_ocr
         self.cache_dir = Path(cache_dir)
+        self.use_imrad = use_imrad
+        self.extract_tables = extract_tables
         self.logger = get_logger("DocumentParser")
         self._converter = None
         self._chunker = None
+        self._imrad_parser = None
         
         # Ensure cache directory exists
         if not self.cache_dir.exists():
             self.cache_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Lazy-load IMRAD parser if enabled
+        if self.use_imrad:
+            try:
+                from core.imrad_parser import IMRADParser
+                self._imrad_parser = IMRADParser()
+            except ImportError:
+                self.logger.warning("IMRADParser not available")
     
     def _get_cache_path(self, file_path: Path) -> Path:
         """Generate a unique cache path based on file content hash."""
@@ -234,12 +262,108 @@ class DocumentParser:
             
         except (ImportError, Exception) as e:
             self.logger.warning(f"Docling parsing failed or unavailable: {e}. Falling back to PyMuPDF.")
-            parsed_doc = self._parse_pdf_pymupdf(path)
+            try:
+                parsed_doc = self._parse_pdf_pymupdf(path)
+            except (ImportError, Exception) as e2:
+                self.logger.warning(f"PyMuPDF failed: {e2}. Trying pdfplumber.")
+                parsed_doc = self._parse_pdf_pdfplumber(path)
+        
+        # Post-processing: IMRAD parsing
+        if parsed_doc and self._imrad_parser and self.use_imrad:
+            try:
+                imrad_sections = self._imrad_parser.parse(parsed_doc.full_text)
+                parsed_doc.metadata["imrad_sections"] = imrad_sections
+                self.logger.debug("Applied IMRAD section parsing")
+            except Exception as e:
+                self.logger.warning(f"IMRAD parsing failed: {e}")
             
         # Save to cache
         if parsed_doc:
             self._save_to_cache(parsed_doc, path)
         return parsed_doc
+    
+    def _parse_pdf_pdfplumber(self, path: Path) -> ParsedDocument:
+        """Tertiary fallback parser using pdfplumber."""
+        if pdfplumber is None:
+            raise ImportError("pdfplumber not installed. Run: pip install pdfplumber")
+            
+        self.logger.info(f"Parsing {path.name} using pdfplumber (tertiary fallback)...")
+        
+        full_text = ""
+        chunks = []
+        tables = []
+        
+        with pdfplumber.open(path) as pdf:
+            for i, page in enumerate(pdf.pages):
+                # Extract text
+                text = page.extract_text() or ""
+                full_text += text + "\n\n"
+                
+                # Chunk the page text
+                page_chunks = split_text_into_chunks(text, chunk_size=1000, chunk_overlap=200)
+                for chunk_text in page_chunks:
+                    chunks.append(DocumentChunk(
+                        text=chunk_text,
+                        section=f"Page {i+1}",
+                        page_number=i+1,
+                        source_file=path.name
+                    ))
+                
+                # Extract tables if enabled
+                if self.extract_tables:
+                    page_tables = page.extract_tables()
+                    for j, table in enumerate(page_tables or []):
+                        if table:
+                            tables.append({
+                                "page": i + 1,
+                                "table_index": j,
+                                "data": table,
+                            })
+                            # Also add table as chunk
+                            table_text = self._table_to_markdown(table)
+                            if table_text:
+                                chunks.append(DocumentChunk(
+                                    text=table_text,
+                                    section=f"Table {len(tables)}",
+                                    chunk_type="table",
+                                    page_number=i+1,
+                                    source_file=path.name
+                                ))
+        
+        return ParsedDocument(
+            filename=path.name,
+            chunks=chunks,
+            full_text=full_text,
+            tables=tables,
+            metadata={
+                "path": str(path),
+                "num_chunks": len(chunks),
+                "num_tables": len(tables),
+                "parser": "pdfplumber",
+                "page_count": len(pdf.pages) if 'pdf' in dir() else 0,
+            }
+        )
+    
+    def _table_to_markdown(self, table: List[List]) -> str:
+        """Convert pdfplumber table to markdown format."""
+        if not table or not table[0]:
+            return ""
+        
+        lines = []
+        # Header row
+        header = [str(cell) if cell else "" for cell in table[0]]
+        lines.append("| " + " | ".join(header) + " |")
+        lines.append("| " + " | ".join(["---"] * len(header)) + " |")
+        
+        # Data rows
+        for row in table[1:]:
+            cells = [str(cell) if cell else "" for cell in row]
+            # Pad if needed
+            while len(cells) < len(header):
+                cells.append("")
+            lines.append("| " + " | ".join(cells[:len(header)]) + " |")
+        
+        return "\n".join(lines)
 
     def _parse_pdf_pymupdf(self, path: Path) -> ParsedDocument:
         """Fallback PDF parser using PyMuPDF (fitz)."""

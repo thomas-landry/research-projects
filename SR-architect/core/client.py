@@ -13,7 +13,7 @@ from .utils import get_logger
 logger = get_logger("LLMClient")
 
 class OllamaHealthCheck:
-    """Checks availability of local Ollama instance."""
+    """Checks availability of local Ollama instance and manages restart."""
     
     @staticmethod
     def is_available(base_url: str) -> bool:
@@ -28,8 +28,55 @@ class OllamaHealthCheck:
             # Check version
             resp = requests.get(f"{url}api/version", timeout=2.0)
             return resp.status_code == 200
+        except Exception:
+            # Using debug usually, but useful to know when it fails during dev
+            return False
+
+    @staticmethod
+    def restart_service() -> bool:
+        """
+        Attempt to restart the Ollama service.
+        Returns True if restart appears successful (process launched).
+        """
+        import subprocess
+        import time
+        import platform
+
+        logger.info("Attempting to auto-restart Ollama service...")
+
+        # 1. Kill existing if any (Unix/Mac specific)
+        try:
+            if platform.system() != "Windows":
+                 subprocess.run(["pkill", "ollama"], check=False)
+                 time.sleep(1) # Grace period
         except Exception as e:
-            logger.warning(f"Ollama health check failed: {e}")
+            logger.warning(f"Could not kill existing ollama process: {e}")
+
+        # 2. Start new instance
+        try:
+            # Run in background
+            # Check for brew services first on Mac
+            if platform.system() == "Darwin":
+                # Try brew services restart first as it's cleaner
+                res = subprocess.run(["brew", "services", "restart", "ollama"], capture_output=True)
+                if res.returncode == 0:
+                    logger.info("Restarted via brew services")
+                    return True
+            
+            # Fallback to direct execution
+            subprocess.Popen(
+                ["ollama", "serve"], 
+                stdout=subprocess.DEVNULL, 
+                stderr=subprocess.DEVNULL,
+                start_new_session=True
+            )
+            logger.info("Launched 'ollama serve' subprocess")
+            return True
+        except FileNotFoundError:
+            logger.error("Could not find 'ollama' executable in PATH")
+            return False
+        except Exception as e:
+            logger.error(f"Failed to restart ollama: {e}")
             return False
 
 class LLMClientFactory:
@@ -100,9 +147,21 @@ class LLMClientFactory:
         
         url = base_url or settings.OLLAMA_BASE_URL
         
-        # Health Check
+        # Health Check & Auto-Healing
         if not OllamaHealthCheck.is_available(url):
-            logger.warning(f"Ollama appears down at {url}. Ensure 'ollama serve' is running.")
+            logger.warning(f"Ollama appears down at {url}. Attempting auto-restart...")
+            if OllamaHealthCheck.restart_service():
+                # Wait up to 10s for it to come up
+                import time
+                for i in range(5):
+                    time.sleep(2)
+                    if OllamaHealthCheck.is_available(url):
+                        logger.info("Ollama service successfully recovered!")
+                        break
+                else:
+                    logger.error("Ollama restart initiated but service is still unresponsive after 10s.")
+            else:
+                logger.error("Auto-restart failed. Please run 'ollama serve' manually.")
             
         client_args = {
             "base_url": url,

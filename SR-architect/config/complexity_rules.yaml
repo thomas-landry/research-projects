@@ -1,0 +1,68 @@
+# Complexity Classification Rules
+# Used by ComplexityClassifier to determine parsing strategy
+
+version: "1.0"
+
+# Thresholds for complexity levels
+thresholds:
+  simple: 3      # Score <= 3 = SIMPLE
+  medium: 7      # Score <= 7 = MEDIUM
+  complex: 100   # Score > 7 = COMPLEX
+
+# Individual complexity signals
+rules:
+  # Document structure signals
+  multi_column:
+    weight: 2
+    description: "Multi-column layout detected"
+    
+  has_tables:
+    weight: 3
+    description: "Document contains tables"
+    
+  has_figures:
+    weight: 1
+    description: "Document contains figures/images"
+    
+  # OCR/scan signals
+  scanned_document:
+    weight: 5
+    description: "Document appears to be scanned (low text recognition confidence)"
+    ocr_confidence_threshold: 0.85
+    
+  # Content signals
+  short_text:
+    weight: 1
+    description: "Document has minimal text content"
+    char_threshold: 5000
+    
+  long_document:
+    weight: 2
+    description: "Document is very long"
+    page_threshold: 30
+    
+  # Section signals
+  missing_sections:
+    weight: 2
+    description: "Standard IMRAD sections not detected"
+    
+  non_english:
+    weight: 3
+    description: "Document appears to be non-English"
+
+# Parser recommendations based on complexity
+parser_recommendations:
+  SIMPLE:
+    primary: "pymupdf"
+    fallback: null
+    use_ocr: false
+    
+  MEDIUM:
+    primary: "docling"
+    fallback: "pymupdf"
+    use_ocr: false
+    
+  COMPLEX:
+    primary: "docling"
+    fallback: "pdfplumber"
+    use_ocr: true

@@ -1,0 +1,399 @@
+{
+  "timestamp": "2026-01-07T02:19:06.677038",
+  "processed_files": [
+    "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+    "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf"
+  ],
+  "failed_files": [
+    "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+    "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf"
+  ],
+  "results": {
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf": {
+      "final_data": {
+        "case_count": null,
+        "case_count_quote": null,
+        "patient_age": null,
+        "patient_age_quote": null,
+        "patient_sex": null,
+        "patient_sex_quote": null,
+        "presenting_symptoms": null,
+        "presenting_symptoms_quote": null,
+        "diagnostic_method": null,
+        "diagnostic_method_quote": null,
+        "imaging_findings": null,
+        "imaging_findings_quote": null,
+        "histopathology": null,
+        "histopathology_quote": null,
+        "immunohistochemistry": null,
+        "immunohistochemistry_quote": null,
+        "treatment": null,
+        "treatment_quote": null,
+        "outcome": null,
+        "outcome_quote": null,
+        "comorbidities": null,
+        "comorbidities_quote": null,
+        "filename": "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+        "extraction_confidence": null,
+        "extraction_notes": null
+      },
+      "evidence": [
+        {
+          "field_name": "patient_age",
+          "extracted_value": "61-year-old female",
+          "exact_quote": "A 61-year-old female with a history of ductal hyperplasia of the breast, common variable immunodeficiency syndrome (CVID), asthma, obstructive sleep apnea, and thyroid follicular cancer",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "female",
+          "exact_quote": "A 61-year-old female with a history of ductal hyperplasia of the breast",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": "ductal hyperplasia of the breast, common variable immunodeficiency syndrome (CVID), asthma, obstructive sleep apnea, thyroid follicular cancer",
+          "exact_quote": "A 61-year-old female with a history of ductal hyperplasia of the breast, common variable immunodeficiency syndrome (CVID), asthma, obstructive sleep apnea, and thyroid follicular cancer was diagnosed with diffuse pulmonary nodules incidentally via CT angiogram chest during inpatient admission for COVID-19 infection.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": "CT angiogram, bronchoscopy with bronchioalveolar lavage (BAL), transbronchial cryo biopsy of lung nodules",
+          "exact_quote": "A 61-year-old female was diagnosed with diffuse pulmonary nodules incidentally via CT angiogram chest during inpatient admission for COVID-19 infection. The patient eventually underwent bronchoscopy with bronchioalveolar lavage (BAL) with transbronchial cryo biopsy of lung nodules, which showed MPMNs with further immunostaining negative for malignancy.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.9
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "numerous sub 6 mm bilateral centrilobular GGNs and solid pulmonary nodules with mild upper lobe predominance",
+          "exact_quote": "Post-COVID her symptoms improved, but a follow-up CT scan chest 1 year later showed numerous sub 6 mm bilateral centrilobular GGNs and solid pulmonary nodules with mild upper lobe predominance.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": "MPMNs",
+          "exact_quote": "The patient's case was discussed with a multidisciplinary ILD clinic, and given the complexity of the case, lack of symptoms, and stability of nodules, a decision was made for close follow-up with serial CT scans.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.7
+        },
+        {
+          "field_name": "treatment",
+          "extracted_value": "close follow-up with serial CT scans",
+          "exact_quote": "The patient's case was discussed with a multidisciplinary ILD clinic, and given the complexity of the case, lack of symptoms, and stability of nodules, a decision was made for close follow-up with serial CT scans.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "validation": {
+        "accuracy_score": 0.7,
+        "consistency_score": 0.85,
+        "overall_score": 0.76,
+        "passed": false,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.7,
+          "consistency": 0.85,
+          "overall": 0.76,
+          "issues": 2
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 20,
+          "filtered_chunks": 20,
+          "removed_chunks": 0,
+          "original_chars": 4512,
+          "filtered_chars": 4512,
+          "removed_chars": 0,
+          "estimated_original_tokens": 1128,
+          "estimated_filtered_tokens": 1128,
+          "estimated_tokens_saved": 0,
+          "reduction_percentage": 0.0
+        },
+        "relevance": {
+          "total_chunks": 20,
+          "relevant_chunks": 3,
+          "irrelevant_chunks": 17,
+          "relevance_rate": 15.0,
+          "avg_confidence": 0.56
+        }
+      },
+      "warnings": [
+        "Reached max iterations (1) without passing validation"
+      ],
+      "source_filename": "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+      "extraction_timestamp": "2026-01-07T08:12:55.130815"
+    },
+    "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf": {
+      "final_data": {
+        "case_count": null,
+        "case_count_quote": null,
+        "patient_age": null,
+        "patient_age_quote": null,
+        "patient_sex": null,
+        "patient_sex_quote": null,
+        "presenting_symptoms": null,
+        "presenting_symptoms_quote": null,
+        "diagnostic_method": null,
+        "diagnostic_method_quote": null,
+        "imaging_findings": null,
+        "imaging_findings_quote": null,
+        "histopathology": null,
+        "histopathology_quote": null,
+        "immunohistochemistry": null,
+        "immunohistochemistry_quote": null,
+        "treatment": null,
+        "treatment_quote": null,
+        "outcome": null,
+        "outcome_quote": null,
+        "comorbidities": null,
+        "comorbidities_quote": null,
+        "filename": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+        "extraction_confidence": null,
+        "extraction_notes": null
+      },
+      "evidence": [],
+      "validation": {
+        "accuracy_score": 0.75,
+        "consistency_score": 0.8,
+        "overall_score": 0.77,
+        "passed": false,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.75,
+          "consistency": 0.8,
+          "overall": 0.77,
+          "issues": 13
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 39,
+          "filtered_chunks": 20,
+          "removed_chunks": 19,
+          "original_chars": 15876,
+          "filtered_chars": 5779,
+          "removed_chars": 10097,
+          "estimated_original_tokens": 3969,
+          "estimated_filtered_tokens": 1444,
+          "estimated_tokens_saved": 2524,
+          "reduction_percentage": 63.6
+        },
+        "relevance": {
+          "total_chunks": 20,
+          "relevant_chunks": 2,
+          "irrelevant_chunks": 18,
+          "relevance_rate": 10.0,
+          "avg_confidence": 0.54
+        }
+      },
+      "warnings": [
+        "Reached max iterations (1) without passing validation"
+      ],
+      "source_filename": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+      "extraction_timestamp": "2026-01-07T08:12:55.129985"
+    },
+    "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf": {
+      "final_data": {
+        "case_count": 1,
+        "case_count_quote": "A2-cm pulmonary nodule was incidentally discovered.",
+        "patient_age": [
+          "55"
+        ],
+        "patient_age_quote": "A 55-year-old nonsmoking Japanese woman",
+        "patient_sex": [
+          "female"
+        ],
+        "patient_sex_quote": "A 55-year-old nonsmoking Japanese woman",
+        "presenting_symptoms": [],
+        "presenting_symptoms_quote": null,
+        "diagnostic_method": [
+          "HRCT",
+          "contrast-enhanced chest CT"
+        ],
+        "diagnostic_method_quote": "Both highresolution CT (HRCT) and routine contrast-enhanced chest CT were obtained...",
+        "imaging_findings": [
+          "a 2-cm nodule with adjacent ground-glass opacity",
+          "tiny nodules of ground-glass attenuation",
+          "spiculated nodule in the posterior segment of the right upper lobe",
+          "ground-glass nodules in the right upper lobe"
+        ],
+        "imaging_findings_quote": "a spiculated 2-cm nodule with adjacent ground-glass opacity... ...tiny nodules of ground-glass attenuation (white arrows)... ...spiculated 2-cm nodule... ...ground-glass nodules...",
+        "histopathology": [
+          "well-differentiated adenocarcinoma, papillary subtype"
+        ],
+        "histopathology_quote": "The diagnosis of the main tumor was well-differentiated adenocarcinoma, papillary subtype...) C.",
+        "immunohistochemistry": [
+          "EMA",
+          "vimentin"
+        ],
+        "immunohistochemistry_quote": "...meningothelial-like nodules were immunoreactive for epithelial membrane antigen (EMA) and vimentin... ...Meningothelial-like nodules in the lung have been found in people aged 12 to 91 years...",
+        "treatment": null,
+        "treatment_quote": null,
+        "outcome": null,
+        "outcome_quote": null,
+        "comorbidities": [
+          "thromboembolism",
+          "cardiac disease",
+          "malignancy"
+        ],
+        "comorbidities_quote": "...Meningothelial-like nodules in the lung have been found in people aged 12 to 91 years, being most common in the seventh decade. They are multiple in 30% to 50%. The lesions are associated with thromboembolism in up to 51% of cases... ...The incidence of the lesions is estimated to be 0.3% to 4% in unselected autopsy cases... Korn et al. (4) described 19 cases, including 14 in females and four in males...",
+        "filename": "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+        "extraction_confidence": 0.8,
+        "extraction_notes": "Age is given as a range instead of a single value."
+      },
+      "evidence": [
+        {
+          "field_name": "case_count",
+          "extracted_value": "1",
+          "exact_quote": "A2-cm pulmonary nodule was incidentally discovered.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.95
+        },
+        {
+          "field_name": "patient_age",
+          "extracted_value": [
+            "55"
+          ],
+          "exact_quote": "A 55-year-old nonsmoking Japanese woman",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": [
+            "female"
+          ],
+          "exact_quote": "A 55-year-old nonsmoking Japanese woman",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_method",
+          "extracted_value": [
+            "HRCT",
+            "contrast-enhanced chest CT"
+          ],
+          "exact_quote": "Both highresolution CT (HRCT) and routine contrast-enhanced chest CT were obtained...",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": [
+            "a 2-cm nodule with adjacent ground-glass opacity",
+            "tiny nodules of ground-glass attenuation",
+            "spiculated nodule in the posterior segment of the right upper lobe",
+            "ground-glass nodules in the right upper lobe"
+          ],
+          "exact_quote": "...a spiculated 2-cm nodule with adjacent ground-glass opacity... ...(white arrows)... ...a spiculated 2-cm nodule... ...ground-glass nodules...",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "histopathology",
+          "extracted_value": [
+            "well-differentiated adenocarcinoma, papillary subtype"
+          ],
+          "exact_quote": "...The diagnosis of the main tumor was well-differentiated adenocarcinoma, papillary subtype...) C.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunohistochemistry",
+          "extracted_value": [
+            "EMA",
+            "vimentin"
+          ],
+          "exact_quote": "...meningothelial-like nodules were immunoreactive for epithelial membrane antigen (EMA) and vimentin...",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": [
+            "thromboembolism",
+            "cardiac disease",
+            "malignancy"
+          ],
+          "exact_quote": "...The incidence of the lesions is estimated to be 0.3% to 4% in unselected autopsy cases... Korn et al. (4) described 19 cases, including 14 in females and four in males...",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 0.95
+        }
+      ],
+      "validation": {
+        "accuracy_score": 0.8,
+        "consistency_score": 0.7,
+        "overall_score": 0.6080000000000001,
+        "passed": false,
+        "iterations": 1
+      },
+      "iteration_history": [
+        {
+          "iteration": 1,
+          "accuracy": 0.8,
+          "consistency": 0.7,
+          "overall": 0.6080000000000001,
+          "issues": 12
+        }
+      ],
+      "stats": {
+        "content_filter": {
+          "original_chunks": 20,
+          "filtered_chunks": 19,
+          "removed_chunks": 1,
+          "original_chars": 9682,
+          "filtered_chars": 8655,
+          "removed_chars": 1027,
+          "estimated_original_tokens": 2420,
+          "estimated_filtered_tokens": 2163,
+          "estimated_tokens_saved": 256,
+          "reduction_percentage": 10.6
+        },
+        "relevance": {
+          "total_chunks": 19,
+          "relevant_chunks": 14,
+          "irrelevant_chunks": 5,
+          "relevance_rate": 73.7,
+          "avg_confidence": 0.75
+        }
+      },
+      "warnings": [
+        "Reached max iterations (1) without passing validation"
+      ],
+      "source_filename": "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+      "extraction_timestamp": "2026-01-07T08:12:55.131440"
+    }
+  },
+  "extraction_stats": {
+    "total": 13,
+    "success": 11,
+    "failed": 2
+  }
+}

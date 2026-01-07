@@ -7,7 +7,7 @@ Extracts data from parsed documents into structured schemas.
 
 import os
 from typing import Type, TypeVar, Optional, Dict, Any, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from core import utils
 from core.parser import ParsedDocument
 
@@ -18,10 +18,18 @@ class EvidenceItem(BaseModel):
     """Citation evidence for a single extracted value."""
     field_name: str = Field(description="Name of the extracted field")
     extracted_value: Any = Field(description="The value that was extracted")
-    exact_quote: str = Field(description="Verbatim quote from source text supporting this value")
+    exact_quote: Optional[str] = Field(default="", description="Verbatim quote from source text supporting this value")
     page_number: Optional[int] = Field(default=None, description="Page number if known")
     chunk_index: Optional[int] = Field(default=None, description="Index of source chunk")
     confidence: float = Field(ge=0.0, le=1.0, default=0.9, description="Confidence in extraction accuracy")
+    
+    @field_validator('exact_quote', mode='before')
+    @classmethod
+    def coerce_quote_to_string(cls, v):
+        """Coerce None to empty string for robustness with local LLMs."""
+        if v is None:
+            return ""
+        return str(v)
 
 
 class ExtractionWithEvidence(BaseModel):
