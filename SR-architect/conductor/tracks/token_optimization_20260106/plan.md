@@ -1,6 +1,6 @@
 # Track Plan: Token Optimization & Hybrid Local/Cloud Architecture
 
-## Phase 0: POC Validation & Baseline Metrics
+## Phase 0: POC Validation & Baseline Metrics [checkpoint: 6f145c9]
 - [x] Task: Select 15-20 representative PDFs (5 RCTs, 5 multi-column, 5 scanned) for the test set. 2049
 - [x] Task: Create "golden dataset" of 20-30 manually verified extractions for these papers. 2151
 - [x] Task: Establish baseline metrics from current Sonnet-only pipeline (cost/paper, tokens/field, accuracy/F1, latency).
