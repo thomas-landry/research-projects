@@ -12,7 +12,7 @@
 - [x] Task: Implement dynamic `max_workers` throttling in `BatchExecutor` based on system health. bee24cd
 - [x] Task: Implement "Graceful Degradation" strategy: auto-escalate to cloud on local OOM. d1f5af9
 - [x] Task: Extend `TokenTracker` to log usage by (Tier × Field × Paper) and integrate `tiktoken`. bf4adb0
-- [ ] Task: Implement "Circuit Breaker" pattern in `BatchExecutor`: bypass local model after N consecutive failures.
+- [x] Task: Implement "Circuit Breaker" pattern in `BatchExecutor`: bypass local model after N consecutive failures. 8a12873
 - [ ] Task: Add failure taxonomy logging to `AuditLogger` (OOM, timeout, schema_fail, low_confidence).
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Resource Management & Observability Foundation' (Protocol in workflow.md)
 
