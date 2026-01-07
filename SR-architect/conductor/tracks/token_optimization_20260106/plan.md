@@ -9,7 +9,7 @@
 
 ## Phase 1: Resource Management & Observability Foundation
 - [x] Task: Implement `ResourceManager` module to monitor M4 RAM (18GB ceiling, 14GB throttle trigger) and CPU usage (`psutil`). 92a31d9
-- [ ] Task: Implement dynamic `max_workers` throttling in `BatchExecutor` based on system health.
+- [x] Task: Implement dynamic `max_workers` throttling in `BatchExecutor` based on system health. bee24cd
 - [ ] Task: Implement "Graceful Degradation" strategy: auto-escalate to cloud on local OOM.
 - [ ] Task: Extend `TokenTracker` to log usage by (Tier × Field × Paper) and integrate `tiktoken`.
 - [ ] Task: Implement "Circuit Breaker" pattern in `BatchExecutor`: bypass local model after N consecutive failures.
