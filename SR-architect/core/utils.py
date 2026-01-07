@@ -22,28 +22,46 @@ from rich.logging import RichHandler
 def setup_logging(level=None, log_file: Optional[Path] = None):
     """
     Configure organized logging with Rich and optional file output.
+    
+    - Console: Defaults to INFO (or 'level' arg), Clean output.
+    - File: Always DEBUG, Full details.
     """
     from .config import settings
     
-    log_level = level or settings.LOG_LEVEL
-    handlers: List[logging.Handler] = [RichHandler(rich_tracebacks=True)]
+    # Console level is determined by argument or settings
+    console_level = level or settings.LOG_LEVEL
+    
+    # Create Console Handler (Rich)
+    console_handler = RichHandler(rich_tracebacks=True, level=console_level)
+    
+    handlers: List[logging.Handler] = [console_handler]
     
     if settings.LOG_FILE_ENABLED or log_file:
         path = log_file or (settings.LOG_DIR / f"sr_architect_{datetime.now().strftime('%Y%m%d')}.log")
         path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Create File Handler
         file_handler = logging.FileHandler(path)
+        file_handler.setLevel(logging.DEBUG) # Always verbose in file
         file_handler.setFormatter(logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         ))
         handlers.append(file_handler)
 
+    # Configure Root Logger to DEBUG to allow all messages to flow to handlers
+    # Handlers will filter based on their individual levels
     logging.basicConfig(
-        level=log_level,
+        level=logging.DEBUG,
         format="%(message)s",
         datefmt="[%X]",
         handlers=handlers,
         force=True
     )
+    
+    # Suppress noisy libraries that might log at DEBUG
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 setup_logging()
 logger = logging.getLogger("SR-Architect")
