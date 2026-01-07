@@ -132,22 +132,28 @@ Input Fields:
         """
         Robustly select N papers for schema discovery.
         
-        - Filters for .pdf extension
-        - Filters out files < 10KB (likely corrupted or placeholder)
+        - Filters for .pdf and .txt extensions
+        - Filters out files < 100 bytes (for txt) or < 10KB (for pdf)
         - Shuffles for representative sampling
         """
         papers_path = Path(papers_dir)
-        all_pdfs = list(papers_path.glob("*.pdf"))
+        all_files = list(papers_path.glob("*.pdf")) + list(papers_path.glob("*.txt"))
         
-        # Filter by size (> 10KB)
-        valid_pdfs = [p for p in all_pdfs if p.stat().st_size > 10240]
+        # Filter by size
+        valid_files = []
+        for p in all_files:
+            size = p.stat().st_size
+            if p.suffix == ".pdf" and size > 10240:
+                valid_files.append(p)
+            elif p.suffix == ".txt" and size > 100:
+                valid_files.append(p)
         
-        if not valid_pdfs:
-            # Fallback to all PDFs if none are > 10KB, but log warning
-            self.logger.warning(f"No PDFs > 10KB found in {papers_dir}. Using all available PDFs.")
-            valid_pdfs = all_pdfs
+        if not valid_files:
+            # Fallback to all found files if filtering is too strict
+            self.logger.warning(f"No files passing size filter found in {papers_dir}. Using all available files.")
+            valid_files = all_files
             
-        if not valid_pdfs:
+        if not valid_files:
             return []
             
         # Shuffle
@@ -156,9 +162,9 @@ Input Fields:
         else:
             random.seed(42) # Stable default shuffle
             
-        random.shuffle(valid_pdfs)
+        random.shuffle(valid_files)
         
-        selected = valid_pdfs[:sample_size]
+        selected = valid_files[:sample_size]
         return [str(p) for p in selected]
 
     def analyze_paper(self, paper_path: str, existing_fields: Optional[List[str]] = None) -> DiscoveryResult:
@@ -166,7 +172,7 @@ Input Fields:
         Analyze a single paper to discover possible fields.
         
         Args:
-            paper_path: Path to PDF file
+            paper_path: Path to file (PDF or TXT)
             existing_fields: Optional list of fields already in the schema
             
         Returns:
@@ -174,8 +180,8 @@ Input Fields:
         """
         self.logger.info(f"Analyzing paper: {Path(paper_path).name}")
         
-        # Parse PDF
-        doc = self.parser.parse_pdf(paper_path)
+        # Parse file (supports PDF and TXT)
+        doc = self.parser.parse_file(paper_path)
         
         # Get extraction context (Abstract + Methods + Results)
         content = doc.get_extraction_context(max_chars=20000)

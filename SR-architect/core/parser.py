@@ -306,10 +306,27 @@ class DocumentParser:
         
         if ext == ".pdf":
             return self.parse_pdf(file_path)
-        # Other methods (HTML, Markdown, etc) would go here...
-        # For brevity and focus on PDF parsing for SRs, skipping them in this refactor
-        # but the structure remains the same.
+        elif ext == ".txt":
+            return self._parse_txt(path)
+            
         raise ValueError(f"Unsupported file extension: {ext}")
+
+    def _parse_txt(self, path: Path) -> ParsedDocument:
+        """Parse a simple text file."""
+        self.logger.info(f"Parsing text file: {path.name}")
+        full_text = path.read_text(encoding="utf-8")
+        chunks = self._simple_chunk(full_text, path.name)
+        
+        return ParsedDocument(
+            filename=path.name,
+            chunks=chunks,
+            full_text=full_text,
+            metadata={
+                "path": str(path),
+                "num_chunks": len(chunks),
+                "parser": "text"
+            }
+        )
 
 
 if __name__ == "__main__":
