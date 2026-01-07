@@ -85,6 +85,9 @@ class BatchExecutor:
                 # Note: Assuming pipeline is thread-safe or stateless enough
                 result = self.pipeline.extract_document(doc, schema, theme)
                 return (doc.filename, result, "success")
+            except MemoryError:
+                logger.error(f"OOM processing {doc.filename}")
+                return (doc.filename, {"error": "Out of memory", "error_type": "MemoryError"}, "failed")
             except Exception as e:
                 logger.error(f"Error processing {doc.filename}: {e}", exc_info=True)
                 return (doc.filename, str(e), "failed")
@@ -114,7 +117,8 @@ class BatchExecutor:
                         if callback:
                             callback(filename, serialized, "success")
                     else:
-                        self.state_manager.update_result(filename, {"error": data}, status="failed")
+                        error_payload = data if isinstance(data, dict) else {"error": str(data)}
+                        self.state_manager.update_result(filename, error_payload, status="failed")
                         logger.error(f"✗ Failed {filename}")
                         if callback:
                             callback(filename, data, "failed")
@@ -194,6 +198,13 @@ class BatchExecutor:
                     if callback:
                         callback(doc.filename, serialized, "success")
                     return result
+                except MemoryError:
+                    logger.error(f"OOM processing {doc.filename}")
+                    error_payload = {"error": "Out of memory", "error_type": "MemoryError"}
+                    self.state_manager.update_result(doc.filename, error_payload, status="failed")
+                    if callback:
+                        callback(doc.filename, error_payload, "failed")
+                    return None
                 except Exception as e:
                     logger.error(f"Error processing {doc.filename}: {e}", exc_info=True)
                     self.state_manager.update_result(doc.filename, {"error": str(e)}, status="failed")
