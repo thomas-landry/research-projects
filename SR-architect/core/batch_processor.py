@@ -19,7 +19,8 @@ class BatchExecutor:
         self,
         pipeline,
         state_manager: StateManager,
-        max_workers: int = 4
+        max_workers: int = 4,
+        resource_manager = None
     ):
         """
         Initialize the batch executor.
@@ -28,10 +29,12 @@ class BatchExecutor:
             pipeline: The HierarchicalExtractionPipeline instance (duck-typed)
             state_manager: The StateManager instance for checkpointing
             max_workers: Number of parallel threads
+            resource_manager: Optional ResourceManager for dynamic throttling
         """
         self.pipeline = pipeline
         self.state_manager = state_manager
         self.max_workers = max_workers
+        self.resource_manager = resource_manager
 
     def process_batch(
         self,
@@ -68,7 +71,12 @@ class BatchExecutor:
             logger.info("All documents already completed.")
             return list(state.results.values())
             
-        logger.info(f"Starting parallel extraction [workers={self.max_workers}] for {len(to_process)} documents.")
+        # Apply throttling
+        limit = self.max_workers
+        if self.resource_manager:
+            limit = self.resource_manager.get_recommended_workers(limit)
+            
+        logger.info(f"Starting parallel extraction [workers={limit}] for {len(to_process)} documents.")
         
         # Define worker function
         def _execute_single(doc: ParsedDocument):
@@ -82,7 +90,7 @@ class BatchExecutor:
                 return (doc.filename, str(e), "failed")
 
         # Execute
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+        with ThreadPoolExecutor(max_workers=limit) as executor:
             future_to_doc = {
                 executor.submit(_execute_single, doc): doc 
                 for doc in to_process
@@ -93,12 +101,6 @@ class BatchExecutor:
                     filename, data, status = future.result()
                     
                     if status == "success":
-                        # Convert pipeline result to dict for storage if needed, 
-                        # or store the object if StateManager handles it. 
-                        # Assuming PipelineResult is pydantic or serializable.
-                        # For now, we assume PipelineResult has a model_dump or dict method, 
-                        # or we store the result.final_data
-                        
                         # Use to_dict() if available, then model_dump(), then __dict__
                         if hasattr(data, 'to_dict'):
                             serialized = data.to_dict()
@@ -161,10 +163,18 @@ class BatchExecutor:
             logger.info("All documents already completed.")
             return list(state.results.values())
             
-        limit = concurrency_limit or self.max_workers
-        logger.info(f"Starting async parallel extraction [concurrency={limit}] for {len(to_process)} documents.")
+        effective_limit = concurrency_limit or self.max_workers
         
-        semaphore = asyncio.Semaphore(limit)
+        # Apply throttling if RM is present
+        if self.resource_manager:
+            recommended = self.resource_manager.get_recommended_workers(effective_limit)
+            if recommended < effective_limit:
+                logger.info(f"Throttling concurrency from {effective_limit} to {recommended} based on system resources.")
+                effective_limit = recommended
+                
+        logger.info(f"Starting async parallel extraction [concurrency={effective_limit}] for {len(to_process)} documents.")
+        
+        semaphore = asyncio.Semaphore(effective_limit)
 
         async def _execute_single_async(doc: ParsedDocument):
             async with semaphore:
