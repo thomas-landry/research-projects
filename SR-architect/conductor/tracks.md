@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [ ] Track: Robustness & Generalization — Adaptive Schema Discovery & Interactive Polish
+## [~] Track: Robustness & Generalization — Adaptive Schema Discovery & Interactive Polish
 *Link: [./conductor/tracks/robustness_generalization_20260106/](./conductor/tracks/robustness_generalization_20260106/)*
