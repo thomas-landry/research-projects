@@ -53,3 +53,43 @@ def test_interactive_builder_delete():
         
         assert len(fields) == 1
         assert fields[0].name == "field_b"
+
+def test_interactive_discovery_undo():
+    from agents.schema_discovery import interactive_discovery
+    
+    with patch("rich.prompt.Prompt.ask") as mock_ask, \
+         patch("rich.prompt.Confirm.ask") as mock_confirm, \
+         patch("agents.schema_discovery.SchemaDiscoveryAgent.discover_schema") as mock_discover:
+        
+        # Mock discovery to return empty initially
+        mock_discover.return_value = []
+        
+        # 1. Start discovery (empty)
+        # 2. Add custom fields? Yes
+        # 3. Field 1
+        # 4. Undo
+        # 5. Finish
+        mock_confirm.side_effect = [True, True] # Add custom fields?, Finish? (Wait, confirm loop is different)
+        # Sequence:
+        # interactive_discovery calls agent.discover_schema -> returns []
+        # Prints "No new fields discovered"
+        # returns [] (Wait, the logic returns early if no suggestions)
+        
+        # Let's mock it finding something
+        mock_discover.return_value = [FieldDefinition(name="discovered_1", description="desc")]
+        
+        mock_ask.side_effect = [
+            "manual_1", "desc manual",
+            "undo",
+            ""
+        ]
+        mock_confirm.side_effect = [
+            True, # Include 'discovered_1'?
+            True, # Add more custom fields manually?
+        ]
+        
+        fields = interactive_discovery("dummy_dir")
+        
+        # Should have 'discovered_1' but NOT 'manual_1'
+        assert len(fields) == 1
+        assert fields[0].name == "discovered_1"
