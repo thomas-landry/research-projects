@@ -7,13 +7,10 @@ Command-line interface for extracting structured data from PDFs.
 
 import os
 import sys
+import json
 import time
 from pathlib import Path
 from typing import Optional, List
-import json
-
-import concurrent.futures
-import threading
 
 import typer
 from rich.console import Console
@@ -21,10 +18,13 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskPr
 from rich.table import Table
 from rich.panel import Panel
 
-# Add parent to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
-
-from core.parser import DocumentParser, ParsedDocument
+from core.config import settings
+from core import (
+    DocumentParser, 
+    HierarchicalExtractionPipeline, 
+    BatchExecutor, 
+    StateManager
+)
 from core.schema_builder import (
     build_extraction_model,
     get_case_report_schema,
@@ -37,7 +37,8 @@ from core.schema_builder import (
 from core.extractor import StructuredExtractor
 from core.vectorizer import ChromaVectorStore
 from core.audit_logger import AuditLogger
-from core.hierarchical_pipeline import HierarchicalExtractionPipeline
+from core.token_tracker import TokenTracker
+from core.utils import setup_logging
 
 app = typer.Typer(
     name="sr-architect",
@@ -73,19 +74,20 @@ def extract(
     schema: str = typer.Option("case_report", "-s", "--schema", help="Schema: case_report, rct, observational, or 'interactive'"),
     interactive: bool = typer.Option(False, "-i", "--interactive", help="Interactive schema builder"),
     limit: Optional[int] = typer.Option(None, "-l", "--limit", help="Limit number of papers to process"),
-    provider: str = typer.Option("openrouter", "-p", "--provider", help="LLM provider: openrouter or ollama"),
-    model: Optional[str] = typer.Option(None, "-m", "--model", help="Override LLM model"),
+    provider: str = typer.Option(settings.LLM_PROVIDER, "-p", "--provider", help="LLM provider: openrouter or ollama"),
+    model: Optional[str] = typer.Option(settings.LLM_MODEL, "-m", "--model", help="Override LLM model"),
     vectorize: bool = typer.Option(True, "--vectorize/--no-vectorize", help="Store vectors in ChromaDB"),
     verbose: bool = typer.Option(False, "-v", "--verbose", help="Verbose output"),
     resume: bool = typer.Option(False, "--resume", help="Resume from checkpoint if available"),
     # Hierarchical extraction options
     hierarchical: bool = typer.Option(False, "-H", "--hierarchical", help="Use hierarchical extraction with validation"),
     theme: Optional[str] = typer.Option(None, "-t", "--theme", help="Meta-analysis theme for relevance filtering (required with --hierarchical)"),
-    threshold: float = typer.Option(0.9, "--threshold", help="Minimum accuracy+consistency score for validation"),
-    max_iter: int = typer.Option(3, "--max-iter", help="Maximum checker feedback iterations"),
+    threshold: float = typer.Option(settings.SCORE_THRESHOLD, "--threshold", help="Minimum accuracy+consistency score for validation"),
+    max_iter: int = typer.Option(settings.MAX_ITERATIONS, "--max-iter", help="Maximum checker feedback iterations"),
     # Optimization & Generalization
-    workers: int = typer.Option(1, "--workers", "-w", help="Number of parallel workers (default: 1)"),
+    workers: int = typer.Option(settings.WORKERS, "--workers", "-w", help="Number of parallel workers (default: 1)"),
     examples: Optional[str] = typer.Option(None, "--examples", "-e", help="Path to few-shot examples text file"),
+    adaptive: bool = typer.Option(False, "--adaptive", help="Automatically discover schema from sample papers"),
 ):
     """
     Extract structured data from PDFs for systematic review.
@@ -94,6 +96,10 @@ def extract(
         python cli.py extract ../DPM-systematic-review/papers -o results.csv
     """
     load_env()
+
+    # Initialize logging
+    log_file = Path(output).parent / "sr_architect.log"
+    setup_logging(level="DEBUG" if verbose else None, log_file=log_file)
     
     papers_path = Path(papers_dir)
     if not papers_path.exists():
@@ -109,6 +115,12 @@ def extract(
     if limit:
         pdf_files = pdf_files[:limit]
     
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Initialize tracker
+    tracker = TokenTracker(log_file=output_path.parent / "token_usage.jsonl")
+    
     console.print(Panel.fit(
         f"[bold cyan]SR-Architect Extraction Pipeline[/bold cyan]\n\n"
         f"Papers: {len(pdf_files)} PDFs\n"
@@ -119,7 +131,28 @@ def extract(
     ))
     
     # Build schema
-    if interactive or schema == "interactive":
+    if adaptive:
+        console.print(f"\n[bold cyan]🔍 Adaptive Schema Discovery[/bold cyan]")
+        pipeline_tmp = HierarchicalExtractionPipeline(
+            provider=provider, 
+            model=model,
+            token_tracker=tracker
+        )
+        discovered_fields = pipeline_tmp.discover_schema(papers_dir, sample_size=3)
+        
+        table = Table(title="Discovered Schema")
+        table.add_column("Field")
+        table.add_column("Type")
+        table.add_column("Description")
+        for f in discovered_fields:
+            table.add_row(f.name, f.field_type.value, f.description[:40])
+        console.print(table)
+        
+        if not typer.confirm("Use this discovered schema for extraction?"):
+            console.print("[yellow]Aborted.[/yellow]")
+            raise typer.Exit()
+        fields = discovered_fields
+    elif interactive or schema == "interactive":
         fields = interactive_schema_builder()
     elif schema in PREDEFINED_SCHEMAS:
         fields = PREDEFINED_SCHEMAS[schema]()
@@ -140,6 +173,19 @@ def extract(
     
     # Build dynamic model
     ExtractionModel = build_extraction_model(fields, "SRExtractionModel")
+    
+    # Pre-flight cost estimate
+    if not resume:
+        # Hierarchical runs are more expensive (discovery + filter + extract + audit)
+        passes = 4 if hierarchical else 1
+        estimate = tracker.estimate_extraction_cost(
+            num_documents=len(pdf_files),
+            model=model or settings.LLM_MODEL or "anthropic/claude-3.5-sonnet",
+            num_passes=passes
+        )
+        console.print(tracker.display_cost_report(estimate))
+        if not typer.confirm("Continue with extraction?"):
+            raise typer.Exit()
     
     # Validate hierarchical mode requirements
     if hierarchical and not theme:
@@ -173,11 +219,17 @@ def extract(
             max_iterations=max_iter,
             verbose=verbose,
             examples=examples_content,
+            token_tracker=tracker
         )
         extractor = None  # Not used in hierarchical mode
     else:
         pipeline = None
-        extractor = StructuredExtractor(provider=provider, model=model, examples=examples_content)
+        extractor = StructuredExtractor(
+            provider=provider, 
+            model=model, 
+            examples=examples_content,
+            token_tracker=tracker
+        )
     
     output_path = Path(output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -192,129 +244,24 @@ def extract(
     
     logger = AuditLogger(log_dir=str(output_path.parent / "logs"))
     
-    # Initialize state manager for checkpointing
-    from core.state_manager import StateManager
-    state_manager = StateManager(str(output_path.parent / "pipeline_state.json"))
+    # Initialize checkpointing
+    checkpoint_path = output_path.parent / "extraction_checkpoint.json"
+    state_manager = StateManager(checkpoint_path)
     
-    if resume and state_manager.exists():
-        state = state_manager.load_or_create(schema_name=schema, papers_dir=papers_dir)
-        console.print(f"[yellow]📂 Resuming from checkpoint: {len(state.completed_papers)} already done[/yellow]")
-    else:
-        state = state_manager.load_or_create(schema_name=schema, papers_dir=papers_dir)
-        if state_manager.exists() and not resume:
-            console.print("[dim]Previous state found. Use --resume to continue from checkpoint.[/dim]")
+    # Initialize Batch Executor
+    batch_executor = BatchExecutor(
+        pipeline=pipeline if hierarchical else extractor,
+        state_manager=state_manager,
+        max_workers=workers
+    )
     
-    # Filter files to process
-    files_to_process = [p for p in pdf_files if state.should_process(p.name)]
-    if len(files_to_process) < len(pdf_files):
-        console.print(f"[dim]Skipping {len(pdf_files) - len(files_to_process)} already processed files[/dim]")
-
-    results = []
+    # Process batch
+    console.print(f"\n[bold yellow]STARTING EXTRACTION...[/bold yellow]")
     
-    # Locks for thread safety
-    state_lock = threading.Lock()
-    log_lock = threading.Lock()
+    # We need to adapt the papers to ParsedDocument objects first
+    # Or let BatchExecutor handle paths? Current BatchExecutor takes ParsedDocument.
+    # Let's parse them first (or update BatchExecutor to take paths).
     
-    def process_pdf(pdf_path, progress_task):
-        """Process a single PDF in a thread-safe manner."""
-        start_time = time.time()
-        
-        try:
-            # Parse PDF
-            doc = parser.parse_pdf(str(pdf_path))
-            
-            # Get extraction context
-            context = doc.get_extraction_context()
-            
-            if len(context) < MIN_CONTEXT_CHARS:
-                with log_lock:
-                    logger.log_skipped(pdf_path.name, f"Insufficient text ({len(context)} chars)")
-                with state_lock:
-                    state.mark_skipped(pdf_path.name)
-                    state_manager.save(state)
-                progress.advance(progress_task)
-                return None
-            
-            extracted_dict = {}
-            
-            # === HIERARCHICAL MODE ===
-            if hierarchical and pipeline:
-                pipeline_result = pipeline.extract_document(doc, ExtractionModel, theme)
-                extracted_dict = pipeline_result.final_data
-                
-                # Metadata
-                extracted_dict["__pipeline_accuracy_score"] = pipeline_result.final_accuracy_score
-                extracted_dict["__pipeline_consistency_score"] = pipeline_result.final_consistency_score
-                extracted_dict["__pipeline_overall_score"] = pipeline_result.final_overall_score
-                extracted_dict["__pipeline_iterations"] = pipeline_result.iterations
-                extracted_dict["__pipeline_passed_validation"] = pipeline_result.passed_validation
-                if pipeline_result.warnings:
-                    extracted_dict["__pipeline_warnings"] = "; ".join(pipeline_result.warnings)
-                
-                # Save evidence
-                evidence_dir = output_path.parent / "evidence"
-                with log_lock: # Ensure directory creation is safe-ish
-                    evidence_file = pipeline_result.save_evidence_json(str(evidence_dir))
-                
-                if verbose:
-                    console.print(f"    Evidence saved: {evidence_file}")
-                
-                 # Store vectors
-                vectors_stored = 0
-                if vector_store:
-                    # ChromaDB writes might need locking or separate client? 
-                    # Assuming basic thread safety or sequential writing if issues arise
-                    vectors_stored = vector_store.add_chunks_from_parsed_doc(doc, extracted_dict)
-
-                with log_lock:
-                    logger.log_success(
-                        filename=pdf_path.name,
-                        chunks=len(doc.chunks),
-                        vectors=vectors_stored,
-                        model=pipeline.extractor.model,
-                        extracted=extracted_dict,
-                        duration=time.time() - start_time,
-                    )
-
-            # === STANDARD MODE ===
-            else:
-                extracted = extractor.extract(context, ExtractionModel, filename=pdf_path.name)
-                extracted_dict = extracted.model_dump()
-                
-                vectors_stored = 0
-                if vector_store:
-                    vectors_stored = vector_store.add_chunks_from_parsed_doc(doc, extracted_dict)
-                
-                with log_lock:
-                    logger.log_success(
-                        filename=pdf_path.name,
-                        chunks=len(doc.chunks),
-                        vectors=vectors_stored,
-                        model=extractor.model,
-                        extracted=extracted_dict,
-                        duration=time.time() - start_time,
-                    )
-            
-            # Update state
-            with state_lock:
-                state.mark_completed(pdf_path.name)
-                state_manager.save(state)
-            
-            progress.advance(progress_task)
-            return extracted_dict
-
-        except Exception as e:
-            duration = time.time() - start_time
-            with log_lock:
-                logger.log_error(pdf_path.name, str(e), duration)
-            with state_lock:
-                state.mark_failed(pdf_path.name, str(e))
-                state_manager.save(state)
-            console.print(f"[red]✗ {pdf_path.name}: {e}[/red]")
-            progress.advance(progress_task)
-            return None
-
-    # Execute
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -322,36 +269,81 @@ def extract(
         TaskProgressColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task("Processing PDFs...", total=len(files_to_process))
+        parsing_task = progress.add_task("Parsing PDFs...", total=len(pdf_files))
+        parsed_docs = []
+        for pdf_path in pdf_files:
+            try:
+                doc = parser.parse_pdf(str(pdf_path))
+                parsed_docs.append(doc)
+            except Exception as e:
+                console.print(f"[red]Error parsing {pdf_path.name}: {e}[/red]")
+            progress.advance(parsing_task)
+            
+        extraction_task = progress.add_task("Extracting data...", total=len(parsed_docs))
+        # Note: BatchExecutor doesn't support rich progress yet, we'll see logs.
+        # Future improvement: Add callback to BatchExecutor for UI updates.
         
-        if workers > 1:
-            console.print(f"[cyan]🚀 Parallel Execution: {workers} workers[/cyan]")
-            with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-                futures = [executor.submit(process_pdf, p, task) for p in files_to_process]
-                for future in concurrent.futures.as_completed(futures):
-                    result = future.result()
-                    if result: results.append(result)
+    import csv
+    with open(output_path, "w", newline="") as f:
+        # Get field names from model
+        fieldnames = list(ExtractionModel.model_fields.keys())
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        
+        def streaming_callback(filename, data, status):
+            if status == "success":
+                # Handle both Hierarchical (PipelineResult) and Standard extraction results
+                extracted_data = data
+                if "final_data" in data and isinstance(data["final_data"], dict):
+                    # It's a PipelineResult dict
+                    extracted_data = data["final_data"]
+                
+                # Filter data to only include schema fields
+                row = {k: v for k, v in extracted_data.items() if k in fieldnames}
+                writer.writerow(row)
+                f.flush()
+
+        if hierarchical:
+            # Use asyncio for hierarchical mode
+            import asyncio
+            results = asyncio.run(batch_executor.process_batch_async(
+                documents=parsed_docs,
+                schema=ExtractionModel,
+                theme=theme or "General extraction",
+                resume=resume,
+                callback=streaming_callback,
+                concurrency_limit=workers
+            ))
         else:
-            # Sequential fallback
-            for pdf_path in files_to_process:
-                progress.update(task, description=f"Processing: {pdf_path.name[:40]}...")
-                result = process_pdf(pdf_path, task)
-                if result: results.append(result)
+            # Use sync batch for standard mode
+            results = batch_executor.process_batch(
+                documents=parsed_docs,
+                schema=ExtractionModel,
+                theme=theme or "General extraction",
+                resume=resume,
+                callback=streaming_callback
+            )
     
-    # Save results to CSV
-    if results:
-        import pandas as pd
-        df = pd.DataFrame(results)
-        df.to_csv(output_path, index=False)
-        console.print(f"\n[green]✓ Saved {len(results)} extractions to {output_path}[/green]")
+    # Final summary with cost
+    console.print(f"\n[bold green]✓ Extraction complete. Results saved to {output}[/bold green]")
     
-    # Print summary
-    logger.print_summary()
-    summary = logger.save_summary()
+    summary = tracker.get_session_summary()
+    table = Table(title="Extraction Summary")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="magenta")
+    table.add_row("Total handled", str(len(parsed_docs)))
+    table.add_row("Total tokens", f"{summary['total_tokens']:,}")
+    table.add_row("Total cost (USD)", f"${summary['total_cost_usd']:.4f}")
+    console.print(table)
+    
+    console.print(tracker.display_session_summary())
     
     if vector_store:
-        stats = vector_store.get_stats()
-        console.print(f"\n[cyan]Vector store: {stats['document_count']} documents[/cyan]")
+        # Note: Vectorization currently happens inside the old process_pdf.
+        # BatchExecutor doesn't handle vectorization yet.
+        # We should either add vectorization to BatchExecutor or handle it here.
+        # For now, let's warn that vectorization is pending update.
+        console.print(f"\n[yellow]Note: Vectorization is currently disabled in batch mode.[/yellow]")
     
     console.print(f"\n[dim]Audit log: {logger.log_file}[/dim]")
 

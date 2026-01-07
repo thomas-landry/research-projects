@@ -88,6 +88,7 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
         api_key: Optional[str] = None,
         accuracy_weight: float = 0.6,
         consistency_weight: float = 0.4,
+        token_tracker: Optional["TokenTracker"] = None,
     ):
         """
         Initialize the extraction checker.
@@ -105,14 +106,16 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
         
         self.accuracy_weight = accuracy_weight
         self.consistency_weight = consistency_weight
+        self.token_tracker = token_tracker
         self._instructor_client = None
+        self._async_instructor_client = None
         
         from core.utils import get_logger
         self.logger = get_logger("ExtractionChecker")
 
     @property
     def client(self):
-        """Initialize and return the Instructor-patched client."""
+        """Initialize and return the Instructor-patched client (Sync)."""
         if self._instructor_client is not None:
             return self._instructor_client
         
@@ -123,6 +126,20 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
             api_key=self.api_key
         )
         return self._instructor_client
+
+    @property
+    def async_client(self):
+        """Initialize and return the Instructor-patched client (Async)."""
+        if self._async_instructor_client is not None:
+            return self._async_instructor_client
+        
+        from core.utils import get_async_llm_client
+        
+        self._async_instructor_client = get_async_llm_client(
+            provider=self.provider,
+            api_key=self.api_key
+        )
+        return self._async_instructor_client
     
     def _format_source_text(self, chunks: List[DocumentChunk], max_chars: int = 8000) -> str:
         """Format source chunks for the checker prompt."""
@@ -214,7 +231,7 @@ Validate each extracted field:
 Provide scores, issues, and specific revision suggestions."""
 
         try:
-            response = client.chat.completions.create(
+            response, completion = client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": self.SYSTEM_PROMPT},
@@ -222,6 +239,18 @@ Provide scores, issues, and specific revision suggestions."""
                 ],
                 response_model=CheckerResponse,
             )
+            
+            # Record usage
+            if self.token_tracker and hasattr(completion, 'usage') and completion.usage:
+                self.token_tracker.record_usage(
+                    usage={
+                        "prompt_tokens": completion.usage.prompt_tokens,
+                        "completion_tokens": completion.usage.completion_tokens,
+                        "total_tokens": completion.usage.total_tokens
+                    },
+                    model=self.model,
+                    operation="extraction_check"
+                )
             
             # Calculate overall score
             overall_score = (
@@ -253,6 +282,95 @@ Provide scores, issues, and specific revision suggestions."""
                 suggestions=["Re-extract all fields due to validation error"],
                 passed=False,
             )
+
+    async def check_async(
+        self,
+        source_chunks: List[DocumentChunk],
+        extracted_data: Dict[str, Any],
+        evidence: List[Dict[str, Any]],
+        theme: str,
+        threshold: float = 0.9,
+    ) -> CheckerResult:
+        """
+        Validate extraction accuracy and consistency (Async).
+        """
+        client = self.async_client
+        
+        source_text = self._format_source_text(source_chunks)
+        data_text = self._format_extracted_data(extracted_data)
+        evidence_text = self._format_evidence(evidence)
+        
+        user_prompt = f"""Verify the following extraction for the meta-analysis theme: "{theme}"
+
+=== ORIGINAL SOURCE TEXT ===
+{source_text}
+
+=== EXTRACTED DATA ===
+{data_text}
+
+=== EVIDENCE CITATIONS ===
+{evidence_text}
+
+Validate each extracted field:
+1. Does the value match the cited quote exactly?
+2. Does the field match the theme requirements?
+
+Provide scores, issues, and specific revision suggestions."""
+
+        try:
+            response, completion = await client.chat.completions.create_with_completion(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": self.SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                response_model=CheckerResponse,
+            )
+            
+            # Record usage
+            if self.token_tracker and hasattr(completion, 'usage') and completion.usage:
+                self.token_tracker.record_usage(
+                    usage={
+                        "prompt_tokens": completion.usage.prompt_tokens,
+                        "completion_tokens": completion.usage.completion_tokens,
+                        "total_tokens": completion.usage.total_tokens
+                    },
+                    model=self.model,
+                    operation="extraction_validation"
+                )
+            
+            # Calculate overall score
+            overall_score = (
+                response.accuracy_score * self.accuracy_weight +
+                response.consistency_score * self.consistency_weight
+            )
+            
+            return CheckerResult(
+                accuracy_score=response.accuracy_score,
+                consistency_score=response.consistency_score,
+                overall_score=overall_score,
+                issues=response.issues,
+                suggestions=response.suggestions,
+                passed=overall_score >= threshold,
+            )
+            
+        except Exception as e:
+            # On error, return a failed result
+            self.logger.error(f"Async Checker failed: {e}")
+            return CheckerResult(
+                accuracy_score=0.0,
+                consistency_score=0.0,
+                overall_score=0.0,
+                issues=[Issue(
+                    field="*",
+                    issue_type="error",
+                    severity="high",
+                    detail=f"Async Checker failed: {str(e)}",
+                )],
+                suggestions=["Re-extract all fields due to validation error"],
+                passed=False,
+            )
+
     
     def format_revision_prompt(self, result: CheckerResult) -> str:
         """

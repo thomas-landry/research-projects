@@ -8,10 +8,10 @@ Extracts data from parsed documents into structured schemas.
 import os
 from typing import Type, TypeVar, Optional, Dict, Any, List
 from pydantic import BaseModel, Field
-from pathlib import Path
+from core import utils
+from core.parser import ParsedDocument
 
 T = TypeVar('T', bound=BaseModel)
-EVIDENCE_CONTEXT_CHARS = 8000
 
 
 class EvidenceItem(BaseModel):
@@ -31,26 +31,7 @@ class ExtractionWithEvidence(BaseModel):
     extraction_metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
-def load_env():
-    """Load environment variables from .env file."""
-    env_paths = [
-        Path.cwd() / ".env",
-        Path(__file__).parent.parent / ".env",
-        Path.home() / "Projects" / ".env",
-    ]
-    
-    for env_path in env_paths:
-        if env_path.exists():
-            with open(env_path) as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        key, _, value = line.partition("=")
-                        key = key.strip()
-                        value = value.strip().strip("'\"")
-                        if key and value:
-                            os.environ.setdefault(key, value)
-            break
+# Using utils.load_env
 
 
 class StructuredExtractor:
@@ -85,6 +66,7 @@ Extract the requested fields according to the provided schema."""
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
         examples: Optional[str] = None,
+        token_tracker: Optional["TokenTracker"] = None,
     ):
         """
         Initialize the extractor logic.
@@ -95,8 +77,9 @@ Extract the requested fields according to the provided schema."""
             api_key: API key
             base_url: Base URL
             examples: Few-shot examples string to append to prompt
+            token_tracker: Optional TokenTracker for cost tracking
         """
-        load_env()
+        utils.load_env()
         
         self.provider = provider.lower()
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
@@ -114,16 +97,21 @@ Extract the requested fields according to the provided schema."""
         
         self._client = None
         self._instructor_client = None
+        self._async_instructor_client = None
+        
+        # Token tracking
+        self.token_tracker = token_tracker
         
         # Usage tracking
         self._stats = {
             "total_calls": 0,
             "calls_by_model": {},
-            "errors": 0
+            "errors": 0,
+            "total_prompt_tokens": 0,
+            "total_completion_tokens": 0,
         }
         
-        from core.utils import get_logger
-        self.logger = get_logger("StructuredExtractor")
+        self.logger = utils.get_logger("StructuredExtractor")
         
         # Build dynamic system prompt
         self.system_prompt = self.SYSTEM_PROMPT_TEMPLATE
@@ -141,22 +129,48 @@ Extract the requested fields according to the provided schema."""
         if self._instructor_client is not None:
             return self._instructor_client
         
-        from core.utils import get_llm_client
-        
         self.logger.debug(f"Initializing LLM client for provider: {self.provider}")
-        self._instructor_client = get_llm_client(
+        self._instructor_client = utils.get_llm_client(
             provider=self.provider,
             api_key=self.api_key
         )
         
         return self._instructor_client
+
+    @property
+    def async_client(self):
+        """Initialize and return the Instructor-patched async client."""
+        if self._async_instructor_client is not None:
+            return self._async_instructor_client
+        
+        self.logger.debug(f"Initializing Async LLM client for provider: {self.provider}")
+        self._async_instructor_client = utils.get_async_llm_client(
+            provider=self.provider,
+            api_key=self.api_key
+        )
+        
+        return self._async_instructor_client
     
-    def _track_usage(self, model: str, success: bool = True):
-        """Track call statistics."""
+    def _track_usage(self, model: str, success: bool = True, usage: Optional[Dict[str, int]] = None, filename: Optional[str] = None):
+        """Track call statistics and token usage."""
         self._stats["total_calls"] += 1
         self._stats["calls_by_model"][model] = self._stats["calls_by_model"].get(model, 0) + 1
         if not success:
             self._stats["errors"] += 1
+        
+        # Track token usage if available
+        if usage:
+            self._stats["total_prompt_tokens"] += usage.get("prompt_tokens", 0)
+            self._stats["total_completion_tokens"] += usage.get("completion_tokens", 0)
+            
+            # Record in token tracker if available
+            if self.token_tracker:
+                self.token_tracker.record_usage(
+                    usage=usage,
+                    model=model,
+                    filename=filename,
+                    operation="extraction",
+                )
     
     def extract(
         self,
@@ -180,13 +194,35 @@ Extract the requested fields according to the provided schema."""
             {"role": "user", "content": f"Extract data from the following academic paper text:\n\n{text}"},
         ]
         
+        # 1. Check Cache
+        from core.utils import LLMCache
+        cache = LLMCache()
+        cached_result = cache.get(self.model, messages, response_model=schema)
+        if cached_result:
+            self.logger.info(f"✓ Using cached extraction for {filename or 'text'}")
+            return cached_result
+
         try:
             self.logger.info(f"Extracting data from {filename or 'text'} using {self.model}")
-            result = self.client.chat.completions.create(
+            result, completion = self.client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=messages,
                 response_model=schema,
             )
+            
+            # Record usage
+            if hasattr(completion, 'usage') and completion.usage:
+                usage_dict = {
+                    "prompt_tokens": completion.usage.prompt_tokens,
+                    "completion_tokens": completion.usage.completion_tokens,
+                    "total_tokens": completion.usage.total_tokens
+                }
+                self._track_usage(self.model, success=True, usage=usage_dict, filename=filename)
+            else:
+                self._track_usage(self.model, success=True)
+            
+            # 2. Save to Cache
+            cache.set(self.model, messages, result)
             
             # Add filename if the schema supports it
             if hasattr(result, 'filename') and filename:
@@ -199,6 +235,76 @@ Extract the requested fields according to the provided schema."""
             self._track_usage(self.model, success=False)
             self.logger.error(f"Extraction failed: {e}")
             raise RuntimeError(f"Extraction failed for {filename or 'text'}: {str(e)}") from e
+
+    async def extract_async(
+        self,
+        text: str,
+        schema: Type[T],
+        filename: Optional[str] = None,
+    ) -> T:
+        """
+        Extract structured data from text (Async).
+        """
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": f"Extract data from the following academic paper text:\n\n{text}"},
+        ]
+        
+        # 1. Check Cache
+        from core.utils import LLMCache
+        cache = LLMCache()
+        cached_result = cache.get(self.model, messages, response_model=schema)
+        if cached_result:
+            self.logger.info(f"✓ Using cached extraction (async) for {filename or 'text'}")
+            return cached_result
+
+        try:
+            self.logger.info(f"Extracting data (async) from {filename or 'text'} examples={len(self.examples)} using {self.model}")
+            result, completion = await self.async_client.chat.completions.create_with_completion(
+                model=self.model,
+                messages=messages,
+                response_model=schema,
+            )
+            
+            # Record usage
+            if hasattr(completion, 'usage') and completion.usage:
+                usage_dict = {
+                    "prompt_tokens": completion.usage.prompt_tokens,
+                    "completion_tokens": completion.usage.completion_tokens,
+                    "total_tokens": completion.usage.total_tokens
+                }
+                self._track_usage(self.model, success=True, usage=usage_dict, filename=filename)
+            else:
+                self._track_usage(self.model, success=True)
+
+            # 2. Save to Cache
+            cache.set(self.model, messages, result)
+            
+            # Add filename if the schema supports it
+            if hasattr(result, 'filename') and filename:
+                result.filename = filename
+            
+            return result
+        
+        except Exception as e:
+            self._track_usage(self.model, success=False)
+            self.logger.error(f"Async extraction failed: {e}")
+            raise RuntimeError(f"Async extraction failed for {filename or 'text'}: {str(e)}") from e
+
+        
+    def extract_document(
+        self,
+        document: ParsedDocument,
+        schema: Type[T],
+        theme: str = "",
+    ) -> Any:
+        """
+        Batch-compatible extraction method.
+        Matches HierarchicalExtractionPipeline.extract_document signature.
+        """
+        # For standard extraction, we just use the full context
+        context = document.get_extraction_context()
+        return self.extract_with_retry(context, schema, filename=document.filename)
     
     def extract_with_retry(
         self,
@@ -207,18 +313,7 @@ Extract the requested fields according to the provided schema."""
         filename: Optional[str] = None,
         max_retries: int = 2,
     ) -> T:
-        """
-        Extract with automatic retry on failure.
-        
-        Args:
-            text: Document text
-            schema: Pydantic schema
-            filename: Source filename
-            max_retries: Maximum retry attempts
-            
-        Returns:
-            Extracted data
-        """
+        """Sync with retry."""
         last_error = None
         
         for attempt in range(max_retries + 1):
@@ -228,6 +323,28 @@ Extract the requested fields according to the provided schema."""
                 last_error = e
                 if attempt < max_retries:
                     self.logger.warning(f"Retry {attempt + 1}/{max_retries} for {filename} due to: {e}")
+        
+        raise last_error
+
+    async def extract_with_retry_async(
+        self,
+        text: str,
+        schema: Type[T],
+        filename: Optional[str] = None,
+        max_retries: int = 2,
+    ) -> T:
+        """
+        Extract with automatic retry on failure (Async).
+        """
+        last_error = None
+        
+        for attempt in range(max_retries + 1):
+            try:
+                return await self.extract_async(text, schema, filename)
+            except Exception as e:
+                last_error = e
+                if attempt < max_retries:
+                    self.logger.warning(f"Retry {attempt + 1}/{max_retries} (async) for {filename} due to: {e}")
         
         raise last_error
     
@@ -299,11 +416,20 @@ You will receive text and must output:
         
         try:
             # First, extract the data using the provided schema
-            data_result = self.client.chat.completions.create(
+            data_result, completion = self.client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=messages,
                 response_model=schema,
             )
+            
+            # Record usage
+            if hasattr(completion, 'usage') and completion.usage:
+                usage_dict = {
+                    "prompt_tokens": completion.usage.prompt_tokens,
+                    "completion_tokens": completion.usage.completion_tokens,
+                    "total_tokens": completion.usage.total_tokens
+                }
+                self._track_usage(self.model, success=True, usage=usage_dict, filename=filename)
             
             # Convert to dict
             data_dict = data_result.model_dump()
@@ -314,10 +440,10 @@ You will receive text and must output:
             
             # Now extract evidence for each field
             # Use proportional truncation based on data location hints
-            evidence_context = text[:EVIDENCE_CONTEXT_CHARS]
-            if len(text) > EVIDENCE_CONTEXT_CHARS:
+            evidence_context = text[:12000]
+            if len(text) > 12000:
                 # Log warning about truncation
-                print(f"Warning: Text truncated from {len(text)} to {EVIDENCE_CONTEXT_CHARS} chars for evidence extraction")
+                self.logger.warning(f"Text truncated from {len(text)} to 12000 chars for evidence extraction")
 
             evidence_messages = [
                 {"role": "system", "content": self.self_proving_prompt},
@@ -334,11 +460,20 @@ Provide evidence citations for each extracted value. For each field that has a n
             class EvidenceResponse(BaseModel):
                 evidence: List[EvidenceItem]
             
-            evidence_result = self.client.chat.completions.create(
+            evidence_result, completion_ev = self.client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=evidence_messages,
                 response_model=EvidenceResponse,
             )
+            
+            # Record usage
+            if hasattr(completion_ev, 'usage') and completion_ev.usage:
+                usage_dict = {
+                    "prompt_tokens": completion_ev.usage.prompt_tokens,
+                    "completion_tokens": completion_ev.usage.completion_tokens,
+                    "total_tokens": completion_ev.usage.total_tokens
+                }
+                self._track_usage(self.model, success=True, usage=usage_dict, filename=filename)
             
             return ExtractionWithEvidence(
                 data=data_dict,
@@ -354,10 +489,78 @@ Provide evidence citations for each extracted value. For each field that has a n
         except Exception as e:
             raise RuntimeError(f"Self-proving extraction failed for {filename or 'text'}: {str(e)}") from e
 
+    async def extract_with_evidence_async(
+        self,
+        text: str,
+        schema: Type[T],
+        filename: Optional[str] = None,
+        revision_prompts: Optional[List[str]] = None,
+    ) -> ExtractionWithEvidence:
+        """
+        Extract structured data with self-proving evidence citations (Async).
+        """
+        # Build the user message
+        user_content = f"Extract data from the following academic paper text:\n\n{text}"
+        
+        if revision_prompts:
+            revision_text = "\n".join(f"- {p}" for p in revision_prompts)
+            user_content += f"\n\n--- REVISION INSTRUCTIONS ---\nPlease fix the following issues from the previous extraction:\n{revision_text}\n\nBe especially careful with these corrections."
+        
+        schema_fields = list(schema.model_fields.keys()) if hasattr(schema, 'model_fields') else []
+        fields_info = f"\n\nFields to extract: {', '.join(schema_fields)}" if schema_fields else ""
+        user_content += fields_info
+        
+        messages = [
+            {"role": "system", "content": self.self_proving_prompt},
+            {"role": "user", "content": user_content},
+        ]
+        
+        try:
+            # First, extract the data
+            data_result = await self.async_client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                response_model=schema,
+            )
+            data_dict = data_result.model_dump()
+            if filename:
+                data_dict["filename"] = filename
+            
+            # Evidence extraction
+            evidence_context = text[:12000]
+            evidence_messages = [
+                {"role": "system", "content": self.self_proving_prompt},
+                {"role": "user", "content": f"Based on this text:\n{evidence_context}\n\nAnd these extracted values:\n{data_dict}\n\nProvide evidence citations for each extracted value."},
+            ]
+            
+            class EvidenceResponse(BaseModel):
+                evidence: List[EvidenceItem]
+            
+            ev_result = await self.async_client.chat.completions.create(
+                model=self.model,
+                messages=evidence_messages,
+                response_model=EvidenceResponse,
+            )
+            
+            return ExtractionWithEvidence(
+                data=data_dict,
+                evidence=ev_result.evidence,
+                extraction_metadata={
+                    "filename": filename,
+                    "model": self.model,
+                    "provider": self.provider,
+                    "had_revision_prompts": bool(revision_prompts),
+                }
+            )
+        except Exception as e:
+            raise RuntimeError(f"Async self-proving extraction failed for {filename or 'text'}: {str(e)}") from e
+
+
 
 if __name__ == "__main__":
     # Quick test
-    from schema_builder import get_case_report_schema, build_extraction_model
+    from core.schema_builder import get_case_report_schema, build_extraction_model
+
     
     schema = get_case_report_schema()
     Model = build_extraction_model(schema, "DPMModel")

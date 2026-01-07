@@ -108,11 +108,12 @@ Input Fields:
 {fields_json}
 """
 
-    def __init__(self, provider: str = "openrouter", model: Optional[str] = None, api_key: Optional[str] = None):
+    def __init__(self, provider: str = "openrouter", model: Optional[str] = None, api_key: Optional[str] = None, token_tracker: Optional["TokenTracker"] = None):
         """Initialize the discovery agent."""
         self.provider = provider
         self.model = model or "gpt-4o"
         self.api_key = api_key
+        self.token_tracker = token_tracker
         self.parser = DocumentParser()
         self._extractor = None
         self._client = None
@@ -155,14 +156,27 @@ Input Fields:
         # Prepare prompt
         prompt = self.DISCOVERY_PROMPT.format(content=content)
         
-        result = self.client.chat.completions.create(
+        response, completion = self.client.chat.completions.create_with_completion(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             response_model=DiscoveryResult,
         )
         
-        result.filename = Path(paper_path).name
-        return result
+        # Record usage
+        if self.token_tracker and hasattr(completion, 'usage') and completion.usage:
+            self.token_tracker.record_usage(
+                usage={
+                    "prompt_tokens": completion.usage.prompt_tokens,
+                    "completion_tokens": completion.usage.completion_tokens,
+                    "total_tokens": completion.usage.total_tokens
+                },
+                model=self.model,
+                operation="schema_discovery",
+                filename=Path(paper_path).name
+            )
+        
+        response.filename = Path(paper_path).name
+        return response
     
     def unify_fields(self, suggestions: List[SuggestedField]) -> List[UnifiedField]:
         """Merge synonymous fields using LLM."""
@@ -187,12 +201,25 @@ Input Fields:
         prompt = self.UNIFICATION_PROMPT.format(fields_json=fields_json)
         
         try:
-            result = self.client.chat.completions.create(
+            response, completion = self.client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 response_model=UnificationResult,
             )
-            return result.fields
+            
+            # Record usage
+            if self.token_tracker and hasattr(completion, 'usage') and completion.usage:
+                self.token_tracker.record_usage(
+                    usage={
+                        "prompt_tokens": completion.usage.prompt_tokens,
+                        "completion_tokens": completion.usage.completion_tokens,
+                        "total_tokens": completion.usage.total_tokens
+                    },
+                    model=self.model,
+                    operation="schema_unification",
+                    filename="unification_process" # No specific paper filename for unification
+                )
+            return response.fields
         except Exception as e:
             self.logger.error(f"Unification failed: {e}")
             # Fallback: return raw as if unified (simplified)

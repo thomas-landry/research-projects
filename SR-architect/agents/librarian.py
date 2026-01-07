@@ -8,31 +8,15 @@ Fetches papers from PubMed and returns structured results for the Orchestrator.
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime
 import json
+import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from core.prisma_state import Paper, PaperStatus, SearchStrategy
-
-
-def load_env():
-    """Load environment variables."""
-    env_paths = [
-        Path.cwd() / ".env",
-        Path(__file__).parent.parent / ".env",
-        Path.home() / "Projects" / ".env",
-    ]
-    for env_path in env_paths:
-        if env_path.exists():
-            with open(env_path) as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        key, _, value = line.partition("=")
-                        os.environ.setdefault(key.strip(), value.strip().strip("'\""))
-            break
+from core.utils import load_env, make_request, get_logger
 
 
 class LibrarianAgent:
@@ -54,9 +38,13 @@ class LibrarianAgent:
             api_key: NCBI API key for higher rate limits
         """
         load_env()
+        self.logger = get_logger("LibrarianAgent")
         
         self.email = email or os.getenv("NCBI_EMAIL", "researcher@example.com")
         self.api_key = api_key or os.getenv("NCBI_API_KEY")
+
+        if not self.email:
+             self.logger.warning("No email provided for NCBI API. Rate limits may be lower.")
     
     def search_pubmed(
         self,
@@ -80,6 +68,7 @@ class LibrarianAgent:
         try:
             import requests
         except ImportError:
+            self.logger.error("requests not installed")
             raise ImportError("requests not installed. Run: pip install requests")
         
         params = {
@@ -100,15 +89,19 @@ class LibrarianAgent:
             params["maxdate"] = date_to
             params["datetype"] = "pdat"  # Publication date
         
-        response = requests.get(self.PUBMED_ESEARCH, params=params)
-        response.raise_for_status()
+        response = make_request(self.PUBMED_ESEARCH, params=params)
         
         data = response.json()
         result = data.get("esearchresult", {})
         
+        count = int(result.get("count", 0))
+        pmids = result.get("idlist", [])
+        
+        self.logger.info(f"PubMed search yielded {count} total results. Retrieving top {len(pmids)}.")
+        
         return {
-            "pmids": result.get("idlist", []),
-            "count": int(result.get("count", 0)),
+            "pmids": pmids,
+            "count": count,
             "query_translation": result.get("querytranslation", query),
             "search_date": datetime.now().isoformat(),
         }
@@ -125,12 +118,6 @@ class LibrarianAgent:
         """
         if not pmids:
             return []
-        
-        try:
-            import requests
-            import xml.etree.ElementTree as ET
-        except ImportError:
-            raise ImportError("requests not installed. Run: pip install requests")
         
         papers = []
         
@@ -150,20 +137,22 @@ class LibrarianAgent:
             if self.api_key:
                 params["api_key"] = self.api_key
             
-            response = requests.get(self.PUBMED_EFETCH, params=params)
-            response.raise_for_status()
-            
-            # Parse XML
-            root = ET.fromstring(response.text)
-            
-            for article in root.findall(".//PubmedArticle"):
-                paper = self._parse_article(article)
-                if paper:
-                    papers.append(paper)
+            try:
+                response = make_request(self.PUBMED_EFETCH, params=params)
+                
+                # Parse XML
+                root = ET.fromstring(response.text)
+                
+                for article in root.findall(".//PubmedArticle"):
+                    paper = self._parse_article(article)
+                    if paper:
+                        papers.append(paper)
+            except Exception as e:
+                self.logger.error(f"Failed to fetch batch details: {e}")
         
         return papers
     
-    def _parse_article(self, article) -> Optional[Paper]:
+    def _parse_article(self, article: ET.Element) -> Optional[Paper]:
         """Parse a single PubmedArticle XML element."""
         try:
             # Get PMID
@@ -199,7 +188,15 @@ class LibrarianAgent:
             
             # Get year
             year_elem = article.find(".//PubDate/Year")
-            year = int(year_elem.text) if year_elem is not None else 0
+            try:
+                year = int(year_elem.text) if year_elem is not None else 0
+            except ValueError:
+                # Fallback for dates like "2023 Dec"
+                year = 0
+                if year_elem and year_elem.text:
+                    parts = year_elem.text.split()
+                    if parts and parts[0].isdigit():
+                        year = int(parts[0])
             
             # Get DOI
             doi = None
@@ -208,6 +205,10 @@ class LibrarianAgent:
                     doi = artid.text
                     break
             
+            # Sanitization
+            if abstract == "No abstract available":
+                abstract = ""
+
             return Paper(
                 pmid=pmid,
                 doi=doi,
@@ -224,7 +225,7 @@ class LibrarianAgent:
             )
         
         except Exception as e:
-            print(f"Warning: Failed to parse article: {e}")
+            self.logger.warning(f"Failed to parse article: {e}")
             return None
     
     def run_search(
@@ -233,7 +234,7 @@ class LibrarianAgent:
         max_results: int = 100,
         date_from: Optional[str] = None,
         date_to: Optional[str] = None,
-    ) -> tuple[List[Paper], SearchStrategy]:
+    ) -> Tuple[List[Paper], SearchStrategy]:
         """
         Complete search workflow: search + fetch details.
         
@@ -247,15 +248,15 @@ class LibrarianAgent:
             Tuple of (papers list, search strategy log)
         """
         # Search
-        print(f"[Librarian] Searching PubMed: {query[:50]}...")
+        self.logger.info(f"Searching PubMed: {query[:50]}...")
         search_result = self.search_pubmed(query, max_results, date_from, date_to)
         
         pmids = search_result["pmids"]
-        print(f"[Librarian] Found {len(pmids)} papers")
+        self.logger.info(f"Found {len(pmids)} papers")
         
         # Fetch details
         papers = self.fetch_paper_details(pmids)
-        print(f"[Librarian] Retrieved metadata for {len(papers)} papers")
+        self.logger.info(f"Retrieved metadata for {len(papers)} papers")
         
         # Create search strategy log
         strategy = SearchStrategy(
@@ -277,15 +278,6 @@ def build_pico_query(
 ) -> str:
     """
     Build a PubMed Boolean query from PICO elements.
-    
-    Args:
-        population: Patient population
-        intervention: Treatment/intervention
-        outcome: Outcome of interest
-        comparator: Optional comparator
-        
-    Returns:
-        Boolean search string
     """
     parts = []
     
@@ -331,6 +323,7 @@ if __name__ == "__main__":
         
         print(f"\nFirst 3 papers:")
         for p in papers[:3]:
+            # Simple print for CLI demo output, agent uses logging internally
             print(f"  - PMID:{p['pmid']}: {p['title'][:60]}...")
             print(f"    {p['authors']}, {p['journal']} ({p['year']})")
     

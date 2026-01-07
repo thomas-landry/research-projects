@@ -6,15 +6,18 @@ Takes an abstract and strictly categorizes it against PICO criteria,
 returning a structured decision with exclusion reason.
 """
 
-import os
 import sys
+import json
+import hashlib
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pydantic import BaseModel, Field
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from core.prisma_state import Paper, PaperStatus, ExclusionReason, PICOCriteria
+from core.utils import get_logger, get_llm_client
 
 
 class ScreeningDecision(BaseModel):
@@ -102,6 +105,7 @@ Respond with a JSON object matching this schema:
     def __init__(
         self,
         pico_criteria: PICOCriteria,
+        client: Optional[Any] = None,
         provider: str = "openrouter",
         model: Optional[str] = None,
     ):
@@ -110,24 +114,23 @@ Respond with a JSON object matching this schema:
         
         Args:
             pico_criteria: PICO inclusion criteria
-            provider: LLM provider
+            client: Optional injected LLM client
+            provider: LLM provider (if client not injected)
             model: Model override
         """
         self.pico = pico_criteria
         self.provider = provider
-        self.model = model or "anthropic/claude-sonnet-4-20250514"
-        self._client = None
-        
-        from core.utils import get_logger
+        self.model = model or "anthropic/claude-3.5-sonnet"
         self.logger = get_logger("ScreenerAgent")
+        
+        # Dependency Injection or Lazy Load
+        self._client = client
     
     @property
     def client(self):
         """Initialize and return the Instructor-patched client."""
         if self._client is not None:
             return self._client
-        
-        from core.utils import get_llm_client
         
         self._client = get_llm_client(
             provider=self.provider,
@@ -144,8 +147,6 @@ Respond with a JSON object matching this schema:
         Returns:
             ScreeningDecision with include/exclude and reason
         """
-        client = self.client
-        
         # Build exclusion criteria text
         exclusion_text = "\n".join(
             f"- {et}" for et in self.pico.get("excluded_types", [])
@@ -163,7 +164,7 @@ Respond with a JSON object matching this schema:
         )
         
         try:
-            decision = client.chat.completions.create(
+            decision = self.client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 response_model=ScreeningDecision,
@@ -177,6 +178,7 @@ Respond with a JSON object matching this schema:
             return decision
         
         except Exception as e:
+            self.logger.error(f"Screening failed for {paper.get('pmid', 'unknown')}: {e}")
             # Return a conservative decision on error
             return ScreeningDecision(
                 include=False,
@@ -188,31 +190,62 @@ Respond with a JSON object matching this schema:
     def screen_batch(
         self,
         papers: List[Paper],
+        max_workers: int = 5,
         callback=None,
     ) -> Dict[str, ScreeningDecision]:
         """
-        Screen multiple papers.
+        Screen multiple papers in parallel with rule-based pre-screening.
         
         Args:
             papers: List of papers to screen
+            max_workers: Parallel workers
             callback: Optional function called after each decision
             
         Returns:
             Dict mapping PMID to ScreeningDecision
         """
         results = {}
+        target_papers = [p for p in papers if p["status"] == PaperStatus.PENDING.value]
         
-        for i, paper in enumerate(papers):
-            if paper["status"] != PaperStatus.PENDING.value:
-                continue
+        if not target_papers:
+            return results
             
-            self.logger.info(f"Screening {i+1}/{len(papers)}: {paper['pmid']}")
+        self.logger.info(f"Starting optimized batch screening for {len(target_papers)} papers")
+        
+        # 1. Rule-based Pre-screening
+        pre_screener = RuleBasedPreScreener(self.pico)
+        to_llm = []
+        
+        for paper in target_papers:
+            decision = pre_screener.pre_screen(paper)
+            if decision:
+                results[paper["pmid"]] = decision
+                if callback:
+                    callback(paper["pmid"], decision)
+            else:
+                to_llm.append(paper)
+        
+        self.logger.info(f"Pre-screening excluded {len(results)} papers. {len(to_llm)} need LLM review.")
+        
+        if not to_llm:
+            return results
             
-            decision = self.screen_abstract(paper)
-            results[paper["pmid"]] = decision
+        # 2. Parallel LLM Screening
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_paper = {
+                executor.submit(self.screen_abstract, paper): paper 
+                for paper in to_llm
+            }
             
-            if callback:
-                callback(paper["pmid"], decision)
+            for future in as_completed(future_to_paper):
+                paper = future_to_paper[future]
+                try:
+                    decision = future.result()
+                    results[paper["pmid"]] = decision
+                    if callback:
+                        callback(paper["pmid"], decision)
+                except Exception as e:
+                    self.logger.error(f"Error in parallel screen for {paper['pmid']}: {e}")
         
         return results
 
@@ -221,17 +254,10 @@ def screen_paper_simple(
     title: str,
     abstract: str,
     pico: PICOCriteria,
+    client: Optional[Any] = None,
 ) -> ScreeningDecision:
     """
     Convenience function to screen a single paper.
-    
-    Args:
-        title: Paper title
-        abstract: Paper abstract
-        pico: PICO criteria
-        
-    Returns:
-        ScreeningDecision
     """
     paper = Paper(
         pmid="temp",
@@ -248,7 +274,7 @@ def screen_paper_simple(
         retrieved_date="",
     )
     
-    screener = ScreenerAgent(pico)
+    screener = ScreenerAgent(pico, client=client)
     return screener.screen_abstract(paper)
 
 
@@ -256,8 +282,6 @@ def screen_paper_simple(
 class RuleBasedPreScreener:
     """
     Fast rule-based pre-screening to exclude obvious non-matches.
-    
-    Runs before LLM screening to save API calls.
     """
     
     def __init__(self, pico: PICOCriteria):

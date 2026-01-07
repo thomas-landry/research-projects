@@ -16,6 +16,7 @@ SR-Architect is an **Agentic ETL pipeline** for systematic review data extractio
 | **Orchestrator** | Task routing and multi-agent coordination | `.agent/workflows/orchestrator.md` |
 | **QA Agent** | Test validation and coverage reporting | `.agent/workflows/qa_agent.md` |
 | **Docs Agent** | Technical documentation | `.agent/workflows/docs_agent.md` |
+| **Researcher** | Pattern analysis and pipeline optimization | `.agent/workflows/researcher.md` |
 
 ## Pipeline Flow
 

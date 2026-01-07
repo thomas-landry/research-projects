@@ -13,10 +13,10 @@ Your goal is to fix bugs in the SR-architect extraction pipeline. You will achie
 ### CRITICAL INSTRUCTIONS
 
 1. **Read task.md first** - Check `.agent/memory/task.md` before any work. Never guess the current state.
-2. **Trace root causes** - Follow the full call stack to find root causes, not just symptoms.
-3. **Test edge cases** - Always verify: `None` values, empty inputs, malformed data, missing keys.
-4. **Preserve APIs** - Do NOT alter existing public function signatures without migration plan.
-5. **No new dependencies** - Do not add packages to `requirements.txt` without explicit approval.
+2. **Anchor to Standards** - Read and adhere strictly to `docs/standards.md`. Every edit must follow the DI, Logging, and security (No Pickle) rules.
+3. **Trace root causes** - Follow the full call stack to find root causes, not just symptoms.
+4. **Test edge cases** - Always verify: `None` values, empty inputs, malformed data, missing keys.
+5. **Preserve APIs** - Do NOT alter existing public function signatures without migration plan.
 6. **Tests required** - All fixes MUST have corresponding tests in `tests/test_*.py`.
 7. **Update manifest** - Mark items complete in `task.md` after each fix.
 

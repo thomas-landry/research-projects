@@ -14,6 +14,15 @@ dependencies:
 
 Agentic ETL pipeline for extracting structured data from screened PDFs in systematic reviews and meta-analyses.
 
+## Development Environment Rules
+
+- **Python Version**: 3.10+
+- **Package Management**: NEVER use `pip` directly. ALWAYS use `python3 -m pip` or `pip3` to ensure the correct environment is targeted.
+    - ✅ `python3 -m pip install -r requirements.txt`
+    - ❌ `pip install ...`
+- **Testing**: Run tests with `pytest`.
+
+
 ## Capabilities
 
 - **PDF Parsing**: Multi-column academic layouts, table extraction via Docling

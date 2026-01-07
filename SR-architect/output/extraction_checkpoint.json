@@ -1,0 +1,736 @@
+{
+  "timestamp": "2026-01-06T14:34:50.804387",
+  "processed_files": [
+    "Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf",
+    "Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf",
+    "Saa and Assaf - 2022 - A Rare Case of Pulmonary Nodules Diffuse Pulmonary Meningotheliomatosis.pdf",
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf"
+  ],
+  "failed_files": [],
+  "results": {
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf": {
+      "case_count": 1,
+      "case_count_quote": "Here, we present a case of diagnostic dilemma in a patient with a history of malignancy and immunosuppression presenting with diffuse pulmonary meningotheliomatosis (DPM).",
+      "patient_age": "61",
+      "patient_age_quote": "A 61-year-old female with a history of ductal hyperplasia of the breast",
+      "patient_sex": "Female",
+      "patient_sex_quote": "A 61-year-old female with a history of ductal hyperplasia of the breast",
+      "presenting_symptoms": "Asymptomatic",
+      "presenting_symptoms_quote": "was diagnosed with diffuse pulmonary nodules incidentally via CT angiogram chest during inpatient admission for COVID-19 infection",
+      "diagnostic_method": "Bronchoscopy with bronchioalveolar lavage (BAL) with transbronchial cryo biopsy",
+      "diagnostic_method_quote": "The patient eventually underwent bronchoscopy with bronchioalveolar lavage (BAL) with transbronchial cryo biopsy of lung nodules",
+      "imaging_findings": "Numerous sub 6 mm bilateral centrilobular ground glass nodules and solid pulmonary nodules with mild upper lobe predominance",
+      "imaging_findings_quote": "CT scan chest 1 year later showed numerous sub 6 mm bilateral centrilobular GGNs and solid pulmonary nodules with mild upper lobe predominance",
+      "histopathology": "Minute Pulmonary Meningothelial-like Nodules with immunostaining negative for malignancy",
+      "histopathology_quote": "which showed MPMNs with further immunostaining negative for malignancy",
+      "immunohistochemistry": null,
+      "immunohistochemistry_quote": null,
+      "treatment": "Observation",
+      "treatment_quote": "given the complexity of the case, lack of symptoms, and stability of nodules, a decision was made for close follow-up with serial CT scans",
+      "outcome": "Stable",
+      "outcome_quote": "given the complexity of the case, lack of symptoms, and stability of nodules, a decision was made for close follow-up with serial CT scans",
+      "comorbidities": "Ductal hyperplasia of the breast, common variable immunodeficiency syndrome (CVID), asthma, obstructive sleep apnea, thyroid follicular cancer",
+      "comorbidities_quote": "A 61-year-old female with a history of ductal hyperplasia of the breast, common variable immunode /uniFB01 ciency syndrome (CVID), asthma, obstructive sleep apnea, and thyroid follicular cancer",
+      "filename": "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+      "extraction_confidence": null,
+      "extraction_notes": null
+    },
+    "Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf": {
+      "patient_age": 63,
+      "patient_age_quote": "A 63-year-old woman was referred for dedicated chest CT imaging",
+      "sex": "female",
+      "sex_quote": "A 63-year-old woman was referred for dedicated chest CT imaging",
+      "comorbidities": null,
+      "comorbidities_quote": null,
+      "symptoms": "diarrhea",
+      "symptoms_quote": "abdominal CT scan performed for evaluation of diarrhea",
+      "diagnostic_method": [
+        "CT scan",
+        "transbronchial cryobiopsy",
+        "immunohistochemistry"
+      ],
+      "diagnostic_method_quote": "Chest CT showed numerous small ( , 6 mm), rounded, ground-glass, randomly distributed nodules... Right lower lobe transbronchial cryobiopsy histopathologic findings revealed nodular cellular proliferation... Immunohistochemistry with positive staining for epithelial membrane antigen and progesterone receptor",
+      "laboratory_findings": null,
+      "laboratory_findings_quote": null,
+      "imaging_findings": "numerous small (< 6 mm), rounded, ground-glass, randomly distributed nodules with no lobe spared. Some nodules showed central lucencies with a ringlike appearance",
+      "imaging_findings_quote": "Chest CT showed numerous small ( , 6 mm), rounded, ground-glass, randomly distributed nodules with no lobe spared. Some nodules showed central lucencies with a ringlike appearance.",
+      "immunostaining_results": null,
+      "immunostaining_results_quote": null,
+      "treatment_plan": null,
+      "treatment_plan_quote": null,
+      "diagnosis": "Minute pulmonary meningothelial-like nodules (MPMNs)",
+      "diagnosis_quote": "Immunohistochemistry with positive staining for epithelial membrane antigen and progesterone receptor, but negative staining for neuroendocrine markers such as synaptophysin, confirmed our diagnosis.",
+      "differential_diagnosis": [
+        "adenocarcinoma in situ",
+        "carcinoid tumor",
+        "tumorlets",
+        "nonfibrotic hypersensitivity pneumonitis",
+        "vasculitis",
+        "atypical infection"
+      ],
+      "differential_diagnosis_quote": "MPMNs usually follow a benign, indolent course but may mimic adenocarcinoma in situ, carcinoid tumor and tumorlets, nonfibrotic hypersensitivity pneumonitis, vasculitis, or atypical infection.",
+      "paper_type": "case report",
+      "paper_type_quote": null,
+      "nodules_size": "< 6 mm",
+      "nodules_size_quote": "numerous small ( , 6 mm), rounded, ground-glass, randomly distributed nodules",
+      "nodules_distribution": "random distribution through both lungs with no lobe spared",
+      "nodules_distribution_quote": "randomly distributed nodules with no lobe spared",
+      "histopathologic_findings": "nodular cellular proliferation expanding the interstitium with whorllike appearance",
+      "histopathologic_findings_quote": "Right lower lobe transbronchial cryobiopsy histopathologic findings revealed nodular cellular proliferation expanding the interstitium with whorllike appearance",
+      "immunohistochemistry_results": [
+        "positive for epithelial membrane antigen",
+        "positive for progesterone receptor",
+        "negative for neuroendocrine markers (synaptophysin)"
+      ],
+      "immunohistochemistry_results_quote": "Immunohistochemistry with positive staining for epithelial membrane antigen and progesterone receptor, but negative staining for neuroendocrine markers such as synaptophysin",
+      "conditions_associated_with_mpnn": [
+        "pulmonary embolism",
+        "primary lung neoplasia",
+        "chronic lung diseases",
+        "cardiac diseases"
+      ],
+      "conditions_associated_with_mpnn_quote": "MPMNs have been reported in association with pulmonary embolism, primary lung neoplasia, and chronic lung or cardiac diseases.",
+      "mpnn_course_nature": "benign, indolent course",
+      "mpnn_course_nature_quote": "MPMNs usually follow a benign, indolent course",
+      "patient_condition": null,
+      "patient_condition_quote": null,
+      "pulmonary_nodule_characteristic": null,
+      "pulmonary_nodule_characteristic_quote": null,
+      "nodule_cell_composition": null,
+      "nodule_cell_composition_quote": null,
+      "expression_markers": null,
+      "expression_markers_quote": null,
+      "treatment_discontinued": null,
+      "treatment_discontinued_quote": null,
+      "disease_progression": null,
+      "disease_progression_quote": null,
+      "filename": "Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf",
+      "extraction_confidence": null,
+      "extraction_notes": null
+    },
+    "Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf": {
+      "final_data": {
+        "patient_age": 48,
+        "patient_age_quote": "A 48-year-old non-smoking woman presented with an abnormal shadow on chest radiography during routine health screening.",
+        "patient_sex": "female",
+        "patient_sex_quote": "A 48-year-old non-smoking woman presented with an abnormal shadow on chest radiography during routine health screening.",
+        "comorbidities": [
+          "Turner syndrome"
+        ],
+        "comorbidities_quote": "The patient had a history of Turner syndrome and had been receiving hormone supplementation with estrogen and progesterone since childhood.",
+        "symptoms": [
+          "few symptoms"
+        ],
+        "symptoms_quote": "Although the patient had few symptoms, she visited a local hospital because of the results of the routine health screening.",
+        "follow_up_ct_findings": [
+          "No further disease progression was observed over a follow-up period of seven months without treatment"
+        ],
+        "follow_up_ct_findings_quote": "No further disease progression was observed over a follow-up period of seven months without treatment.",
+        "lab_results": null,
+        "lab_results_quote": null,
+        "diagnostic_methods": [
+          "chest CT",
+          "bronchoscopy",
+          "transbronchial lung cryobiopsy",
+          "bronchoalveolar lavage"
+        ],
+        "diagnostic_methods_quote": "Chest CT revealed diffuse centrilobular granular opacities and nodular shadows in both lungs... Bronchoscopy revealed a mildly elevated lymphocyte fraction of 21 % in the bronchoalveolar lavage fluid (BALF)... Subsequently, TBLC was performed using a 1.9 mm cryoprobe",
+        "immunostaining_results": "[\"positive for epithelial membrane antigen (EMA)\", \"positive for progesterone receptor (PgR)\", \"positive for CD56\"]",
+        "immunostaining_results_quote": "Immunohistochemically, these cells were positive for the epithelial membrane antigen (EMA), progesterone receptor (PgR), and CD 56",
+        "case_discussion": "This case highlights the diagnostic utility of TBLC for the evaluation of small pulmonary nodules that exhibit the Cheerios sign.",
+        "case_discussion_quote": "This case highlights the diagnostic utility of TBLC for the evaluation of small pulmonary nodules that exhibit the Cheerios sign.",
+        "differential_diagnosis": [
+          "pulmonary Langerhans cell histiocytosis",
+          "DPM",
+          "granulomatosis with polyangiitis",
+          "metastatic lung tumors",
+          "infectious diseases",
+          "fungal infections",
+          "mycobacterial infections"
+        ],
+        "differential_diagnosis_quote": "Based on the characteristic CT findings of nodules with central cavitation, known as the Cheerios sign, differential diagnoses including pulmonary Langerhans cell histiocytosis, DPM, granulomatosis with polyangiitis, metastatic lung tumors, and infectious diseases, such as fungal or mycobacterial infections, were considered.",
+        "study_design": null,
+        "study_design_quote": null,
+        "patient_ethnicity": null,
+        "patient_ethnicity_quote": null,
+        "symptoms_duration": null,
+        "symptoms_duration_quote": null,
+        "imaging_findings": "[\"diffuse centrilobular granular opacities and nodular shadows in both lungs\", \"some nodular shadows accompanied by central cavities\"]",
+        "imaging_findings_quote": "Chest CT revealed diffuse centrilobular granular opacities and nodular shadows in both lungs, with some nodular shadows accompanied by central cavities",
+        "pathology_findings": "[\"multiple small nodules measuring approximately 2 mm in diameter in the interstitium\", \"nodules consisted of low-grade, round to short spindle-shaped cells resembling meningeal epithelial cells\", \"uniform round nuclei and eosinophilic cytoplasm\", \"no cellular atypia, necrosis, or significant inflammation\"]",
+        "pathology_findings_quote": "Histopathological examinations of both specimens revealed multiple small nodules measuring approximately 2 mm in diameter in the interstitium... The nodules consisted of low-grade, round to short spindle-shaped cells resembling meningeal epithelial cells, with uniform round nuclei and eosinophilic cytoplasm. No cellular atypia, necrosis, or significant inflammation was observed.",
+        "treatment_interventions": "[\"discontinuation of estrogen and progesterone supplementation\"]",
+        "treatment_interventions_quote": "Given the potential hormonal influence on both the DPM and uterine polyps, estrogen and progesterone supplementation was discontinued",
+        "outcome_response": "[\"remained asymptomatic\", \"no significant issues related to Turner syndrome\", \"pulmonary function did not decline\", \"clinical and radiological findings remained stable\"]",
+        "outcome_response_quote": "After discontinuation, the patient remained asymptomatic, with no significant issues related to Turner syndrome. Furthermore, the patient's pulmonary function did not decline, and both the clinical and radiological findings remained stable during the seven-month follow-up period without treatment.",
+        "study_setting": null,
+        "study_setting_quote": null,
+        "sample_size": null,
+        "sample_size_quote": null,
+        "study_timeframe": null,
+        "study_timeframe_quote": null,
+        "patient_condition": null,
+        "patient_condition_quote": null,
+        "pulmonary_nodules_description": null,
+        "pulmonary_nodules_description_quote": null,
+        "diagnostic_procedure_initial": "[\"transbronchial lung biopsy\"]",
+        "diagnostic_procedure_initial_quote": "Although the TBLB sample included alveolar areas, the target lesion could not be captured; therefore, a definitive diagnosis could not be established.",
+        "diagnostic_procedure_final": "[\"transbronchial lung cryobiopsy\"]",
+        "diagnostic_procedure_final_quote": "Subsequently, TBLC was performed using a 1.9 mm cryoprobe with a 6second freezing time and the blood-blocking balloon technique.",
+        "final_diagnosis": "[\"DPM\"]",
+        "final_diagnosis_quote": "the patient was diagnosed with DPM based on the radiological and histopathological findings.",
+        "hormone_therapy_discontinued": [
+          "estrogen and progesterone supplementation"
+        ],
+        "hormone_therapy_discontinued_quote": "estrogen and progesterone supplementation was discontinued, with the expectation that hormone withdrawal might halt disease progression.",
+        "disease_stability": "[\"remained stable during the seven-month follow-up period without treatment\"]",
+        "disease_stability_quote": "both the clinical and radiological findings remained stable during the seven-month follow-up period without treatment.",
+        "diagnostic_marker_positive": [
+          "epithelial membrane antigen (EMA)",
+          "progesterone receptor (PgR)",
+          "CD56"
+        ],
+        "diagnostic_marker_positive_quote": "Immunohistochemically, these cells were positive for the epithelial membrane antigen (EMA), progesterone receptor (PgR), and CD 56",
+        "filename": "Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "All key information was clearly stated in the text with direct quotes available. The case report format made extraction straightforward."
+      },
+      "evidence": [
+        {
+          "field_name": "patient_age",
+          "extracted_value": 48,
+          "exact_quote": "A 48-year-old non-smoking woman presented with an abnormal shadow on chest radiography during routine health screening.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "female",
+          "exact_quote": "A 48-year-old non-smoking woman presented with an abnormal shadow on chest radiography during routine health screening.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": [
+            "Turner syndrome"
+          ],
+          "exact_quote": "The patient had a history of Turner syndrome and had been receiving hormone supplementation with estrogen and progesterone since childhood.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "symptoms",
+          "extracted_value": [
+            "few symptoms"
+          ],
+          "exact_quote": "Although the patient had few symptoms, she visited a local hospital because of the results of the routine health screening.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "follow_up_ct_findings",
+          "extracted_value": [
+            "No further disease progression was observed over a follow-up period of seven months without treatment"
+          ],
+          "exact_quote": "No further disease progression was observed over a follow-up period of seven months without treatment.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_methods",
+          "extracted_value": [
+            "chest CT",
+            "bronchoscopy",
+            "transbronchial lung cryobiopsy",
+            "bronchoalveolar lavage"
+          ],
+          "exact_quote": "Chest CT revealed diffuse centrilobular granular opacities and nodular shadows in both lungs... Bronchoscopy revealed a mildly elevated lymphocyte fraction of 21 % in the bronchoalveolar lavage fluid (BALF)... Subsequently, TBLC was performed using a 1.9 mm cryoprobe",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunostaining_results",
+          "extracted_value": [
+            "positive for epithelial membrane antigen (EMA)",
+            "positive for progesterone receptor (PgR)",
+            "positive for CD56"
+          ],
+          "exact_quote": "Immunohistochemically, these cells were positive for the epithelial membrane antigen (EMA), progesterone receptor (PgR), and CD 56",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "case_discussion",
+          "extracted_value": "This case highlights the diagnostic utility of TBLC for the evaluation of small pulmonary nodules that exhibit the Cheerios sign.",
+          "exact_quote": "This case highlights the diagnostic utility of TBLC for the evaluation of small pulmonary nodules that exhibit the Cheerios sign.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "differential_diagnosis",
+          "extracted_value": [
+            "pulmonary Langerhans cell histiocytosis",
+            "DPM",
+            "granulomatosis with polyangiitis",
+            "metastatic lung tumors",
+            "infectious diseases",
+            "fungal infections",
+            "mycobacterial infections"
+          ],
+          "exact_quote": "Based on the characteristic CT findings of nodules with central cavitation, known as the Cheerios sign, differential diagnoses including pulmonary Langerhans cell histiocytosis, DPM, granulomatosis with polyangiitis, metastatic lung tumors, and infectious diseases, such as fungal or mycobacterial infections, were considered.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": [
+            "diffuse centrilobular granular opacities and nodular shadows in both lungs",
+            "some nodular shadows accompanied by central cavities"
+          ],
+          "exact_quote": "Chest CT revealed diffuse centrilobular granular opacities and nodular shadows in both lungs, with some nodular shadows accompanied by central cavities",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "pathology_findings",
+          "extracted_value": [
+            "multiple small nodules measuring approximately 2 mm in diameter in the interstitium",
+            "nodules consisted of low-grade, round to short spindle-shaped cells resembling meningeal epithelial cells",
+            "uniform round nuclei and eosinophilic cytoplasm",
+            "no cellular atypia, necrosis, or significant inflammation"
+          ],
+          "exact_quote": "Histopathological examinations of both specimens revealed multiple small nodules measuring approximately 2 mm in diameter in the interstitium... The nodules consisted of low-grade, round to short spindle-shaped cells resembling meningeal epithelial cells, with uniform round nuclei and eosinophilic cytoplasm. No cellular atypia, necrosis, or significant inflammation was observed.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "treatment_interventions",
+          "extracted_value": [
+            "discontinuation of estrogen and progesterone supplementation"
+          ],
+          "exact_quote": "Given the potential hormonal influence on both the DPM and uterine polyps, estrogen and progesterone supplementation was discontinued",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "outcome_response",
+          "extracted_value": [
+            "remained asymptomatic",
+            "no significant issues related to Turner syndrome",
+            "pulmonary function did not decline",
+            "clinical and radiological findings remained stable"
+          ],
+          "exact_quote": "After discontinuation, the patient remained asymptomatic, with no significant issues related to Turner syndrome. Furthermore, the patient's pulmonary function did not decline, and both the clinical and radiological findings remained stable during the seven-month follow-up period without treatment.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_procedure_initial",
+          "extracted_value": [
+            "transbronchial lung biopsy"
+          ],
+          "exact_quote": "Although the TBLB sample included alveolar areas, the target lesion could not be captured; therefore, a definitive diagnosis could not be established.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_procedure_final",
+          "extracted_value": [
+            "transbronchial lung cryobiopsy"
+          ],
+          "exact_quote": "Subsequently, TBLC was performed using a 1.9 mm cryoprobe with a 6second freezing time and the blood-blocking balloon technique.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "final_diagnosis",
+          "extracted_value": [
+            "DPM"
+          ],
+          "exact_quote": "the patient was diagnosed with DPM based on the radiological and histopathological findings.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "hormone_therapy_discontinued",
+          "extracted_value": [
+            "estrogen and progesterone supplementation"
+          ],
+          "exact_quote": "estrogen and progesterone supplementation was discontinued, with the expectation that hormone withdrawal might halt disease progression.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "disease_stability",
+          "extracted_value": [
+            "remained stable during the seven-month follow-up period without treatment"
+          ],
+          "exact_quote": "both the clinical and radiological findings remained stable during the seven-month follow-up period without treatment.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_marker_positive",
+          "extracted_value": [
+            "epithelial membrane antigen (EMA)",
+            "progesterone receptor (PgR)",
+            "CD56"
+          ],
+          "exact_quote": "Immunohistochemically, these cells were positive for the epithelial membrane antigen (EMA), progesterone receptor (PgR), and CD 56",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "final_accuracy_score": 1.0,
+      "final_consistency_score": 1.0,
+      "final_overall_score": 1.0,
+      "passed_validation": true,
+      "iterations": 2,
+      "iteration_history": [
+        {
+          "iteration_number": 1,
+          "accuracy_score": 0.96875,
+          "consistency_score": 0.9875,
+          "overall_score": 0.781,
+          "issues_count": 5,
+          "suggestions": [
+            "Correct the extracted value for 'case_discussion' to more accurately reflect the provided quote.",
+            "For symptoms: The source quote indicates that the patient visited a hospital due to routine health screening results and mentions that the patient had few symptoms. It does not explicitly state any symptom like 'abnormal shadow on chest radiography.' Therefore, the extracted value is not directly supported by the quote.",
+            "For diagnostic_methods: The quote supports some of the extracted diagnostic methods (chest radiography, chest CT, bronchoscopy, TBLC), but it does not mention TBLB or immunohistochemistry. These seem to be hallucinations or incorrect extractions based on the provided quote.",
+            "For case_discussion: The extracted value claims that TBLC is useful when TBLB is non-diagnostic, but the source quote does not mention TBLB or its diagnostic status. The source quote only discusses the utility of TBLC for evaluating small pulmonary nodules with the Cheerios sign, not in the context of TBLB being non-diagnostic.",
+            "For final_diagnosis: The extracted value 'diffuse pulmonary meningotheliomatosis' does not match the acronym 'DPM' used in the quote. The quote does not provide an expanded form of the acronym, and it's an assumption that 'DPM' stands for 'diffuse pulmonary meningotheliomatosis'."
+          ]
+        },
+        {
+          "iteration_number": 2,
+          "accuracy_score": 1.0,
+          "consistency_score": 1.0,
+          "overall_score": 1.0,
+          "issues_count": 0,
+          "suggestions": []
+        }
+      ],
+      "content_filter_stats": {
+        "original_chunks": 49,
+        "filtered_chunks": 44,
+        "removed_chunks": 5,
+        "original_chars": 25686,
+        "filtered_chars": 21421,
+        "removed_chars": 4265,
+        "estimated_original_tokens": 6421,
+        "estimated_filtered_tokens": 5355,
+        "estimated_tokens_saved": 1066,
+        "reduction_percentage": 16.6
+      },
+      "relevance_stats": {
+        "total_chunks": 44,
+        "relevant_chunks": 22,
+        "irrelevant_chunks": 22,
+        "relevance_rate": 50.0,
+        "avg_confidence": 0.7
+      },
+      "warnings": [],
+      "source_filename": "Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf",
+      "extraction_timestamp": "2026-01-06T14:36:13.346978"
+    },
+    "Saa and Assaf - 2022 - A Rare Case of Pulmonary Nodules Diffuse Pulmonary Meningotheliomatosis.pdf": {
+      "final_data": {
+        "patient_age": 51,
+        "patient_age_quote": "A 51-year-old female",
+        "patient_sex": "female",
+        "patient_sex_quote": "A 51-year-old female",
+        "comorbidities": [
+          "transient ischemic attack",
+          "hypertension",
+          "childhood asthma"
+        ],
+        "comorbidities_quote": "with a past medical history of transient ischemic attack, hypertension, and childhood asthma on albuterol",
+        "symptoms": [
+          "worsening dyspnea",
+          "cough"
+        ],
+        "symptoms_quote": "presented to the clinic for worsening dyspnea since December 2019. Her dyspnea originally started with cold symptoms including a cough; although her cough improved, her dyspnea persisted.",
+        "follow_up_ct_findings": null,
+        "follow_up_ct_findings_quote": null,
+        "lab_results": [
+          "Fungal serology negative",
+          "connective tissue disease panels negative",
+          "Quantiferon testing negative",
+          "Cultures negative for bacterial, mycobacterial and fungal growth"
+        ],
+        "lab_results_quote": "Fungal serology and connective tissue disease panels were negative. Quantiferon testing was negative. Cultures were negative for bacterial, mycobacterial and fungal growth.",
+        "diagnostic_methods": [
+          "CT of the chest",
+          "bronchoscopy with bronchoalveolar lavage (BAL)",
+          "transbronchial lung biopsies (TBBX)",
+          "right thoracotomy with multiple lung biopsies",
+          "immunostaining"
+        ],
+        "diagnostic_methods_quote": "A CT of the chest was obtained... She subsequently underwent a bronchoscopy with bronchoalveolar lavage (BAL) and transbronchial lung biopsies (TBBX)... she underwent a right thoracotomy with multiple lung biopsies.",
+        "immunostaining_results": "positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor",
+        "immunostaining_results_quote": "immunostaining positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor",
+        "case_discussion": "Diffuse pulmonary meningotheliomatosis is a rare diagnosis with unclear etiology. The case highlights the importance of considering this condition in patients with dyspnea and multiple pulmonary nodules.",
+        "case_discussion_quote": "Diffuse pulmonary meningotheliomatosis is a rare diagnosis, and the etiology is still unclear, with the leading theory being that it originates from meningothelial cells... This case illustrates the need for consideration of diffuse pulmonary meningotheliomatosis in the differential diagnosis for patients who present with dyspnea and are found to have multiple pulmonary nodules on imaging.",
+        "differential_diagnosis": null,
+        "differential_diagnosis_quote": null,
+        "study_design": null,
+        "study_design_quote": null,
+        "patient_ethnicity": null,
+        "patient_ethnicity_quote": null,
+        "symptoms_duration": "since December 2019",
+        "symptoms_duration_quote": "worsening dyspnea since December 2019",
+        "imaging_findings": "diffuse subcentimetric nodularities in random distribution",
+        "imaging_findings_quote": "A CT of the chest was obtained, which showed diffuse subcentimetric nodularities in random distribution.",
+        "pathology_findings": "nested cells with meningothelial like morphology",
+        "pathology_findings_quote": "Nested cells with meningothelial like morphology (A+B)",
+        "treatment_interventions": null,
+        "treatment_interventions_quote": null,
+        "outcome_response": null,
+        "outcome_response_quote": null,
+        "study_setting": null,
+        "study_setting_quote": null,
+        "sample_size": null,
+        "sample_size_quote": null,
+        "study_timeframe": null,
+        "study_timeframe_quote": null,
+        "patient_condition": null,
+        "patient_condition_quote": null,
+        "pulmonary_nodules_description": "diffuse subcentimetric nodularities in random distribution",
+        "pulmonary_nodules_description_quote": "diffuse subcentimetric nodularities in random distribution",
+        "diagnostic_procedure_initial": "bronchoscopy with BAL and TBBX",
+        "diagnostic_procedure_initial_quote": "She subsequently underwent a bronchoscopy with bronchoalveolar lavage (BAL) and transbronchial lung biopsies (TBBX).",
+        "diagnostic_procedure_final": "right thoracotomy with multiple lung biopsies",
+        "diagnostic_procedure_final_quote": "she underwent a right thoracotomy with multiple lung biopsies. Pathology was significant for nested cells with immunostaining positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor.",
+        "final_diagnosis": "diffuse pulmonary meningotheliomatosis",
+        "final_diagnosis_quote": "The morphology and immunophenotype supported the diagnosis of diffuse pulmonary meningotheliomatosis.",
+        "hormone_therapy_discontinued": null,
+        "hormone_therapy_discontinued_quote": null,
+        "disease_stability": null,
+        "disease_stability_quote": null,
+        "diagnostic_marker_positive": [
+          "epithelial membrane antigen (EMA)",
+          "CD56",
+          "progesterone receptor"
+        ],
+        "diagnostic_marker_positive_quote": "immunostaining positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor",
+        "filename": "Saa and Assaf - 2022 - A Rare Case of Pulmonary Nodules Diffuse Pulmonary Meningotheliomatosis.pdf",
+        "extraction_confidence": 0.9,
+        "extraction_notes": "All key information was clearly stated in the text with direct quotes available. The case report was well-structured and provided detailed clinical information."
+      },
+      "evidence": [
+        {
+          "field_name": "patient_age",
+          "extracted_value": 51,
+          "exact_quote": "A 51-year-old female",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "patient_sex",
+          "extracted_value": "female",
+          "exact_quote": "A 51-year-old female",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "comorbidities",
+          "extracted_value": [
+            "transient ischemic attack",
+            "hypertension",
+            "childhood asthma"
+          ],
+          "exact_quote": "with a past medical history of transient ischemic attack, hypertension, and childhood asthma on albuterol",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "symptoms",
+          "extracted_value": [
+            "worsening dyspnea",
+            "cough"
+          ],
+          "exact_quote": "presented to the clinic for worsening dyspnea since December 2019. Her dyspnea originally started with cold symptoms including a cough; although her cough improved, her dyspnea persisted.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "lab_results",
+          "extracted_value": [
+            "Fungal serology negative",
+            "connective tissue disease panels negative",
+            "Quantiferon testing negative",
+            "Cultures negative for bacterial, mycobacterial and fungal growth"
+          ],
+          "exact_quote": "Fungal serology and connective tissue disease panels were negative. Quantiferon testing was negative. Cultures were negative for bacterial, mycobacterial and fungal growth.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_methods",
+          "extracted_value": [
+            "CT of the chest",
+            "bronchoscopy with bronchoalveolar lavage (BAL)",
+            "transbronchial lung biopsies (TBBX)",
+            "right thoracotomy with multiple lung biopsies",
+            "immunostaining"
+          ],
+          "exact_quote": "A CT of the chest was obtained... She subsequently underwent a bronchoscopy with bronchoalveolar lavage (BAL) and transbronchial lung biopsies (TBBX)... she underwent a right thoracotomy with multiple lung biopsies.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "immunostaining_results",
+          "extracted_value": "positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor",
+          "exact_quote": "immunostaining positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "case_discussion",
+          "extracted_value": "Diffuse pulmonary meningotheliomatosis is a rare diagnosis with unclear etiology. The case highlights the importance of considering this condition in patients with dyspnea and multiple pulmonary nodules.",
+          "exact_quote": "Diffuse pulmonary meningotheliomatosis is a rare diagnosis, and the etiology is still unclear, with the leading theory being that it originates from meningothelial cells... This case illustrates the need for consideration of diffuse pulmonary meningotheliomatosis in the differential diagnosis for patients who present with dyspnea and are found to have multiple pulmonary nodules on imaging.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "symptoms_duration",
+          "extracted_value": "since December 2019",
+          "exact_quote": "worsening dyspnea since December 2019",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "imaging_findings",
+          "extracted_value": "diffuse subcentimetric nodularities in random distribution",
+          "exact_quote": "A CT of the chest was obtained, which showed diffuse subcentimetric nodularities in random distribution.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "pathology_findings",
+          "extracted_value": "nested cells with meningothelial like morphology",
+          "exact_quote": "Nested cells with meningothelial like morphology (A+B)",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "pulmonary_nodules_description",
+          "extracted_value": "diffuse subcentimetric nodularities in random distribution",
+          "exact_quote": "diffuse subcentimetric nodularities in random distribution",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_procedure_initial",
+          "extracted_value": "bronchoscopy with BAL and TBBX",
+          "exact_quote": "She subsequently underwent a bronchoscopy with bronchoalveolar lavage (BAL) and transbronchial lung biopsies (TBBX).",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_procedure_final",
+          "extracted_value": "right thoracotomy with multiple lung biopsies",
+          "exact_quote": "she underwent a right thoracotomy with multiple lung biopsies. Pathology was significant for nested cells with immunostaining positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "final_diagnosis",
+          "extracted_value": "diffuse pulmonary meningotheliomatosis",
+          "exact_quote": "The morphology and immunophenotype supported the diagnosis of diffuse pulmonary meningotheliomatosis.",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        },
+        {
+          "field_name": "diagnostic_marker_positive",
+          "extracted_value": [
+            "epithelial membrane antigen (EMA)",
+            "CD56",
+            "progesterone receptor"
+          ],
+          "exact_quote": "immunostaining positive for epithelial membrane antigen (EMA), CD56, and progesterone receptor",
+          "page_number": null,
+          "chunk_index": null,
+          "confidence": 1.0
+        }
+      ],
+      "final_accuracy_score": 1.0,
+      "final_consistency_score": 1.0,
+      "final_overall_score": 1.0,
+      "passed_validation": true,
+      "iterations": 1,
+      "iteration_history": [
+        {
+          "iteration_number": 1,
+          "accuracy_score": 1.0,
+          "consistency_score": 1.0,
+          "overall_score": 1.0,
+          "issues_count": 0,
+          "suggestions": []
+        }
+      ],
+      "content_filter_stats": {
+        "original_chunks": 6,
+        "filtered_chunks": 6,
+        "removed_chunks": 0,
+        "original_chars": 3147,
+        "filtered_chars": 3147,
+        "removed_chars": 0,
+        "estimated_original_tokens": 786,
+        "estimated_filtered_tokens": 786,
+        "estimated_tokens_saved": 0,
+        "reduction_percentage": 0.0
+      },
+      "relevance_stats": {
+        "total_chunks": 6,
+        "relevant_chunks": 2,
+        "irrelevant_chunks": 4,
+        "relevance_rate": 33.3,
+        "avg_confidence": 0.63
+      },
+      "warnings": [],
+      "source_filename": "Saa and Assaf - 2022 - A Rare Case of Pulmonary Nodules Diffuse Pulmonary Meningotheliomatosis.pdf",
+      "extraction_timestamp": "2026-01-06T14:39:45.408727"
+    }
+  },
+  "extraction_stats": {
+    "total": 7,
+    "success": 7,
+    "failed": 0
+  }
+}

@@ -151,6 +151,17 @@ class AuditLogger:
             error_message=reason,
         )
     
+    def log_event(self, event_type: str, data: Dict[str, Any]):
+        """Log a generic workflow event."""
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "event_type": event_type,
+            "data": data
+        }
+        # Append to log file
+        with open(self.log_file, "a") as f:
+            f.write(json.dumps(entry) + "\n")
+    
     def get_summary(self) -> Dict[str, Any]:
         """Generate session summary statistics."""
         total = len(self.entries)

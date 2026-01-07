@@ -6,6 +6,7 @@
     *   **Core**: Pure processing logic, stateless where possible.
     *   **Agents**: Autonomous entities with distinct responsibilities (`Screener`, `Librarian`, `Extractor`).
     *   **State**: All cross-component communication via typed Pydantic models.
+    *   **Dependency Injection**: Agents components should be injected, not instantiated inside other components.
 
 2.  **PRISMA Compliance**:
     *   Strict adherence to PRISMA 2020 guidelines.
@@ -15,6 +16,10 @@
 3.  **Typer/Rich CLI**:
     *   All user interaction via the CLI.
     *   Use `Rich` for beautiful, informative output.
+
+4.  **Security & Reliability**:
+    *   **NO PICKLE**: Use JSON/Pydantic for persistence. Pickle is unsafe and brittle.
+    *   **Atomic Writes**: Ensure file operations are atomic to prevent corruption.
 
 ## Code Structure
 

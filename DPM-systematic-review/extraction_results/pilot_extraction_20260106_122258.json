@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "timestamp": "20260106_122258",
+    "model": "anthropic/claude-sonnet-4-20250514",
+    "sample_size": 3,
+    "papers": [
+      "Agozzino et al. - 2006 - Minute pulmonary meningothelial-like nodules in the transbronchial biopsy of a lung transplant recip",
+      "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease",
+      "Alkurashi et al. - 2020 - Diffuse Pulmonary Meningotheliomatosis A Rare Lung Disease Presenting with Diffuse Ground-Glass Opa"
+    ]
+  },
+  "cost": {
+    "estimated_cost_usd": 0.108252,
+    "actual_cost_usd": 0.0,
+    "total_tokens": 0
+  },
+  "results": [
+    {
+      "filename": "Agozzino et al. - 2006 - Minute pulmonary meningothelial-like nodules in the transbronchial biopsy of a lung transplant recip.pdf",
+      "status": "error",
+      "error": "Extraction failed for Agozzino et al. - 2006 - Minute pulmonary meningothelial-like nodules in the transbronchial biopsy of a lung transplant recip.pdf: <failed_attempts>\n\n<generation number=\"1\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"2\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"3\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n</failed_attempts>\n\n<last_exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</last_exception>"
+    },
+    {
+      "filename": "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf",
+      "status": "error",
+      "error": "Extraction failed for Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf: <failed_attempts>\n\n<generation number=\"1\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"2\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"3\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n</failed_attempts>\n\n<last_exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</last_exception>"
+    },
+    {
+      "filename": "Alkurashi et al. - 2020 - Diffuse Pulmonary Meningotheliomatosis A Rare Lung Disease Presenting with Diffuse Ground-Glass Opa.pdf",
+      "status": "error",
+      "error": "Extraction failed for Alkurashi et al. - 2020 - Diffuse Pulmonary Meningotheliomatosis A Rare Lung Disease Presenting with Diffuse Ground-Glass Opa.pdf: <failed_attempts>\n\n<generation number=\"1\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"2\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"3\">\n<exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n</failed_attempts>\n\n<last_exception>\n    Error code: 400 - {'error': {'message': 'anthropic/claude-sonnet-4-20250514 is not a valid model ID', 'code': 400}, 'user_id': 'user_36pSErV3pPVeAHYPnV921fa2pOF'}\n</last_exception>"
+    }
+  ]
+}

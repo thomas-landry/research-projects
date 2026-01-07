@@ -12,8 +12,8 @@ from typing import List, Dict, Any, Optional, Type
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
 
+from core import utils
 from .parser import DocumentChunk
-from .extractor import load_env
 
 
 @dataclass
@@ -61,6 +61,7 @@ It's better to include slightly irrelevant content than to miss important data."
         api_key: Optional[str] = None,
         batch_size: int = 10,
         preview_chars: int = 500,
+        token_tracker: Optional["TokenTracker"] = None,
     ):
         """
         Initialize the relevance classifier.
@@ -72,7 +73,7 @@ It's better to include slightly irrelevant content than to miss important data."
             batch_size: Number of chunks to classify per API call
             preview_chars: Characters per chunk for classification context
         """
-        load_env()
+        utils.load_env()
         
         self.provider = provider.lower()
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
@@ -88,42 +89,33 @@ It's better to include slightly irrelevant content than to miss important data."
         
         self.batch_size = batch_size
         self.preview_chars = preview_chars
+        self.token_tracker = token_tracker
         self._client = None
         self._instructor_client = None
+        self._async_instructor_client = None
+        self.logger = utils.get_logger("RelevanceClassifier")
     
     def _get_client(self):
-        """Initialize the Instructor-patched client."""
+        """Initialize the Instructor-patched client (Sync)."""
         if self._instructor_client is not None:
             return self._instructor_client
         
-        try:
-            import instructor
-            from openai import OpenAI
-        except ImportError:
-            raise ImportError(
-                "Required packages not installed. Run:\n"
-                "pip install instructor openai"
-            )
-        
-        if self.provider == "openrouter":
-            if not self.api_key:
-                raise ValueError("OPENROUTER_API_KEY not set.")
-            
-            self._client = OpenAI(
-                base_url="https://openrouter.ai/api/v1",
-                api_key=self.api_key,
-            )
-        elif self.provider == "ollama":
-            ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-            self._client = OpenAI(
-                base_url=f"{ollama_host}/v1",
-                api_key="ollama",
-            )
-        else:
-            raise ValueError(f"Unknown provider: {self.provider}")
-        
-        self._instructor_client = instructor.from_openai(self._client)
+        self._instructor_client = utils.get_llm_client(
+            provider=self.provider,
+            api_key=self.api_key
+        )
         return self._instructor_client
+
+    def _get_async_client(self):
+        """Initialize the Instructor-patched client (Async)."""
+        if self._async_instructor_client is not None:
+            return self._async_instructor_client
+        
+        self._async_instructor_client = utils.get_async_llm_client(
+            provider=self.provider,
+            api_key=self.api_key
+        )
+        return self._async_instructor_client
     
     def _truncate_chunk(self, chunk: DocumentChunk) -> str:
         """Truncate chunk text for classification preview."""
@@ -195,7 +187,7 @@ For each chunk, provide:
             )
             
             try:
-                response = client.chat.completions.create(
+                response, completion = client.chat.completions.create_with_completion(
                     model=self.model,
                     messages=[
                         {"role": "system", "content": self.SYSTEM_PROMPT},
@@ -203,6 +195,18 @@ For each chunk, provide:
                     ],
                     response_model=RelevanceResponse,
                 )
+                
+                # Record usage
+                if self.token_tracker and hasattr(completion, 'usage') and completion.usage:
+                    self.token_tracker.record_usage(
+                        usage={
+                            "prompt_tokens": completion.usage.prompt_tokens,
+                            "completion_tokens": completion.usage.completion_tokens,
+                            "total_tokens": completion.usage.total_tokens
+                        },
+                        model=self.model,
+                        operation="relevance_classification"
+                    )
                 
                 # Map response to results
                 for classification in response.classifications:
@@ -218,7 +222,7 @@ For each chunk, provide:
                     
             except Exception as e:
                 # On error, mark all chunks in batch as relevant (safe default)
-                print(f"Warning: Relevance classification failed for batch {batch_start}-{batch_end}: {e}")
+                self.logger.warning(f"Relevance classification failed for batch {batch_start}-{batch_end}: {e}")
                 for i in range(batch_start, batch_end):
                     all_results.append(RelevanceResult(
                         chunk_index=i,
@@ -244,6 +248,86 @@ For each chunk, provide:
                 ))
         
         return final_results
+
+    async def classify_batch_async(
+        self,
+        chunks: List[DocumentChunk],
+        theme: str,
+        schema_fields: List[str],
+    ) -> List[RelevanceResult]:
+        """
+        Classify all chunks for relevance (Async).
+        """
+        if not chunks:
+            return []
+        
+        client = self._get_async_client()
+        all_results: List[RelevanceResult] = []
+        
+        # Process in batches
+        for batch_start in range(0, len(chunks), self.batch_size):
+            batch_end = min(batch_start + self.batch_size, len(chunks))
+            batch_chunks = chunks[batch_start:batch_end]
+            
+            user_prompt = self._build_batch_prompt(
+                batch_chunks, batch_start, theme, schema_fields
+            )
+            
+            try:
+                response, completion = await client.chat.completions.create_with_completion(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": self.SYSTEM_PROMPT},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    response_model=RelevanceResponse,
+                )
+                
+                # Record usage
+                if self.token_tracker and hasattr(completion, 'usage') and completion.usage:
+                    self.token_tracker.record_usage(
+                        usage={
+                            "prompt_tokens": completion.usage.prompt_tokens,
+                            "completion_tokens": completion.usage.completion_tokens,
+                            "total_tokens": completion.usage.total_tokens
+                        },
+                        model=self.model,
+                        operation="relevance_classification"
+                    )
+                
+                for classification in response.classifications:
+                    all_results.append(RelevanceResult(
+                        chunk_index=classification.index,
+                        is_relevant=classification.relevant == 1,
+                        confidence=0.9 if classification.relevant == 1 else 0.5,
+                        reason=classification.reason,
+                    ))
+                    
+            except Exception as e:
+                self.logger.warning(f"Async Relevance classification failed for batch {batch_start}-{batch_end}: {e}")
+                for i in range(batch_start, batch_end):
+                    all_results.append(RelevanceResult(
+                        chunk_index=i,
+                        is_relevant=True,
+                        confidence=0.5,
+                        reason="Classification failed - defaulting to relevant",
+                    ))
+        
+        # Sorting and filling gaps
+        results_by_index = {r.chunk_index: r for r in all_results}
+        final_results = []
+        for i in range(len(chunks)):
+            if i in results_by_index:
+                final_results.append(results_by_index[i])
+            else:
+                final_results.append(RelevanceResult(
+                    chunk_index=i,
+                    is_relevant=True,
+                    confidence=0.5,
+                    reason="Not classified - defaulting to relevant",
+                ))
+        return final_results
+
     
     def get_relevant_chunks(
         self,
@@ -270,6 +354,25 @@ For each chunk, provide:
         ]
         
         return relevant_chunks, results
+
+    async def get_relevant_chunks_async(
+        self,
+        chunks: List[DocumentChunk],
+        theme: str,
+        schema_fields: List[str],
+    ) -> tuple[List[DocumentChunk], List[RelevanceResult]]:
+        """
+        Filter chunks to only those classified as relevant (Async).
+        """
+        results = await self.classify_batch_async(chunks, theme, schema_fields)
+        
+        relevant_chunks = [
+            chunk for chunk, result in zip(chunks, results)
+            if result.is_relevant
+        ]
+        
+        return relevant_chunks, results
+
     
     def get_classification_summary(self, results: List[RelevanceResult]) -> Dict[str, Any]:
         """Generate summary statistics for classification results."""

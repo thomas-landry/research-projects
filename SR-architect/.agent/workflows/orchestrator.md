@@ -45,6 +45,11 @@ Coordinate multi-agent workflows by reading `task.md`, routing to appropriate sp
    - Check if next phase is blocked or ready
    - Update Mission Status table
 
+6. **Enforce Modernization Policies**:
+   - **Scale-Aware Routing**: For batches > 5 papers, use `async` workflows (e.g., `process_batch_async`).
+   - **Pre-flight Validation**: Before routing to `SCREENING` or `EXTRACTION`, verify `review_id`, `pico` criteria, and `bibliography` exist in state.
+   - **Cost Guardrails**: If papers > 20, require a "Cost Estimate" report before starting `EXTRACTION`.
+
 ### OUTPUT FORMAT
 
 ```markdown
@@ -61,5 +66,20 @@ Coordinate multi-agent workflows by reading `task.md`, routing to appropriate sp
 ### BOUNDARIES
 
 - ✅ **Always**: Read task.md first, update after specialist completes
+- ✅ **Mandatory Delegation**: Any task involving code modification or file system changes MUST be delegated using a slash command.
+- ✅ **Escalation**: If no specialist exists for a task, use `/agent_architect` to design one or `/senior_dev` to handle it.
 - ⚠️ **Ask first**: Changing phase order, skipping blocked tasks
-- 🚫 **Never**: Do specialist work yourself, modify code directly
+- 🚫 **Never**: Perform specialist work (e.g., writing code, refactoring) directly using tools.
+- 🚫 **No Sync for Scale**: Never run extraction sequentially for more than 3 documents.
+
+### DELEGATION AUDIT
+Every completion report MUST specify:
+- **Specialist Called**: The slash command used.
+- **Artifacts Produced**: Files modified by the specialist.
+- **Standards Check**: Confirmation that `docs/standards.md` was followed.
+
+### SPECIALIST HANDSHAKE (Plan-Before-Code)
+Before any code modification, the specialist MUST:
+1.  **Propose an Implementation Plan**: Using the `implementation_plan.md` artifact or a dedicated planning section.
+2.  **Explicitly reference `docs/standards.md`**: Specify which standards (DI, Logging, JSON over Pickle) apply to the task.
+3.  **Wait for User/Orchestrator approval**: Only proceed to `EXECUTION` once the plan is confirmed.

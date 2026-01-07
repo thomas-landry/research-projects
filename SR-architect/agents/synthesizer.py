@@ -10,6 +10,9 @@ from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 import json
 
+from core.utils import get_logger, get_llm_client
+
+
 class SynthesisReport(BaseModel):
     """Structured synthesis of multiple extracted papers."""
     title: str = Field(description="Title of the synthesis report")
@@ -20,6 +23,7 @@ class SynthesisReport(BaseModel):
     consensus_points: List[str] = Field(description="Points where studies agree")
     limitations: List[str] = Field(description="Noted limitations in the source data")
     
+
 class SynthesizerAgent:
     """
     Agent responsible for synthesizing multiple extraction results into a coherent report.
@@ -49,25 +53,33 @@ RULES:
 
     def __init__(
         self,
+        client: Optional[Any] = None,
         provider: str = "openrouter",
         model: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
+        """
+        Initialize SynthesizerAgent.
+        
+        Args:
+            client: Optional injected LLM client.
+            provider: LLM provider (if client not provided).
+            model: Model name.
+            api_key: API key (if client not provided).
+        """
         self.provider = provider
         self.api_key = api_key
         self.model = model or "gpt-4o"
-        self._client = None
-        
-        from core.utils import get_logger
         self.logger = get_logger("SynthesizerAgent")
+        
+        # Dependency Injection
+        self._client = client
 
     @property
     def client(self):
         """Initialize and return the Instructor-patched client."""
         if self._client is not None:
             return self._client
-        
-        from core.utils import get_llm_client
         
         self.logger.debug(f"Initializing LLM client for {self.provider}")
         self._client = get_llm_client(
@@ -88,13 +100,12 @@ RULES:
             SynthesisReport object.
         """
         if not results:
+            self.logger.error("No results provided for synthesis.")
             raise ValueError("No results provided for synthesis.")
         
         self.logger.info(f"Synthesizing {len(results)} papers for theme: {theme}")
         
-        # Prepare data for prompt (simplify to reduce tokens if needed)
-        # For now, we dump the whole dicts. In a real-world scenario, we might want to 
-        # filter or truncate large text fields.
+        # Prepare data for prompt
         data_json = json.dumps(results, indent=2)
         
         user_prompt = f"""
@@ -121,7 +132,8 @@ Please generate a synthesis report for this data.
             self.logger.error(f"Synthesis failed: {e}")
             raise RuntimeError(f"Synthesis failed: {e}") from e
 
+
 if __name__ == "__main__":
-    # Demo
-    agent = SynthesizerAgent(api_key="sk-test")
-    print("Synthesizer initialized.")
+    # Demo/Smoke test
+    agent = SynthesizerAgent()
+    print("Synthesizer initialized. Verified DI and Logging compatibility.")

@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "timestamp": "20260106_125432",
+    "metadata_model": "llama3.1:8b",
+    "clinical_model": "anthropic/claude-3.5-sonnet",
+    "sample_size": 3
+  },
+  "results": [
+    {
+      "filename": "Agozzino et al. - 2006 - Minute pulmonary meningothelial-like nodules in the transbronchial biopsy of a lung transplant recip.pdf",
+      "status": "error",
+      "error": "Extraction failed for Agozzino et al. - 2006 - Minute pulmonary meningothelial-like nodules in the transbronchial biopsy of a lung transplant recip.pdf: <failed_attempts>\n\n<generation number=\"1\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"2\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"3\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n</failed_attempts>\n\n<last_exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</last_exception>"
+    },
+    {
+      "filename": "Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf",
+      "status": "error",
+      "error": "Extraction failed for Aksel et al. - 2019 - An Unusual Case of Diffuse Pulmonary Meningotheliomatosis Accompanying with Cystic Lung Disease.pdf: <failed_attempts>\n\n<generation number=\"1\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"2\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"3\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n</failed_attempts>\n\n<last_exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</last_exception>"
+    },
+    {
+      "filename": "Alkurashi et al. - 2020 - Diffuse Pulmonary Meningotheliomatosis A Rare Lung Disease Presenting with Diffuse Ground-Glass Opa.pdf",
+      "status": "error",
+      "error": "Extraction failed for Alkurashi et al. - 2020 - Diffuse Pulmonary Meningotheliomatosis A Rare Lung Disease Presenting with Diffuse Ground-Glass Opa.pdf: <failed_attempts>\n\n<generation number=\"1\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"2\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n<generation number=\"3\">\n<exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</exception>\n<completion>\n    None\n</completion>\n</generation>\n\n</failed_attempts>\n\n<last_exception>\n    Error code: 404 - {'error': {'message': \"model 'llama3.1:8b' not found\", 'type': 'api_error', 'param': None, 'code': None}}\n</last_exception>"
+    }
+  ]
+}

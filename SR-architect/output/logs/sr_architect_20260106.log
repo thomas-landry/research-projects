@@ -1,0 +1,23 @@
+2026-01-06 18:03:19,773 - SchemaDiscoveryAgent - INFO - Analyzing paper: Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf
+2026-01-06 18:03:21,031 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-06 18:03:29,370 - SchemaDiscoveryAgent - INFO - Analyzing paper: Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf
+2026-01-06 18:03:29,836 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-06 18:03:39,341 - SchemaDiscoveryAgent - INFO - Analyzing paper: Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf
+2026-01-06 18:03:39,816 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-06 18:03:45,475 - SchemaDiscoveryAgent - INFO - Unifying 31 raw field suggestions...
+2026-01-06 18:03:45,852 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-06 18:04:09,555 - core.state_manager - INFO - Loaded checkpoint with 4 processed files.
+2026-01-06 18:04:09,556 - core.batch_processor - INFO - Starting parallel extraction [workers=1] for 2 documents.
+2026-01-06 18:04:09,557 - StructuredExtractor - INFO - Extracting data from Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf using anthropic/claude-3.5-sonnet
+2026-01-06 18:04:11,390 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-06 18:04:30,608 - StructuredExtractor - INFO - Extracting data from Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf using anthropic/claude-3.5-sonnet
+2026-01-06 18:04:30,613 - core.batch_processor - INFO - ✓ Completed Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf
+2026-01-06 18:04:32,339 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-06 18:04:51,465 - core.batch_processor - INFO - ✓ Completed Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf
+2026-01-06 18:04:51,467 - core.state_manager - INFO - Loaded checkpoint with 4 processed files.
+2026-01-06 18:05:01,716 - core.state_manager - INFO - Loaded checkpoint with 4 processed files.
+2026-01-06 18:05:01,716 - core.batch_processor - INFO - Starting parallel extraction [workers=1] for 1 documents.
+2026-01-06 18:05:01,717 - StructuredExtractor - INFO - Extracting data from Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf using anthropic/claude-3.5-sonnet
+2026-01-06 18:05:04,444 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-06 18:05:18,954 - core.batch_processor - INFO - ✓ Completed Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf
+2026-01-06 18:05:18,956 - core.state_manager - INFO - Loaded checkpoint with 4 processed files.

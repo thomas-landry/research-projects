@@ -28,43 +28,19 @@ from core.prisma_state import (
     recalculate_counts,
     validate_prisma_counts,
 )
+from core.batch_processor import BatchExecutor
+from core.state_manager import StateManager
+from core.schema_builder import get_observational_schema, build_extraction_model
+from core.parser import DocumentParser
+from core.utils import get_logger
+from core.audit_logger import AuditLogger
 
-
-# ============================================================================
-# ORCHESTRATOR SYSTEM PROMPT
-# ============================================================================
-
-ORCHESTRATOR_SYSTEM_PROMPT = """
-# Role
-You are the Principal Investigator (PI) for a rigorous Systematic Review and Meta-Analysis. Your goal is to oversee the lifecycle of evidence synthesis with strict adherence to the PRISMA 2020 guidelines.
-
-# Mission
-Coordinate a team of agents (Librarian, Screener, Statistician) to answer a specific Clinical Question (PICO). You are responsible for the integrity of the "Methods" section and the accuracy of the "PRISMA Flow Diagram."
-
-# Responsibilities
-
-1.  **Protocol Enforcement (The Methods Section)**
-    * You must define and LOG the exact search strategy used (Databases, Date Ranges, Boolean Strings).
-    * You must record the Inclusion/Exclusion criteria explicitly before screening begins.
-    * *Output:* At the end of the run, you must generate the text for the "Methods" section describing exactly how the search and screening were conducted.
-
-2.  **Strict Flow Tracking (The PRISMA Diagram)**
-    * You must track the count of records at every stage:
-        * `n_identified`: Total raw hits.
-        * `n_duplicates_removed`: Count of duplicates.
-        * `n_screened`: Papers sent to the Screener.
-        * `n_excluded`: Papers rejected by the Screener.
-        * `n_included`: Papers passing all criteria.
-    * **CRITICAL:** You must enforce that the Screener provides a "Reason for Exclusion" for every rejected paper (e.g., "Wrong Study Design," "Wrong Population," "Animal Study"). You cannot accept a rejection without a tagged reason.
-
-3.  **State Management**
-    * Do not allow the "Writer" to start synthesizing until the "Screener" has finished and you (the Orchestrator) have verified the PRISMA counts balance (Identified - Duplicates - Excluded = Included).
-
-# Interaction Style
-* Be concise and directive.
-* If an agent returns vague data (e.g., "I found some papers"), reject it and demand structured JSON with PMIDs and specific counts.
-* Prioritize High-Quality Evidence: RCTs > Cohorts > Case Series.
-"""
+# Agent Imports
+from agents.librarian import LibrarianAgent
+from agents.screener import ScreenerAgent
+from agents.synthesizer import SynthesizerAgent
+from core.extractor import StructuredExtractor
+from core.schema_builder import get_observational_schema, build_extraction_model
 
 
 class WorkflowPhase(str, Enum):
@@ -94,41 +70,68 @@ class OrchestratorPI:
     Enforces PRISMA 2020 compliance and coordinates agents.
     """
     
-    def __init__(self, state: Optional[ReviewState] = None):
-        """Initialize the orchestrator with optional existing state."""
+    def __init__(
+        self, 
+        state: Optional[ReviewState] = None,
+        librarian: Optional[LibrarianAgent] = None,
+        screener: Optional[ScreenerAgent] = None,
+        extractor: Optional[StructuredExtractor] = None,
+        synthesizer: Optional[SynthesizerAgent] = None
+    ):
+        """
+        Initialize the orchestrator.
+        
+        Args:
+            state: Existing review state (optional)
+            librarian: Injected LibrarianAgent
+            screener: Injected ScreenerAgent
+            extractor: Injected StructuredExtractor
+            synthesizer: Injected SynthesizerAgent
+        """
         self.state = state
         self.phase = WorkflowPhase.PROTOCOL if state is None else self._detect_phase(state)
-        self.agents: Dict[str, Callable] = {}
-        self.log: List[str] = []
+        
+        # Dependency Injection with lazy defaults if not provided
+        self.librarian = librarian or LibrarianAgent()
+        self.screener = screener  # Screener often needs PICO, so strictly we might init later if not provided
+        self.extractor = extractor or StructuredExtractor()
+        self.synthesizer = synthesizer or SynthesizerAgent()
+        
+        self.logger = get_logger("OrchestratorPI")
+        self.audit = AuditLogger()
+        self.log_history: List[str] = []
     
     def _detect_phase(self, state: ReviewState) -> WorkflowPhase:
         """Detect current phase from state."""
-        if state["is_complete"]:
+        if state.get("is_complete"):
             return WorkflowPhase.COMPLETE
         
-        if not state["bibliography"]:
+        if not state.get("bibliography"):
             return WorkflowPhase.IDENTIFICATION
         
         pending = sum(1 for p in state["bibliography"] if p["status"] == PaperStatus.PENDING.value)
         if pending > 0:
             return WorkflowPhase.SCREENING
         
-        if state["count_included"] > 0:
+        if state["count_included"] > 0 and not state.get("extraction_results"):
             return WorkflowPhase.EXTRACTION
+            
+        if state.get("extraction_results"):
+            return WorkflowPhase.SYNTHESIS
         
         return WorkflowPhase.COMPLETE
     
-    def _log(self, message: str):
-        """Add to orchestrator log."""
+    def _log(self, message: str, level: str = "info"):
+        """Internal log wrapper."""
+        # Keep log history for report generation if needed
         from datetime import datetime
         timestamp = datetime.now().strftime("%H:%M:%S")
-        self.log.append(f"[{timestamp}] {message}")
-        print(f"[PI] {message}")
-    
-    def register_agent(self, name: str, agent_fn: Callable):
-        """Register an agent function."""
-        self.agents[name] = agent_fn
-        self._log(f"Registered agent: {name}")
+        self.log_history.append(f"[{timestamp}] {message}")
+        
+        if level == "error":
+            self.logger.error(message)
+        else:
+            self.logger.info(message)
     
     def initialize_review(
         self,
@@ -136,22 +139,20 @@ class OrchestratorPI:
         question: str,
         pico: PICOCriteria,
     ) -> ReviewState:
-        """
-        Initialize a new systematic review.
-        
-        Args:
-            title: Review title
-            question: Clinical question
-            pico: PICO criteria
-            
-        Returns:
-            Initialized ReviewState
-        """
+        """Initialize a new systematic review."""
         self._log(f"Initializing review: {title}")
         
         self.state = create_empty_state(title, question, pico)
+        if "review_id" not in self.state:
+            import uuid
+            self.state["review_id"] = str(uuid.uuid4())
+            
         self.phase = WorkflowPhase.PROTOCOL
         
+        # Re-initialize screener with new PICO if it wasn't injected or needs update
+        if not self.screener or self.screener.pico != pico:
+            self.screener = ScreenerAgent(pico)
+
         # Log the protocol
         self.state["screening_protocol"] = f"""
 INCLUSION CRITERIA:
@@ -173,42 +174,20 @@ EXCLUSION CRITERIA:
         return self.state
     
     def run_identification(self, search_results: List[Paper], strategy_log: str) -> AgentResponse:
-        """
-        Process search results from Librarian agent.
-        
-        Args:
-            search_results: Papers from database search
-            strategy_log: Documentation of search strategy
-            
-        Returns:
-            AgentResponse with status
-        """
+        """Process search results from Librarian agent."""
         if self.phase != WorkflowPhase.IDENTIFICATION:
-            return AgentResponse(
-                success=False,
-                agent_name="Librarian",
-                data={},
-                error=f"Cannot run identification in phase: {self.phase}"
-            )
+            self._log(f"Cannot run identification in phase: {self.phase}", "error")
+            return AgentResponse(False, "Librarian", {}, f"Wrong phase: {self.phase}")
+        
+        if not search_results:
+            self._log("Librarian returned no papers.", "error")
+            return AgentResponse(False, "Librarian", {}, "No papers provided")
         
         # Validate input
-        if not search_results:
-            return AgentResponse(
-                success=False,
-                agent_name="Librarian",
-                data={},
-                error="REJECTED: No papers provided. Provide structured results with PMIDs."
-            )
-        
-        # Check all papers have required fields
         for paper in search_results:
             if not paper.get("pmid") or not paper.get("title"):
-                return AgentResponse(
-                    success=False,
-                    agent_name="Librarian",
-                    data={},
-                    error=f"REJECTED: Paper missing PMID or title: {paper}"
-                )
+                self._log(f"Paper missing PMID/title: {paper}", "error")
+                return AgentResponse(False, "Librarian", {}, f"Paper missing PMID/title: {paper}")
         
         # Accept results
         self.state["bibliography"] = search_results
@@ -216,6 +195,8 @@ EXCLUSION CRITERIA:
         self.state = recalculate_counts(self.state)
         
         self._log(f"Identification complete: {self.state['count_identified']} papers found")
+        self.audit.log_event("identification_complete", {"count": len(search_results)})
+        
         self.phase = WorkflowPhase.DEDUPLICATION
         
         return AgentResponse(
@@ -223,24 +204,15 @@ EXCLUSION CRITERIA:
             agent_name="Librarian",
             data={
                 "count_identified": self.state["count_identified"],
-                "sources": list(set(p["source_database"] for p in search_results)),
+                "sources": list(set(p.get("source_database", "unknown") for p in search_results)),
             }
         )
     
     def run_deduplication(self) -> AgentResponse:
-        """
-        Remove duplicate papers based on PMID.
-        
-        Returns:
-            AgentResponse with deduplication stats
-        """
+        """Remove duplicate papers based on PMID."""
         if self.phase != WorkflowPhase.DEDUPLICATION:
-            return AgentResponse(
-                success=False,
-                agent_name="Deduplicator",
-                data={},
-                error=f"Cannot deduplicate in phase: {self.phase}"
-            )
+             self._log(f"Cannot run deduplication in phase: {self.phase}", "error")
+             return AgentResponse(False, "Deduplicator", {}, f"Wrong phase: {self.phase}")
         
         seen_pmids = set()
         duplicates = 0
@@ -277,50 +249,19 @@ EXCLUSION CRITERIA:
     ) -> AgentResponse:
         """
         Record a screening decision for a single paper.
-        
-        CRITICAL: If excluded, must provide exclusion_reason.
-        
-        Args:
-            pmid: Paper PMID
-            include: True to include, False to exclude
-            exclusion_reason: Required if excluded
-            notes: Optional notes
-            
-        Returns:
-            AgentResponse with decision status
         """
         if self.phase != WorkflowPhase.SCREENING:
-            return AgentResponse(
-                success=False,
-                agent_name="Screener",
-                data={},
-                error=f"Cannot screen in phase: {self.phase}"
-            )
+            return AgentResponse(False, "Screener", {}, f"Wrong phase: {self.phase}")
         
         # Find paper
-        paper = None
-        for p in self.state["bibliography"]:
-            if p["pmid"] == pmid:
-                paper = p
-                break
+        paper = next((p for p in self.state["bibliography"] if p["pmid"] == pmid), None)
         
         if paper is None:
-            return AgentResponse(
-                success=False,
-                agent_name="Screener",
-                data={},
-                error=f"REJECTED: PMID {pmid} not found in bibliography"
-            )
+            return AgentResponse(False, "Screener", {}, f"PMID {pmid} not found")
         
         # CRITICAL: Enforce exclusion reason
         if not include and not exclusion_reason:
-            return AgentResponse(
-                success=False,
-                agent_name="Screener",
-                data={},
-                error=f"REJECTED: Cannot exclude PMID {pmid} without a reason. "
-                      f"Valid reasons: {[e.value for e in ExclusionReason]}"
-            )
+            return AgentResponse(False, "Screener", {}, "Cannot exclude without reason")
         
         # Record decision
         if include:
@@ -344,73 +285,34 @@ EXCLUSION CRITERIA:
         )
     
     def complete_screening(self) -> AgentResponse:
-        """
-        Finalize screening phase and validate PRISMA counts.
-        
-        Returns:
-            AgentResponse with validation results
-        """
+        """Finalize screening phase and validate PRISMA counts."""
         if self.phase != WorkflowPhase.SCREENING:
-            return AgentResponse(
-                success=False,
-                agent_name="Orchestrator",
-                data={},
-                error=f"Cannot complete screening in phase: {self.phase}"
-            )
+            return AgentResponse(False, "Orchestrator", {}, f"Wrong phase: {self.phase}")
         
-        # Check for pending papers
         pending = [
             p["pmid"] for p in self.state["bibliography"]
             if p["status"] == PaperStatus.PENDING.value
         ]
         
         if pending:
-            return AgentResponse(
-                success=False,
-                agent_name="Orchestrator",
-                data={"pending_count": len(pending)},
-                error=f"Cannot complete screening: {len(pending)} papers still pending. "
-                      f"PMIDs: {pending[:5]}..."
-            )
+            return AgentResponse(False, "Orchestrator", {"pending": pending}, f"{len(pending)} papers pending")
         
-        # Validate PRISMA counts
         errors = validate_prisma_counts(self.state)
-        
         if errors:
-            return AgentResponse(
-                success=False,
-                agent_name="Orchestrator",
-                data={"validation_errors": errors},
-                error=f"PRISMA validation failed: {errors}"
-            )
+            return AgentResponse(False, "Orchestrator", {"errors": errors}, "PRISMA validation failed")
         
-        self._log(f"Screening complete: {self.state['count_included']} included, "
-                  f"{self.state['count_excluded']} excluded")
-        self._log(f"Exclusion breakdown: {self.state['count_excluded_reasons']}")
-        
+        self._log(f"Screening complete: {self.state['count_included']} included, {self.state['count_excluded']} excluded")
         self.phase = WorkflowPhase.EXTRACTION
         
         return AgentResponse(
             success=True,
             agent_name="Orchestrator",
             data={
-                "count_included": self.state["count_included"],
-                "count_excluded": self.state["count_excluded"],
-                "exclusion_reasons": self.state["count_excluded_reasons"],
+                "included": self.state["count_included"],
+                "excluded": self.state["count_excluded"],
                 "prisma_valid": True,
             }
         )
-    
-    def get_prisma_counts(self) -> Dict[str, Any]:
-        """Get current PRISMA counts for flow diagram."""
-        return {
-            "identified": self.state["count_identified"],
-            "duplicates": self.state["count_duplicates"],
-            "screened": self.state["count_screened"],
-            "excluded": self.state["count_excluded"],
-            "exclusion_reasons": self.state["count_excluded_reasons"],
-            "included": self.state["count_included"],
-        }
     
     def get_included_papers(self) -> List[Paper]:
         """Get list of included papers for extraction."""
@@ -418,17 +320,149 @@ EXCLUSION CRITERIA:
             p for p in self.state["bibliography"]
             if p["status"] == PaperStatus.INCLUDED.value
         ]
-    
-    def can_start_synthesis(self) -> bool:
-        """Check if synthesis can begin (all screening complete and valid)."""
-        if self.phase not in [WorkflowPhase.EXTRACTION, WorkflowPhase.SYNTHESIS]:
-            return False
+
+    async def run_pipeline(self):
+        """Execute the full systematic review pipeline automatically (Async)."""
+        self._log(f"Starting automated async pipeline. Initial phase: {self.phase}")
         
-        errors = validate_prisma_counts(self.state)
-        return len(errors) == 0
+        while self.phase != WorkflowPhase.COMPLETE:
+            if self.phase == WorkflowPhase.PROTOCOL:
+                self._log("Protocol phase active. Please initialize review first.", "error")
+                break
+                
+            elif self.phase == WorkflowPhase.IDENTIFICATION:
+                self._run_identification_phase()
+                
+            elif self.phase == WorkflowPhase.DEDUPLICATION:
+                self._run_deduplication_phase()
+                
+            elif self.phase == WorkflowPhase.SCREENING:
+                # Screening can be parallel but its callback structure and internal state updates
+                # are currently synchronous. screen_batch internally uses ThreadPoolExecutor.
+                # We'll stick to calling it but the pipeline remains async-ready.
+                self._run_screening_phase()
+                
+            elif self.phase == WorkflowPhase.EXTRACTION:
+                await self._run_extraction_phase()
+                
+            elif self.phase == WorkflowPhase.SYNTHESIS:
+                self._run_synthesis_phase()
+                
+            else:
+                self._log(f"Unknown phase: {self.phase}", "error")
+                break
+                
+        self._log("Pipeline execution finished.")
+
+    def _run_identification_phase(self):
+        """Execute Librarian search."""
+        self._log("=== PHASE: IDENTIFICATION ===")
+        
+        pico = self.state['pico_criteria']
+        query = f"({pico['population']}) AND ({pico['intervention']}) AND ({pico['outcome']})"
+        self._log(f"Generated Query: {query}")
+        
+        papers, strategy = self.librarian.run_search(query, max_results=20)
+        self.run_identification(papers, str(strategy))
+
+    def _run_deduplication_phase(self):
+        """Execute Deduplication."""
+        self._log("=== PHASE: DEDUPLICATION ===")
+        self.run_deduplication()
+
+    def _run_screening_phase(self):
+        """Execute Screener agent."""
+        self._log("=== PHASE: SCREENING ===")
+        
+        # Ensure screener is configured
+        if not self.screener or self.screener.pico != self.state['pico_criteria']:
+            self.screener = ScreenerAgent(self.state['pico_criteria'])
+        
+        pending = [p for p in self.state["bibliography"] if p["status"] == PaperStatus.PENDING.value]
+        self._log(f"Screening {len(pending)} pending papers...")
+        
+        def _decision_callback(pmid, decision):
+            self.record_screening_decision(
+                pmid=pmid,
+                include=decision.include,
+                exclusion_reason=decision.exclusion_reason,
+                notes=decision.notes
+            )
+            
+        self.screener.screen_batch(pending, callback=_decision_callback)
+        self.complete_screening()
+
+    async def _run_extraction_phase(self):
+        """Execute Extraction agent (Async Batch)."""
+        self._log("=== PHASE: EXTRACTION ===")
+        
+        schema_fields = get_observational_schema()
+        ExtractionModel = build_extraction_model(schema_fields, "SRExtractionModel")
+        
+        included = self.get_included_papers()
+        self._log(f"Extracting data from {len(included)} included papers in parallel (Async)...")
+        
+        # 1. Prepare StateManager for batch
+        state_path = f".cache/reviews/{self.state['review_id']}_batch.json"
+        temp_state_manager = StateManager(state_path)
+        
+        # 2. Prepare BatchExecutor
+        executor = BatchExecutor(
+            pipeline=self.extractor, 
+            state_manager=temp_state_manager,
+            max_workers=5
+        )
+        
+        # 3. Prepare "Documents" 
+        from core.parser import ParsedDocument, DocumentChunk
+        docs_to_process = []
+        for paper in included:
+            doc = ParsedDocument(
+                filename=f"{paper['pmid']}.pdf",
+                full_text=f"Title: {paper['title']}\nAbstract: {paper['abstract']}",
+                chunks=[DocumentChunk(text=paper['abstract'], section="Abstract")]
+            )
+            doc.metadata["pmid"] = paper["pmid"]
+            docs_to_process.append(doc)
+            
+        # 4. Run Batch (Async)
+        results_list = await executor.process_batch_async(
+            documents=docs_to_process,
+            schema=ExtractionModel,
+            theme=self.state["review_question"],
+            resume=True
+        )
+        
+        # 5. Extract just the successful data items
+        extraction_results = [r["final_data"] if "final_data" in r else r for r in results_list if "error" not in r]
+        
+        self.state["extraction_results"] = extraction_results
+        self.phase = WorkflowPhase.SYNTHESIS
+
+    def _run_synthesis_phase(self):
+        """Execute Synthesizer agent."""
+        self._log("=== PHASE: SYNTHESIS ===")
+        
+        results = self.state.get("extraction_results", [])
+        if not results:
+            self._log("No extraction results available.", "error")
+            self.phase = WorkflowPhase.COMPLETE
+            return
+            
+        report = self.synthesizer.synthesize(results, theme=self.state["review_question"])
+        
+        # Log synthesis success
+        self._log(f"Synthesis complete: {report.title}")
+        self.audit.log_event("synthesis_complete", {"title": report.title})
+        
+        self.state["synthesis_report"] = report.model_dump()
+        self.state["is_complete"] = True
+        self.phase = WorkflowPhase.COMPLETE
 
 
 if __name__ == "__main__":
+    import asyncio
+    
     # Demo workflow
     pico = PICOCriteria(
         population="Adult ICU patients",
@@ -441,9 +475,9 @@ if __name__ == "__main__":
         excluded_types=["animal_study", "in_vitro_study"],
     )
     
+    # Initialize with default agents (or inject custom ones)
     pi = OrchestratorPI()
     
-    # Initialize
     pi.initialize_review(
         title="Bowel Protocols in ICU",
         question="Does prophylactic bowel management reduce constipation?",
@@ -451,4 +485,4 @@ if __name__ == "__main__":
     )
     
     print(f"\nPhase: {pi.phase}")
-    print(f"Protocol:\n{pi.state['screening_protocol']}")
+    asyncio.run(pi.run_pipeline())
