@@ -169,6 +169,14 @@ def extract(
             table.add_row(f.name, f.field_type.value, f.description[:50])
         console.print(table)
     
+    # Confirmation for large batches
+    if len(pdf_files) > 25 and not resume:
+        console.print(f"\n[bold yellow]⚠ WARNING: Large Batch Detected ({len(pdf_files)} papers)[/bold yellow]")
+        console.print("Processing many papers can take significant time and API tokens.")
+        if not typer.confirm("Do you want to proceed with the full batch?"):
+            console.print("[yellow]Aborted.[/yellow]")
+            raise typer.Exit()
+
     # Build dynamic model
     ExtractionModel = build_extraction_model(fields, "SRExtractionModel")
     
@@ -547,6 +555,11 @@ def discover(
     ]
     
     output_path = Path(output)
+    if output_path.exists():
+        if not typer.confirm(f"File '{output}' already exists. Overwrite?"):
+            console.print("[yellow]Aborted.[/yellow]")
+            raise typer.Exit()
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
         json.dump(schema_data, f, indent=2)
