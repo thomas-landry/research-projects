@@ -25,6 +25,7 @@ from core import (
     BatchExecutor, 
     StateManager
 )
+from core.service import ExtractionService
 from core.schema_builder import (
     build_extraction_model,
     get_case_report_schema,
@@ -177,9 +178,29 @@ def extract(
             console.print("[yellow]Aborted.[/yellow]")
             raise typer.Exit()
 
-    # Build dynamic model
-    ExtractionModel = build_extraction_model(fields, "SRExtractionModel")
+    # Initialize Service
+    service = ExtractionService(
+        provider=provider,
+        model=model,
+        token_tracker=tracker,
+        verbose=verbose
+    )
+
+    # Validate hierarchical mode requirements
+    if hierarchical and not theme:
+        console.print("[red]Error: --theme is required when using --hierarchical mode[/red]")
+        console.print("[dim]Example: --hierarchical --theme 'patient outcomes in treatment X'[/dim]")
+        raise typer.Exit(1)
     
+    # Load examples if provided
+    examples_content = None
+    if examples:
+        try:
+            examples_content = Path(examples).read_text()
+            console.print(f"[green]Loaded few-shot examples from {examples}[/green]")
+        except Exception as e:
+            console.print(f"[yellow]Could not load examples from {examples}: {e}[/yellow]")
+
     # Pre-flight cost estimate
     if not resume:
         # Hierarchical runs are more expensive (discovery + filter + extract + audit)
@@ -193,80 +214,8 @@ def extract(
         if not typer.confirm("Continue with extraction?"):
             raise typer.Exit()
     
-    # Validate hierarchical mode requirements
-    if hierarchical and not theme:
-        console.print("[red]Error: --theme is required when using --hierarchical mode[/red]")
-        console.print("[dim]Example: --hierarchical --theme 'patient outcomes in treatment X'[/dim]")
-        raise typer.Exit(1)
-    
-    # Initialize components
-    parser = DocumentParser()
-    
-    # Load examples if provided
-    examples_content = None
-    if examples:
-        try:
-            examples_content = Path(examples).read_text()
-            console.print(f"[green]Loaded few-shot examples from {examples}[/green]")
-        except Exception as e:
-            console.print(f"[yellow]Could not load examples from {examples}: {e}[/yellow]")
-
-    # Initialize appropriate extractor based on mode
-    if hierarchical:
-        console.print(f"\n[bold magenta]🔬 Hierarchical Extraction Mode[/bold magenta]")
-        console.print(f"  Theme: {theme}")
-        console.print(f"  Threshold: {threshold}")
-        console.print(f"  Max iterations: {max_iter}\n")
-        
-        pipeline = HierarchicalExtractionPipeline(
-            provider=provider,
-            model=model,
-            score_threshold=threshold,
-            max_iterations=max_iter,
-            verbose=verbose,
-            examples=examples_content,
-            token_tracker=tracker
-        )
-        extractor = None  # Not used in hierarchical mode
-    else:
-        pipeline = None
-        extractor = StructuredExtractor(
-            provider=provider, 
-            model=model, 
-            examples=examples_content,
-            token_tracker=tracker
-        )
-    
-    output_path = Path(output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    vector_store = None
-    if vectorize:
-        vector_dir = output_path.parent / "vector_store"
-        vector_store = ChromaVectorStore(
-            collection_name="sr_extraction",
-            persist_directory=str(vector_dir),
-        )
-    
-    logger = AuditLogger(log_dir=str(output_path.parent / "logs"))
-    
-    # Initialize checkpointing
-    checkpoint_path = output_path.parent / "extraction_checkpoint.json"
-    state_manager = StateManager(checkpoint_path)
-    
-    # Initialize Batch Executor
-    batch_executor = BatchExecutor(
-        pipeline=pipeline if hierarchical else extractor,
-        state_manager=state_manager,
-        max_workers=workers
-    )
-    
     # Process batch
     console.print(f"\n[bold yellow]STARTING EXTRACTION...[/bold yellow]")
-    
-    # We need to adapt the papers to ParsedDocument objects first
-    # Or let BatchExecutor handle paths? Current BatchExecutor takes ParsedDocument.
-    # Let's parse them first (or update BatchExecutor to take paths).
     
     with Progress(
         SpinnerColumn(),
@@ -275,68 +224,29 @@ def extract(
         TaskProgressColumn(),
         console=console,
     ) as progress:
-        parsing_task = progress.add_task("Parsing PDFs...", total=len(pdf_files))
-        parsed_docs = []
-        for pdf_path in pdf_files:
-            try:
-                doc = parser.parse_pdf(str(pdf_path))
-                parsed_docs.append(doc)
-            except Exception as e:
-                console.print(f"[red]Error parsing {pdf_path.name}: {e}[/red]")
+        parsing_task = progress.add_task("Processing papers...", total=len(pdf_files))
+        
+        def progress_callback(filename, data, status):
             progress.advance(parsing_task)
-            
-        extraction_task = progress.add_task("Extracting data...", total=len(parsed_docs))
-        # Note: BatchExecutor doesn't support rich progress yet, we'll see logs.
-        # Future improvement: Add callback to BatchExecutor for UI updates.
-        
-    import csv
-    failed_files = []
-    
-    with open(output_path, "w", newline="") as f:
-        # Get field names from model
-        fieldnames = list(ExtractionModel.model_fields.keys())
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        
-        def streaming_callback(filename, data, status):
-            if status == "success":
-                # Handle both Hierarchical (PipelineResult) and Standard extraction results
-                extracted_data = data
-                if "final_data" in data and isinstance(data["final_data"], dict):
-                    # It's a PipelineResult dict
-                    extracted_data = data["final_data"]
-                
-                # Filter data to only include schema fields
-                row = {k: v for k, v in extracted_data.items() if k in fieldnames}
-                writer.writerow(row)
-                f.flush()
-            else:
-                failed_files.append((filename, str(data)))
 
-        if hierarchical:
-            # Use asyncio for hierarchical mode
-            import asyncio
-            results = asyncio.run(batch_executor.process_batch_async(
-                documents=parsed_docs,
-                schema=ExtractionModel,
-                theme=theme or "General extraction",
-                resume=resume,
-                callback=streaming_callback,
-                concurrency_limit=workers
-            ))
-        else:
-            # Use sync batch for standard mode
-            results = batch_executor.process_batch(
-                documents=parsed_docs,
-                schema=ExtractionModel,
-                theme=theme or "General extraction",
-                resume=resume,
-                callback=streaming_callback
-            )
+        execution_summary = service.run_extraction(
+            papers_dir=papers_dir,
+            fields=fields,
+            output_csv=output,
+            hierarchical=hierarchical,
+            theme=theme or "General extraction",
+            threshold=threshold,
+            max_iter=max_iter,
+            workers=workers,
+            resume=resume,
+            examples=examples_content,
+            vectorize=vectorize,
+            callback=progress_callback
+        )
     
-    # Final summary with cost
-    if failed_files:
-        error_msg = "\n".join([f"• [bold red]{f}[/bold red]: {err[:100]}..." if len(err) > 100 else f"• [bold red]{f}[/bold red]: {err}" for f, err in failed_files])
+    # Final summary with failures
+    if execution_summary["failed_files"]:
+        error_msg = "\n".join([f"• [bold red]{f}[/bold red]: {err[:100]}..." if len(err) > 100 else f"• [bold red]{f}[/bold red]: {err}" for f, err in execution_summary["failed_files"]])
         console.print(Panel(error_msg, title="[bold red]Extraction Failures[/bold red]", border_style="red"))
 
     console.print(f"\n[bold green]✓ Extraction complete. Results saved to {output}[/bold green]")
@@ -345,17 +255,18 @@ def extract(
     table = Table(title="Extraction Summary")
     table.add_column("Metric", style="cyan")
     table.add_column("Value", style="magenta")
-    table.add_row("Total handled", str(len(parsed_docs)))
+    table.add_row("Total PDFs", str(execution_summary["total_files"]))
+    table.add_row("Successfully parsed", str(execution_summary["parsed_files"]))
+    table.add_row("Extraction failures", str(len(execution_summary["failed_files"])))
     table.add_row("Total tokens", f"{summary['total_tokens']:,}")
     table.add_row("Total cost (USD)", f"${summary['total_cost_usd']:.4f}")
     console.print(table)
     
     console.print(tracker.display_session_summary())
     
-    if vector_store:
-        # Note: Vectorization currently happens inside the old process_pdf.
-        # BatchExecutor doesn't handle vectorization yet.
-        # We should either add vectorization to BatchExecutor or handle it here.
+    if vectorize:
+        console.print(f"[green]✓ Knowledge base updated in ChromaDB[/green]")
+
         # For now, let's warn that vectorization is pending update.
         console.print(f"\n[yellow]Note: Vectorization is currently disabled in batch mode.[/yellow]")
     
