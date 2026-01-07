@@ -59,6 +59,8 @@ class SchemaDiscoveryAgent:
 
 Read the following academic paper content and identify ALL data points that could be systematically extracted and compared across multiple papers in a systematic review.
 
+{existing_fields_context}
+
 For each data point, provide:
 - field_name: snake_case identifier (e.g., patient_age, sample_size)
 - description: clear description of what this captures
@@ -159,12 +161,13 @@ Input Fields:
         selected = valid_pdfs[:sample_size]
         return [str(p) for p in selected]
 
-    def analyze_paper(self, paper_path: str) -> DiscoveryResult:
+    def analyze_paper(self, paper_path: str, existing_fields: Optional[List[str]] = None) -> DiscoveryResult:
         """
         Analyze a single paper to discover possible fields.
         
         Args:
             paper_path: Path to PDF file
+            existing_fields: Optional list of fields already in the schema
             
         Returns:
             DiscoveryResult with suggested fields
@@ -177,8 +180,22 @@ Input Fields:
         # Get extraction context (Abstract + Methods + Results)
         content = doc.get_extraction_context(max_chars=20000)
         
+        # Prepare existing fields context
+        if existing_fields:
+            existing_fields_context = (
+                "The following fields are ALREADY defined in our schema. "
+                "While you can suggest improvements to them, focus primarily on finding "
+                "NOVEL variables that are not on this list but are important for this paper:\n"
+                f"- {', '.join(existing_fields)}"
+            )
+        else:
+            existing_fields_context = "This is a fresh discovery session. Suggest any relevant data points."
+
         # Prepare prompt
-        prompt = self.DISCOVERY_PROMPT.format(content=content)
+        prompt = self.DISCOVERY_PROMPT.format(
+            content=content,
+            existing_fields_context=existing_fields_context
+        )
         
         response, completion = self.client.chat.completions.create_with_completion(
             model=self.model,
@@ -263,6 +280,7 @@ Input Fields:
         papers_dir: str,
         sample_size: int = 3,
         min_frequency: int = 1,
+        existing_schema: Optional[List[FieldDefinition]] = None,
     ) -> List[FieldDefinition]:
         """
         Analyze sample papers and aggregate field suggestions.
@@ -271,6 +289,7 @@ Input Fields:
             papers_dir: Directory containing PDFs
             sample_size: Number of papers to analyze
             min_frequency: Minimum papers a concept must appear in
+            existing_schema: Optional current schema to augment
             
         Returns:
             List of suggested FieldDefinition objects
@@ -279,10 +298,11 @@ Input Fields:
         papers = self.get_sample_papers(papers_dir, sample_size)
         
         all_suggestions = []
+        existing_field_names = [f.name for f in existing_schema] if existing_schema else None
         
         for paper_path in papers:
             try:
-                result = self.analyze_paper(paper_path)
+                result = self.analyze_paper(paper_path, existing_fields=existing_field_names)
                 all_suggestions.extend(result.suggested_fields)
             except Exception as e:
                 self.logger.error(f"Failed to analyze {Path(paper_path).name}: {e}")
@@ -293,6 +313,10 @@ Input Fields:
         # Build FieldDefinition list
         definitions = []
         for uf in unified_fields:
+            # Skip if already in existing_schema
+            if existing_field_names and uf.canonical_name in existing_field_names:
+                continue
+                
             if uf.frequency >= min_frequency:
                 # Map string type to FieldType enum
                 type_map = {
