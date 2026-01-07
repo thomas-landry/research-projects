@@ -8,7 +8,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 0: POC Validation & Baseline Metrics' (Protocol in workflow.md)
 
 ## Phase 1: Resource Management & Observability Foundation
-- [ ] Task: Implement `ResourceManager` module to monitor M4 RAM (18GB ceiling, 14GB throttle trigger) and CPU usage (`psutil`).
+- [x] Task: Implement `ResourceManager` module to monitor M4 RAM (18GB ceiling, 14GB throttle trigger) and CPU usage (`psutil`). 92a31d9
 - [ ] Task: Implement dynamic `max_workers` throttling in `BatchExecutor` based on system health.
 - [ ] Task: Implement "Graceful Degradation" strategy: auto-escalate to cloud on local OOM.
 - [ ] Task: Extend `TokenTracker` to log usage by (Tier × Field × Paper) and integrate `tiktoken`.
