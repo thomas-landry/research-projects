@@ -1,9 +1,9 @@
 # Track Plan: Robustness & Generalization — Adaptive Schema Discovery & Interactive Polish
 
-## Phase 1: Foundation & Logging (Dual-Layer)
+## Phase 1: Foundation & Logging (Dual-Layer) [checkpoint: 72641cd]
 - [x] Task: Implement verbose file logging alongside clean console output. 1984b66
 - [x] Task: Create a base `DiscoveryAgent` interface. 336d4ea
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Logging' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Logging' (Protocol in workflow.md) 72641cd
 
 ## Phase 2: Adaptive Schema Discovery
 - [ ] Task: Implement the "Sampling" logic to select N papers for discovery.
