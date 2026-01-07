@@ -12,6 +12,7 @@ SR-Architect is an **Agentic ETL pipeline** for systematic review data extractio
 | **Extractor** | Structured data extraction with self-proving quotes | `core/extractor.py` |
 | **Auditor** | Validates extractions against source text | `core/extraction_checker.py` |
 | **Synthesizer** | Aggregates data into meta-analysis reports | `agents/synthesizer.py` |
+| **Schema Discovery** | Analyzes papers to suggest extraction schemas | `agents/schema_discovery.py` |
 | **Senior Dev** | Bug remediation, code fixes, refactoring | `.agent/workflows/senior_dev.md` |
 | **Orchestrator** | Task routing and multi-agent coordination | `.agent/workflows/orchestrator.md` |
 | **QA Agent** | Test validation and coverage reporting | `.agent/workflows/qa_agent.md` |

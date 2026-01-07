@@ -327,7 +327,7 @@ Provide scores, issues, and specific revision suggestions."""
             
             # Record usage
             if self.token_tracker and hasattr(completion, 'usage') and completion.usage:
-                self.token_tracker.record_usage(
+                await self.token_tracker.record_usage_async(
                     usage={
                         "prompt_tokens": completion.usage.prompt_tokens,
                         "completion_tokens": completion.usage.completion_tokens,

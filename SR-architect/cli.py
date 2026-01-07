@@ -152,9 +152,9 @@ def extract(
 
     # 2. Adaptive Discovery (optional or forced by flag)
     if adaptive:
-        fields = interactive_discovery(papers_dir, sample_size=3, existing_schema=fields)
+        fields = interactive_discovery(papers_dir, sample_size=3, existing_schema=fields, provider=provider, model=model)
     elif not resume and typer.confirm("\nWould you like to run adaptive discovery to find additional fields?", default=False):
-        fields = interactive_discovery(papers_dir, sample_size=3, existing_schema=fields)
+        fields = interactive_discovery(papers_dir, sample_size=3, existing_schema=fields, provider=provider, model=model)
     
     if not fields:
         console.print("[red]Error: No extraction fields defined. Aborting.[/red]")
@@ -389,6 +389,8 @@ def discover(
     papers_dir: str = typer.Argument(..., help="Directory containing PDFs"),
     sample: int = typer.Option(3, "-n", "--sample", help="Number of papers to analyze"),
     output: str = typer.Option("./discovered_schema.json", "-o", "--output", help="Save schema to JSON"),
+    provider: str = typer.Option(settings.LLM_PROVIDER, "-p", "--provider", help="LLM provider: openrouter or ollama"),
+    model: Optional[str] = typer.Option(settings.LLM_MODEL, "-m", "--model", help="Override LLM model"),
 ):
     """
     Discover extraction schema from sample papers.
@@ -397,7 +399,7 @@ def discover(
     then allows you to approve/modify before full extraction.
     
     Example:
-        python cli.py discover ../DPM-systematic-review/papers --sample 3
+        python cli.py discover ../DPM-systematic-review/papers --sample 3 --provider ollama
     """
     load_env()
     
@@ -416,7 +418,7 @@ def discover(
     console.print(f"\n[bold cyan]🔍 Adaptive Schema Discovery[/bold cyan]")
     console.print(f"Analyzing {len(pdf_files)} papers to discover extraction variables...\n")
     
-    agent = SchemaDiscoveryAgent()
+    agent = SchemaDiscoveryAgent(provider=provider, model=model)
     
     all_suggestions = []
     
@@ -486,6 +488,32 @@ def discover(
     console.print(f"\n[green]✓ Schema saved to {output_path}[/green]")
     console.print(f"\n[dim]Next: Review the schema, then run:[/dim]")
     console.print(f"  python cli.py extract {papers_dir} --interactive")
+
+
+@app.command()
+def benchmark(
+    papers_dir: str = typer.Argument(..., help="Directory containing PDFs"),
+    output: str = typer.Option("./output/benchmark", "-o", "--output", help="Output directory"),
+    models: str = typer.Option("llama3.1:8b-instruct-q8_0,mistral:7b-instruct-v0.3-q8_0,qwen2.5-coder:7b-instruct-q8_0", "-m", "--models", help="Comma-separated list of models"),
+    sample: int = typer.Option(3, "-n", "--sample", help="Number of papers per model"),
+    provider: str = typer.Option("ollama", "-p", "--provider", help="LLM Provider"),
+):
+    """
+    Run partial benchmark on multiple local models.
+    """
+    load_env()
+    from core.benchmark import ModelBenchmark
+    
+    model_list = [m.strip() for m in models.split(",")]
+    
+    console.print(f"\n[bold cyan]🚀 Starting Model Benchmark[/bold cyan]")
+    console.print(f"Models: {', '.join(model_list)}")
+    console.print(f"Provider: {provider}")
+    
+    harness = ModelBenchmark(papers_dir, output)
+    results = harness.run_benchmark(model_list, sample_size=sample, provider=provider)
+    
+    console.print("\n[bold green]Benchmark Complete.[/bold green]")
 
 
 if __name__ == "__main__":

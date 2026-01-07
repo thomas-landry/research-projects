@@ -62,6 +62,7 @@ class ExtractionService:
         resume: bool = False,
         examples: Optional[str] = None,
         vectorize: bool = True,
+        limit: Optional[int] = None,
         callback: Optional[Callable[[str, Any, str], None]] = None
     ) -> Dict[str, Any]:
         """
@@ -83,6 +84,9 @@ class ExtractionService:
         # 3. Load Papers
         papers_path = Path(papers_dir)
         pdf_files = list(papers_path.glob("*.pdf"))
+        if limit:
+            pdf_files = pdf_files[:limit]
+            
         if not pdf_files:
             raise FileNotFoundError(f"No PDF files found in {papers_dir}")
             
@@ -132,7 +136,7 @@ class ExtractionService:
         failed_files = []
         
         with open(output_path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             
             def internal_callback(filename, data, status):
@@ -145,12 +149,20 @@ class ExtractionService:
                     writer.writerow(row)
                     f.flush()
                     
-                    # Handle Vectorization
+                    # Handle Vectorization (Non-blocking)
                     if vector_store:
                         # Find the doc in parsed_docs
                         doc = next((d for d in parsed_docs if d.filename == filename), None)
                         if doc:
-                            vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
+                            try:
+                                import asyncio
+                                import functools
+                                loop = asyncio.get_running_loop()
+                                func = functools.partial(vector_store.add_chunks_from_parsed_doc, doc, extracted_data=extracted_data)
+                                loop.run_in_executor(None, func)
+                            except RuntimeError:
+                                # Fallback if no loop (sync mode)
+                                vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
                 else:
                     failed_files.append((filename, str(data)))
                 

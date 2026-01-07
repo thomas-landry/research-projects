@@ -6,8 +6,8 @@ Creates Pydantic models at runtime based on user input.
 """
 
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional, Type, get_type_hints
-from pydantic import BaseModel, Field, create_model
+from typing import Dict, Any, List, Optional, Type, get_type_hints, Union, Annotated
+from pydantic import BaseModel, Field, create_model, BeforeValidator
 from enum import Enum
 
 
@@ -18,6 +18,44 @@ class FieldType(str, Enum):
     FLOAT = "float"
     BOOLEAN = "boolean"
     LIST_TEXT = "list_text"
+
+
+def ensure_list(v: Any) -> List[str]:
+    """Coerce value to list of strings."""
+    if v is None:
+        return []
+    if isinstance(v, list):
+        return [str(i) for i in v]
+    return [str(v)]
+
+def ensure_int(v: Any) -> Optional[int]:
+    """Coerce value to integer."""
+    if v is None:
+        return None
+    if isinstance(v, list):
+        if not v:
+            return None
+        return int(v[0]) # Take first item
+    try:
+        return int(v)
+    except (ValueError, TypeError):
+        return None
+
+def ensure_str(v: Any) -> Optional[str]:
+    """Coerce value to string."""
+    if v is None:
+        return None
+    if isinstance(v, list):
+        if not v:
+            return None
+        # Join multiple strings if list is provided (common for quotes)
+        return " ".join([str(i) for i in v])
+    return str(v)
+
+# Flexible types
+FlexibleList = Annotated[List[str], BeforeValidator(ensure_list)]
+FlexibleInt = Annotated[Optional[int], BeforeValidator(ensure_int)]
+FlexibleStr = Annotated[Optional[str], BeforeValidator(ensure_str)]
 
 
 @dataclass
@@ -34,13 +72,13 @@ class FieldDefinition:
 def get_python_type(field_type: FieldType) -> type:
     """Map FieldType to Python type."""
     mapping = {
-        FieldType.TEXT: str,
-        FieldType.INTEGER: int,
-        FieldType.FLOAT: float,
+        FieldType.TEXT: FlexibleStr,
+        FieldType.INTEGER: FlexibleInt,
+        FieldType.FLOAT: float, # Could make FlexibleFloat too
         FieldType.BOOLEAN: bool,
-        FieldType.LIST_TEXT: List[str],
+        FieldType.LIST_TEXT: FlexibleList,
     }
-    return mapping.get(field_type, str)
+    return mapping.get(field_type, FlexibleStr)
 
 
 def build_extraction_model(
@@ -64,6 +102,8 @@ def build_extraction_model(
     
     for field_def in fields:
         python_type = get_python_type(field_def.field_type)
+        # Note: Flexible types are already Optional-ish due to logic, 
+        # but we keep the structure for consistency.
         
         # Handle optional fields
         if not field_def.required:
@@ -84,8 +124,9 @@ def build_extraction_model(
         # Quote field for traceability
         if field_def.include_quote:
             quote_field_name = f"{field_def.name}_quote"
+            # Use FlexibleStr for quotes as models often return lists of quotes
             field_definitions[quote_field_name] = (
-                Optional[str],
+                FlexibleStr,
                 Field(
                     default=None,
                     description=f"Exact quote from text supporting the {field_def.name} value",
@@ -94,7 +135,7 @@ def build_extraction_model(
     
     # Add standard metadata fields
     field_definitions["filename"] = (
-        Optional[str],
+        FlexibleStr,
         Field(default=None, description="Source filename")
     )
     field_definitions["extraction_confidence"] = (
@@ -124,7 +165,7 @@ def get_rct_schema() -> List[FieldDefinition]:
         FieldDefinition("comparator", "Description of control/comparator group", FieldType.TEXT),
         FieldDefinition("primary_outcome", "Primary outcome measure", FieldType.TEXT),
         FieldDefinition("primary_result", "Result for primary outcome", FieldType.TEXT),
-        FieldDefinition("adverse_events", "Reported adverse events", FieldType.TEXT, required=False),
+        FieldDefinition("adverse_events", "Reported adverse events", FieldType.LIST_TEXT, required=False),
         FieldDefinition("follow_up_duration", "Duration of follow-up", FieldType.TEXT),
         FieldDefinition("funding_source", "Study funding source", FieldType.TEXT, required=False),
     ]
@@ -132,18 +173,19 @@ def get_rct_schema() -> List[FieldDefinition]:
 
 def get_case_report_schema() -> List[FieldDefinition]:
     """Schema for Case Reports/Series (e.g., for DPM systematic review)."""
+    # Using LIST_TEXT (FlexibleList) for most fields to handle local model inconsistencies
     return [
-        FieldDefinition("case_count", "Number of cases reported (integer)", FieldType.INTEGER),
-        FieldDefinition("patient_age", "Patient age(s) in years (if multiple, list all e.g., '65, 42')", FieldType.TEXT),
-        FieldDefinition("patient_sex", "Patient sex/gender (if multiple, list all e.g., 'Male, Female')", FieldType.TEXT),
-        FieldDefinition("presenting_symptoms", "Initial presenting symptoms (use 'Asymptomatic' if incidental/screening finding)", FieldType.TEXT),
-        FieldDefinition("diagnostic_method", "Method used for diagnosis (e.g., biopsy type, imaging)", FieldType.TEXT),
-        FieldDefinition("imaging_findings", "CT/X-ray/imaging findings (detailed description)", FieldType.TEXT),
-        FieldDefinition("histopathology", "Histopathological findings (expand abbreviations, e.g., 'Minute Pulmonary Meningothelial-like Nodules' instead of 'MPMNs')", FieldType.TEXT),
-        FieldDefinition("immunohistochemistry", "IHC markers/results (positive/negative stains)", FieldType.TEXT, required=False),
-        FieldDefinition("treatment", "Treatment provided (include 'Observation' if no active treatment)", FieldType.TEXT, required=False),
-        FieldDefinition("outcome", "Patient outcome/follow-up status (stable, resolved, died)", FieldType.TEXT),
-        FieldDefinition("comorbidities", "Associated conditions/comorbidities (list important ones)", FieldType.TEXT, required=False),
+        FieldDefinition("case_count", "Number of cases reported (integer)", FieldType.INTEGER, required=False),
+        FieldDefinition("patient_age", "Patient age(s) in years", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("patient_sex", "Patient sex/gender", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("presenting_symptoms", "Initial presenting symptoms", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("diagnostic_method", "Method used for diagnosis", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("imaging_findings", "CT/X-ray/imaging findings", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("histopathology", "Histopathological findings", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("immunohistochemistry", "IHC markers/results", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("treatment", "Treatment provided", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("outcome", "Patient outcome/follow-up status", FieldType.LIST_TEXT, required=False),
+        FieldDefinition("comorbidities", "Associated conditions/comorbidities", FieldType.LIST_TEXT, required=False),
     ]
 
 

@@ -76,9 +76,9 @@ Owner: `Orchestrator`
 ### Phase 6: Documentation 🚀 IN PROGRESS
 Owner: `Docs Agent`
 
-- [ ] Update README.md with latest CLI commands
-- [ ] Document bug fixes in CHANGELOG.md
-- [ ] Update AGENTS.md with new capabilities
+- [x] Update README.md with latest CLI commands
+- [x] Document bug fixes in CHANGELOG.md
+- [x] Update AGENTS.md with new capabilities
 
 ---
 

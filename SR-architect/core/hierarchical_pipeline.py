@@ -306,6 +306,14 @@ class HierarchicalExtractionPipeline:
             except Exception as e:
                 warnings.append(f"Extraction failed on iteration {iteration + 1}: {str(e)}")
                 self.logger.info(f"    ERROR: {str(e)}")
+                
+                # Register error for debugging
+                from core.error_registry import ErrorRegistry
+                ErrorRegistry().register(
+                    e, 
+                    location="HierarchicalExtractionPipeline.extract_document",
+                    context={"filename": document.filename, "iteration": iteration + 1}
+                )
                 continue
             
             # Check extraction quality
@@ -415,9 +423,14 @@ class HierarchicalExtractionPipeline:
         
         self.logger.info(f"Starting async extraction for: {document.filename}")
         
-        # === Stage 1: Content Filtering (Currently Sync as it's regex-based) ===
+        # === Stage 1: Content Filtering (Sync -> Thread Offload) ===
         self.logger.info("Stage 1: Filtering content...")
-        filter_result = self.content_filter.filter_chunks(document.chunks)
+        import asyncio
+        loop = asyncio.get_running_loop()
+        filter_result = await loop.run_in_executor(
+            None, 
+            lambda: self.content_filter.filter_chunks(document.chunks)
+        )
         filtered_chunks = filter_result.filtered_chunks
         
         if not filtered_chunks:
@@ -459,6 +472,14 @@ class HierarchicalExtractionPipeline:
             except Exception as e:
                 warnings.append(f"Async extraction failed on iteration {iteration + 1}: {str(e)}")
                 self.logger.info(f"    ERROR: {str(e)}")
+                
+                # Register error for debugging
+                from core.error_registry import ErrorRegistry
+                ErrorRegistry().register(
+                    e, 
+                    location="HierarchicalExtractionPipeline.extract_document_async",
+                    context={"filename": document.filename, "iteration": iteration + 1}
+                )
                 continue
             
             evidence_dicts = [e.model_dump() for e in extraction.evidence]

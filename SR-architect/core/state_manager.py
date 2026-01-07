@@ -101,7 +101,54 @@ class StateManager:
             if temp_path.exists():
                 temp_path.unlink()
 
-    def update_result(self, filename: str, result: Dict[str, Any], status: str = "success"):
+    async def save_async(self) -> None:
+        """
+        Save the current state to the checkpoint file asynchronously.
+        Creates a snapshot in the main thread to avoid race conditions.
+        """
+        import asyncio
+        loop = asyncio.get_running_loop()
+        
+        # Snapshot the state to avoid "dictionary changed size during iteration"
+        # We rely on Pydantic's model_dump to create a dict snapshot
+        # This runs in main thread (blocking for a split second) but is safe.
+        state_snapshot = self.state.model_copy(deep=True)
+        
+        await loop.run_in_executor(None, lambda: self._save_snapshot(state_snapshot))
+
+    def _save_snapshot(self, state_snapshot) -> None:
+        """Internal method to save a specific state snapshot."""
+        try:
+            json_str = state_snapshot.model_dump_json(indent=2)
+            
+            temp_path = self.checkpoint_path.with_suffix(".tmp")
+            
+            with open(temp_path, 'w') as f:
+                # File locking (Unix only)
+                try:
+                    fcntl.flock(f, fcntl.LOCK_EX)
+                except (IOError, OSError):
+                    pass # Windows/Non-Unix fallback
+                    
+                f.write(json_str)
+                f.flush()
+                # fsync to force write to disk
+                import os
+                os.fsync(f.fileno())
+                
+                try:
+                    fcntl.flock(f, fcntl.LOCK_UN)
+                except (IOError, OSError):
+                    pass
+            
+            # Atomic rename
+            temp_path.replace(self.checkpoint_path)
+            
+        except Exception as e:
+            # We use print/fallback logger here to avoid circular dependencies if needed
+            print(f"Error saving checkpoint: {e}")
+
+    def update_result(self, filename: str, result: Dict[str, Any], status: str = "success", save: bool = True):
         """Update state with a single result."""
         if status == "success":
             self.state.processed_files.add(filename)
@@ -112,4 +159,6 @@ class StateManager:
             self.state.extraction_stats["failed"] += 1
         
         self.state.extraction_stats["total"] += 1
-        self.save()
+        
+        if save:
+            self.save()

@@ -210,24 +210,46 @@ class TokenTracker:
         field: Optional[str] = None,
     ) -> UsageRecord:
         """
-        Record token usage from an API response.
-        
-        Args:
-            usage: Dict with 'prompt_tokens', 'completion_tokens', 'total_tokens'
-            model: Model used
-            filename: Source document
-            operation: Type of operation
-            tier: Extraction tier (e.g. 'tier1', 'tier2')
-            field: Specific field being extracted
-            
-        Returns:
-            The created usage record
+        Record token usage from an API response (Sync).
         """
+        record = self._create_record(usage, model, filename, operation, tier, field)
+        self.records.append(record)
+        
+        if self.log_file:
+            self._append_to_log(record)
+        
+        return record
+
+    async def record_usage_async(
+        self,
+        usage: Dict[str, Any],
+        model: str,
+        filename: Optional[str] = None,
+        operation: str = "extraction",
+        tier: Optional[str] = None,
+        field: Optional[str] = None,
+    ) -> UsageRecord:
+        """
+        Record token usage from an API response (Async).
+        Offloads file I/O to executor to prevent blocking the loop.
+        """
+        record = self._create_record(usage, model, filename, operation, tier, field)
+        self.records.append(record)
+        
+        if self.log_file:
+            import asyncio
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, lambda: self._append_to_log(record))
+        
+        return record
+
+    def _create_record(self, usage, model, filename, operation, tier, field) -> UsageRecord:
+        """Helper to create UsageRecord object."""
         prompt_tokens = usage.get("prompt_tokens", 0)
         completion_tokens = usage.get("completion_tokens", 0)
         total_tokens = usage.get("total_tokens", prompt_tokens + completion_tokens)
         
-        # Check for direct cost from API response (e.g. OpenRouter 'cost' field)
+        # Check for direct cost
         if "cost" in usage:
             cost = float(usage["cost"])
         elif "cost_usd" in usage:
@@ -235,7 +257,7 @@ class TokenTracker:
         else:
             cost = self.calculate_cost(prompt_tokens, completion_tokens, model)
         
-        record = UsageRecord(
+        return UsageRecord(
             timestamp=datetime.now().isoformat(),
             model=model,
             prompt_tokens=prompt_tokens,
@@ -247,14 +269,6 @@ class TokenTracker:
             tier=tier,
             field=field,
         )
-        
-        self.records.append(record)
-        
-        # Persist if log file configured
-        if self.log_file:
-            self._append_to_log(record)
-        
-        return record
     
     def _append_to_log(self, record: UsageRecord):
         """Append record to log file."""

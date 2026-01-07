@@ -100,6 +100,10 @@ Options:
   -m, --model TEXT       Override model selection
   --no-vectorize         Skip ChromaDB storage
   -v, --verbose          Show detailed progress
+  --hierarchical         Enable hierarchical extraction (requires --theme)
+  --theme TEXT           Theme for relevance filtering (required for hierarchical)
+  --resume               Resume from last checkpoint
+  --adaptive             Automatically discover schema from first 3 papers
 ```
 
 **Examples:**
@@ -112,6 +116,29 @@ python cli.py extract ./papers --interactive
 
 # Use local Ollama instead of OpenRouter
 python cli.py extract ./papers --provider ollama --model llama3.1:8b
+
+# Hierarchical extraction for specific theme
+python cli.py extract ./papers --hierarchical --theme "adverse events"
+```
+
+### `discover` — Adaptive Schema Discovery
+
+Analyze sample papers to automatically generate an extraction schema:
+
+```bash
+python cli.py discover <papers_dir> [OPTIONS]
+
+Options:
+  -n, --sample INT       Number of papers to analyze [default: 3]
+  -o, --output PATH      Save schema to JSON [default: ./discovered_schema.json]
+```
+
+### `benchmark` — Model Performance Testing
+
+Run partial extraction benchmarks across multiple local models:
+
+```bash
+python cli.py benchmark <papers_dir> --models "llama3.1:8b,mistral:7b"
 ```
 
 ### `query` — Semantic Search

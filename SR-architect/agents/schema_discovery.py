@@ -355,7 +355,13 @@ Input Fields:
         return definitions
 
 
-def interactive_discovery(papers_dir: str, sample_size: int = 3, existing_schema: Optional[List[FieldDefinition]] = None):
+def interactive_discovery(
+    papers_dir: str, 
+    sample_size: int = 3, 
+    existing_schema: Optional[List[FieldDefinition]] = None,
+    provider: str = "openrouter",
+    model: Optional[str] = None
+):
     """
     Run interactive schema discovery with user approval.
     """
@@ -373,7 +379,7 @@ def interactive_discovery(papers_dir: str, sample_size: int = 3, existing_schema
         console.print(f"Analyzing {sample_size} sample papers to discover extraction variables...\n")
     
     # Run discovery
-    agent = SchemaDiscoveryAgent()
+    agent = SchemaDiscoveryAgent(provider=provider, model=model)
     suggested_fields = agent.discover_schema(papers_dir, sample_size, existing_schema=existing_schema)
     
     if not suggested_fields:

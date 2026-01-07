@@ -171,6 +171,27 @@ Extract the requested fields according to the provided schema."""
                     filename=filename,
                     operation="extraction",
                 )
+
+    async def _track_usage_async(self, model: str, success: bool = True, usage: Optional[Dict[str, int]] = None, filename: Optional[str] = None):
+        """Track call statistics and token usage (Async)."""
+        self._stats["total_calls"] += 1
+        self._stats["calls_by_model"][model] = self._stats["calls_by_model"].get(model, 0) + 1
+        if not success:
+            self._stats["errors"] += 1
+        
+        # Track token usage if available
+        if usage:
+            self._stats["total_prompt_tokens"] += usage.get("prompt_tokens", 0)
+            self._stats["total_completion_tokens"] += usage.get("completion_tokens", 0)
+            
+            # Record in token tracker using async method
+            if self.token_tracker:
+                await self.token_tracker.record_usage_async(
+                    usage=usage,
+                    model=model,
+                    filename=filename,
+                    operation="extraction",
+                )
     
     def extract(
         self,
@@ -255,7 +276,7 @@ Extract the requested fields according to the provided schema."""
         # 1. Check Cache
         from core.utils import LLMCache
         cache = LLMCache()
-        cached_result = cache.get(self.model, messages, response_model=schema)
+        cached_result = await cache.get_async(self.model, messages, response_model=schema)
         if cached_result:
             self.logger.info(f"✓ Using cached extraction (async) for {filename or 'text'}")
             return cached_result
@@ -277,12 +298,12 @@ Extract the requested fields according to the provided schema."""
                     "completion_tokens": completion.usage.completion_tokens,
                     "total_tokens": completion.usage.total_tokens
                 }
-                self._track_usage(self.model, success=True, usage=usage_dict, filename=filename)
+                await self._track_usage_async(self.model, success=True, usage=usage_dict, filename=filename)
             else:
-                self._track_usage(self.model, success=True)
+                await self._track_usage_async(self.model, success=True)
 
             # 2. Save to Cache
-            cache.set(self.model, messages, result)
+            await cache.set_async(self.model, messages, result)
             
             # Add filename if the schema supports it
             if hasattr(result, 'filename') and filename:
@@ -523,11 +544,22 @@ Provide evidence citations for each extracted value. For each field that has a n
         
         try:
             # First, extract the data
-            data_result = await self.async_client.chat.completions.create(
+            data_result, completion = await self.async_client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=messages,
                 response_model=schema,
+                extra_body={"usage": {"include": True}}
             )
+            
+            # Record usage
+            if hasattr(completion, 'usage') and completion.usage:
+                usage_dict = {
+                    "prompt_tokens": completion.usage.prompt_tokens,
+                    "completion_tokens": completion.usage.completion_tokens,
+                    "total_tokens": completion.usage.total_tokens
+                }
+                await self._track_usage_async(self.model, success=True, usage=usage_dict, filename=filename)
+
             data_dict = data_result.model_dump()
             if filename:
                 data_dict["filename"] = filename
@@ -542,11 +574,21 @@ Provide evidence citations for each extracted value. For each field that has a n
             class EvidenceResponse(BaseModel):
                 evidence: List[EvidenceItem]
             
-            ev_result = await self.async_client.chat.completions.create(
+            ev_result, completion_ev = await self.async_client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=evidence_messages,
                 response_model=EvidenceResponse,
+                extra_body={"usage": {"include": True}}
             )
+
+            # Record usage
+            if hasattr(completion_ev, 'usage') and completion_ev.usage:
+                usage_dict = {
+                    "prompt_tokens": completion_ev.usage.prompt_tokens,
+                    "completion_tokens": completion_ev.usage.completion_tokens,
+                    "total_tokens": completion_ev.usage.total_tokens
+                }
+                await self._track_usage_async(self.model, success=True, usage=usage_dict, filename=filename)
             
             return ExtractionWithEvidence(
                 data=data_dict,
@@ -559,6 +601,7 @@ Provide evidence citations for each extracted value. For each field that has a n
                 }
             )
         except Exception as e:
+            await self._track_usage_async(self.model, success=False)
             raise RuntimeError(f"Async self-proving extraction failed for {filename or 'text'}: {str(e)}") from e
 
 

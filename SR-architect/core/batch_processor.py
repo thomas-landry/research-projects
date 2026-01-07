@@ -210,7 +210,7 @@ class BatchExecutor:
             recommended = self.resource_manager.get_recommended_workers(effective_limit)
             if recommended < effective_limit:
                 logger.info(f"Throttling concurrency from {effective_limit} to {recommended} based on system resources.")
-                effective_limit = recommended
+                effective_limit = max(1, recommended)
                 
         logger.info(f"Starting async parallel extraction [concurrency={effective_limit}] for {len(to_process)} documents.")
         
@@ -231,10 +231,13 @@ class BatchExecutor:
                         serialized = result.to_dict()
                     elif hasattr(result, 'model_dump'):
                         serialized = result.model_dump()
+                    elif isinstance(result, dict):
+                        serialized = result
                     else:
                         serialized = result.__dict__
 
-                    self.state_manager.update_result(doc.filename, serialized, status="success")
+                    self.state_manager.update_result(doc.filename, serialized, status="success", save=False)
+                    await self.state_manager.save_async()
                     logger.info(f"✓ Completed {doc.filename}")
                     if callback:
                         callback(doc.filename, serialized, "success")
@@ -243,14 +246,26 @@ class BatchExecutor:
                     logger.error(f"OOM processing {doc.filename}")
                     self.circuit_breaker.record_failure()
                     error_payload = {"error": "Out of memory", "error_type": "MemoryError"}
-                    self.state_manager.update_result(doc.filename, error_payload, status="failed")
+                    self.state_manager.update_result(doc.filename, error_payload, status="failed", save=False)
+                    await self.state_manager.save_async()
                     if callback:
                         callback(doc.filename, error_payload, "failed")
                     return None
                 except Exception as e:
                     logger.error(f"Error processing {doc.filename}: {e}", exc_info=True)
                     self.circuit_breaker.record_failure()
-                    self.state_manager.update_result(doc.filename, {"error": str(e)}, status="failed")
+                    
+                    # Register fatal error
+                    from core.error_registry import ErrorRegistry
+                    ErrorRegistry().register(
+                        e,
+                        location="BatchExecutor.process_batch_async",
+                        context={"filename": doc.filename}
+                    )
+                    
+                    self.state_manager.update_result(doc.filename, {"error": str(e)}, status="failed", save=False)
+                    # We await async save even in failure to ensure checkpoint integrity
+                    await self.state_manager.save_async()
                     logger.error(f"✗ Failed {doc.filename}")
                     if callback:
                         callback(doc.filename, str(e), "failed")

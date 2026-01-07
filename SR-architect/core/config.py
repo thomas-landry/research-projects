@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "openrouter"
     LLM_MODEL: Optional[str] = None
     
+    # Ollama Settings
+    OLLAMA_BASE_URL: str = "http://localhost:11434/v1"
+    OLLAMA_MODEL: str = "llama3.1:8b"
+    
     # Pipeline Settings
     SCORE_THRESHOLD: float = 0.8
     MAX_ITERATIONS: int = 3
@@ -23,7 +27,7 @@ class Settings(BaseSettings):
     LOG_FILE_ENABLED: bool = True
     
     # Execution Settings
-    WORKERS: int = 1
+    WORKERS: int = 4
     
     # Paths
     VECTOR_DIR: Path = Path("./output/vector_store")

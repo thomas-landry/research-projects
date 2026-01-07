@@ -178,6 +178,18 @@ class LLMCache:
                 return None
         return None 
 
+    async def get_async(self, model: str, messages: List[Dict[str, Any]], response_model: Optional[Type[T]] = None, **kwargs) -> Optional[Any]:
+        """
+        Async wrapper for get using thread executor.
+        Non-blocking for event loop.
+        """
+        import asyncio
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(
+            None, 
+            lambda: self.get(model, messages, response_model, **kwargs)
+        )
+
     def set(self, model: str, messages: List[Dict[str, Any]], data: Any, **kwargs):
         """Save to cache with Pydantic support."""
         cache_hash = self._get_hash(model, messages, **kwargs)
@@ -194,6 +206,16 @@ class LLMCache:
                 json.dump(payload, f)
         except Exception:
             pass
+            
+    async def set_async(self, model: str, messages: List[Dict[str, Any]], data: Any, **kwargs):
+        """Async wrapper for set using thread executor."""
+        import asyncio
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(
+            None,
+            lambda: self.set(model, messages, data, **kwargs)
+        )
+
 
 
 def get_llm_client(
@@ -203,23 +225,12 @@ def get_llm_client(
 ) -> Any:
     """
     Get a configured Instructor-patched OpenAI client (Sync).
+    Delegates to core.client.LLMClientFactory.
     """
-    try:
-        import instructor
-        from openai import OpenAI
-    except ImportError:
-        raise ImportError(
-            "Required packages not installed. Run:\n"
-            "pip install instructor openai"
-        )
-    
+    from .client import LLMClientFactory
     load_env()
-    client_args = _get_client_args(provider, api_key, base_url)
-    
     try:
-        base_client = OpenAI(**client_args)
-        mode = instructor.Mode.MD_JSON if provider == "ollama" else instructor.Mode.TOOLS
-        return instructor.from_openai(base_client, mode=mode)
+        return LLMClientFactory.create(provider, api_key, base_url)
     except Exception as e:
         raise RuntimeError(f"Failed to initialize LLM client for {provider}: {e}")
 
@@ -231,53 +242,15 @@ def get_async_llm_client(
 ) -> Any:
     """
     Get a configured Instructor-patched AsyncOpenAI client.
+    Delegates to core.client.LLMClientFactory.
     """
-    try:
-        import instructor
-        from openai import AsyncOpenAI
-    except ImportError:
-        raise ImportError(
-            "Required packages not installed. Run:\n"
-            "pip install instructor openai"
-        )
-    
+    from .client import LLMClientFactory
     load_env()
-    client_args = _get_client_args(provider, api_key, base_url)
-    
     try:
-        base_client = AsyncOpenAI(**client_args)
-        mode = instructor.Mode.MD_JSON if provider == "ollama" else instructor.Mode.TOOLS
-        return instructor.from_openai(base_client, mode=mode)
+        return LLMClientFactory.create_async(provider, api_key, base_url)
     except Exception as e:
         raise RuntimeError(f"Failed to initialize Async LLM client for {provider}: {e}")
 
 
-def _get_client_args(
-    provider: str,
-    api_key: Optional[str] = None,
-    base_url: Optional[str] = None,
-) -> Dict[str, Any]:
-    """Helper to build client arguments for sync and async clients."""
-    client_args = {}
-    
-    if provider == "openrouter":
-        key = api_key or os.getenv("OPENROUTER_API_KEY")
-        if not key:
-            raise ValueError("OPENROUTER_API_KEY not set in environment or arguments.")
-        
-        client_args["base_url"] = base_url or "https://openrouter.ai/api/v1"
-        client_args["api_key"] = key
-        
-    elif provider == "ollama":
-        host = base_url or os.getenv("OLLAMA_HOST", "http://localhost:11434")
-        client_args["base_url"] = f"{host}/v1"
-        client_args["api_key"] = "ollama"
-        
-    else:
-        # Fallback for generic OpenAI usage
-        client_args["api_key"] = api_key or os.getenv("OPENAI_API_KEY")
-        if base_url:
-            client_args["base_url"] = base_url
-            
-    return client_args
+
 
