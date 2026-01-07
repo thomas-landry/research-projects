@@ -7,6 +7,9 @@ from core.content_filter import ContentFilter
 from core.pubmed_fetcher import PubMedFetcher, PubMedArticle
 
 
+import shutil
+import tempfile
+
 class TestLayoutCleaner(unittest.TestCase):
     def setUp(self):
         self.filter = ContentFilter()
@@ -58,7 +61,11 @@ class TestLayoutCleaner(unittest.TestCase):
 
 class TestPubMedFetcher(unittest.TestCase):
     def setUp(self):
-        self.fetcher = PubMedFetcher(cache_dir=".cache/pubmed_test")
+        self.test_dir = tempfile.mkdtemp()
+        self.fetcher = PubMedFetcher(cache_dir=self.test_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
 
     def test_article_dataclass(self):
         article = PubMedArticle(
@@ -71,8 +78,7 @@ class TestPubMedFetcher(unittest.TestCase):
         self.assertEqual(d["pmid"], "12345")
         self.assertEqual(d["title"], "Test Article")
 
-    @patch('core.pubmed_fetcher.requests.get')
-    def test_fetch_by_pmid_success(self, mock_get):
+    def test_fetch_by_pmid_success(self):
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "result": {
@@ -86,7 +92,9 @@ class TestPubMedFetcher(unittest.TestCase):
             }
         }
         mock_response.raise_for_status = MagicMock()
-        mock_get.return_value = mock_response
+        
+        # Mock the session.get method
+        self.fetcher._session.get = MagicMock(return_value=mock_response)
         
         article = self.fetcher.fetch_by_pmid("12345")
         
@@ -95,8 +103,7 @@ class TestPubMedFetcher(unittest.TestCase):
         self.assertEqual(article.title, "Test Article Title")
         self.assertEqual(article.doi, "10.1234/test")
 
-    @patch('core.pubmed_fetcher.requests.get')
-    def test_fetch_by_pmid_not_found(self, mock_get):
+    def test_fetch_by_pmid_not_found(self):
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "result": {
@@ -104,7 +111,9 @@ class TestPubMedFetcher(unittest.TestCase):
             }
         }
         mock_response.raise_for_status = MagicMock()
-        mock_get.return_value = mock_response
+        
+        # Mock the session.get method
+        self.fetcher._session.get = MagicMock(return_value=mock_response)
         
         article = self.fetcher.fetch_by_pmid("12345")
         

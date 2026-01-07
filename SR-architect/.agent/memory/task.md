@@ -82,6 +82,18 @@ Owner: `Docs Agent`
 
 ---
 
+### Phase 7: Memory Optimization ✅ COMPLETE
+Owner: `Senior Dev Agent`
+
+- [x] Create `tests/profile_memory.py` profiling script
+- [x] Run baseline memory profile (N=3 papers)
+- [x] `/bug_finder` - Static analysis of high-risk files
+- [x] `/senior_dev` - Fix identified memory leaks (MEM-001, MEM-002, MEM-004)
+- [x] `/refactor_standards_guardian` - Refactor hierarchical_pipeline.py
+- [x] `/qa_agent` - Validate fixes (119 docs pass)
+
+---
+
 ## 🚨 Agent Directives
 
 ### For Senior Dev Agent
@@ -136,6 +148,8 @@ OUTPUT: Update README.md, create CHANGELOG.md
 | 2026-01-05T16:55 | Researcher | Orchestrator | Analysis complete. Core fields 100% fill. Rec: Use Enums for standardization. |
 | 2026-01-07T11:25 | Docs Agent | All Agents | **Known Test Failures**: 2 pre-existing failures logged (TEST-001, TEST-002). See Known Issues section. |
 | 2026-01-07T11:45 | Docs Agent | All Agents | **Freshness Review**: Updated CODE_MAP.md and OPTIMIZATION.md. Verified 4 other docs. All docs now ✅ Fresh. |
+| 2026-01-07T11:48 | Orchestrator | All Agents | **Manifest Sync**: Added completed Phase 7 (Memory Optimization) to shared task list. |
+| 2026-01-07T11:55 | Senior Dev | Orchestrator | **Fix Complete**: Resolved TEST-001 and TEST-002. All tests passing. Track archived. |
 
 ---
 
@@ -146,8 +160,10 @@ OUTPUT: Update README.md, create CHANGELOG.md
 
 | ID | File | Test | Status | Description |
 |----|------|------|--------|-------------|
-| TEST-001 | `tests/test_config.py` | `test_settings_defaults` | ⚠️ OPEN | Assertion `WORKERS == 1` fails; actual value is `4`. Config default mismatch. |
-| TEST-002 | `tests/test_phase2_components.py` | `TestPubMedFetcher::test_fetch_by_pmid_not_found` | ⚠️ OPEN | Test asserts `is None` but receives cached article object. Cache interfering with "not found" test. |
+| ID | File | Test | Status | Description |
+|----|------|------|--------|-------------|
+| TEST-001 | `tests/test_config.py` | `test_settings_defaults` | ✅ FIXED | Fixed config expectation mismatch. |
+| TEST-002 | `tests/test_phase2_components.py` | `TestPubMedFetcher` | ✅ FIXED | Fixed cache test isolation and mocked session properly. |
 
 **Priority**: Low (not blocking pipeline functionality)
 **Next Owner**: Senior Dev Agent

@@ -84,6 +84,19 @@ When starting new feature work:
    *Link: [./conductor/tracks/[name]_[YYYYMMDD]/](./conductor/tracks/[name]_[YYYYMMDD]/)*
    ```
 
+### TRACK COMPLETION & ARCHIVING
+
+When a track is complete:
+1. Verify all deliverables in `plan.md` are checked `[x]`
+2. Move track folder to archive:
+   ```bash
+   mv conductor/tracks/[name] conductor/archive/
+   ```
+3. Update `conductor/tracks.md`:
+   - Mark as `[x]`
+   - Update link to `./archive/...`
+   - Add status summary
+
 ### OUTPUT FORMAT
 
 ```markdown

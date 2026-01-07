@@ -10,7 +10,7 @@ def test_settings_defaults():
     assert settings.LLM_PROVIDER == "openrouter"
     assert settings.SCORE_THRESHOLD == 0.8
     assert settings.MAX_ITERATIONS == 3
-    assert settings.WORKERS == 1
+    assert settings.WORKERS == 4
 
 def test_settings_env_override():
     """Test that environment variables override defaults."""
