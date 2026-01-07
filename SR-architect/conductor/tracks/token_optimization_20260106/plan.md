@@ -7,14 +7,14 @@
 - [x] Task: Document current pipeline performance in `BASELINE.md`.
 - [x] Task: Conductor - User Manual Verification 'Phase 0: POC Validation & Baseline Metrics' (Protocol in workflow.md)
 
-## Phase 1: Resource Management & Observability Foundation
+## Phase 1: Resource Management & Observability Foundation [checkpoint: 36ea9af]
 - [x] Task: Implement `ResourceManager` module to monitor M4 RAM (18GB ceiling, 14GB throttle trigger) and CPU usage (`psutil`). 92a31d9
 - [x] Task: Implement dynamic `max_workers` throttling in `BatchExecutor` based on system health. bee24cd
 - [x] Task: Implement "Graceful Degradation" strategy: auto-escalate to cloud on local OOM. d1f5af9
 - [x] Task: Extend `TokenTracker` to log usage by (Tier × Field × Paper) and integrate `tiktoken`. bf4adb0
 - [x] Task: Implement "Circuit Breaker" pattern in `BatchExecutor`: bypass local model after N consecutive failures. 8a12873
 - [x] Task: Add failure taxonomy logging to `AuditLogger` (OOM, timeout, schema_fail, low_confidence). 90c0445
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Resource Management & Observability Foundation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Resource Management & Observability Foundation' (Protocol in workflow.md) 36ea9af
 
 ## Phase 2: Intelligent PDF Parsing & Pre-Processing
 - [ ] Task: Create `ComplexityClassifier` with YAML config for PyMuPDF metrics (image >30%, text density).
