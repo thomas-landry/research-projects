@@ -1,0 +1,19 @@
+{
+  "filename": "tmp1mv6eigg.pdf",
+  "chunks": [
+    {
+      "text": "Test",
+      "section": "",
+      "subsection": "",
+      "chunk_type": "text",
+      "page_number": 1,
+      "source_file": "tmp1mv6eigg.pdf"
+    }
+  ],
+  "metadata": {
+    "path": "/var/folders/g5/ljmwhjbx3n984t0tr37x46dh0000gn/T/tmp1mv6eigg.pdf",
+    "num_chunks": 1,
+    "parser": "docling"
+  },
+  "full_text": "Full text"
+}

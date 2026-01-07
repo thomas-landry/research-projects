@@ -1,20 +1,26 @@
+"""
+Tests for SynthesizerAgent.
+
+These tests verify the synthesizer can aggregate extraction results
+into a coherent synthesis report.
+"""
 import pytest
 from unittest.mock import MagicMock, patch
 from agents.synthesizer import SynthesizerAgent, SynthesisReport
 
-@pytest.fixture
-def mock_utils():
-    with patch("core.utils.get_llm_client") as mock:
-        yield mock
 
-def test_synthesizer_init(mock_utils):
-    agent = SynthesizerAgent(provider="openai")
+def test_synthesizer_init():
+    """Test that SynthesizerAgent initializes correctly."""
+    # Use DI to inject mock client
+    mock_client = MagicMock()
+    agent = SynthesizerAgent(client=mock_client, provider="openai")
     assert agent.provider == "openai"
-    # Logger should handle init
     assert agent.logger is not None
+    assert agent.client is mock_client
 
-def test_synthesize_success(mock_utils):
-    # Setup mock
+
+def test_synthesize_success():
+    """Test successful synthesis with mocked client."""
     mock_report = SynthesisReport(
         title="Test Meta-Analysis",
         executive_summary="Summary",
@@ -25,11 +31,11 @@ def test_synthesize_success(mock_utils):
         limitations=["Limit 1"]
     )
     
+    # Create mock client and inject via DI
     mock_client = MagicMock()
     mock_client.chat.completions.create.return_value = mock_report
-    mock_utils.return_value = mock_client
     
-    agent = SynthesizerAgent(api_key="test")
+    agent = SynthesizerAgent(client=mock_client)
     
     input_data = [
         {"pmid": "1", "sample_size": 50, "outcome": "positive"},
@@ -42,18 +48,22 @@ def test_synthesize_success(mock_utils):
     assert result.title == "Test Meta-Analysis"
     mock_client.chat.completions.create.assert_called_once()
 
+
 def test_synthesize_empty_input():
-    agent = SynthesizerAgent(api_key="test")
+    """Test that empty input raises ValueError."""
+    mock_client = MagicMock()
+    agent = SynthesizerAgent(client=mock_client)
     with pytest.raises(ValueError) as exc:
         agent.synthesize([])
     assert "No results provided" in str(exc.value)
 
-def test_synthesize_failure(mock_utils):
+
+def test_synthesize_failure():
+    """Test that API failure raises RuntimeError."""
     mock_client = MagicMock()
     mock_client.chat.completions.create.side_effect = Exception("API fail")
-    mock_utils.return_value = mock_client
     
-    agent = SynthesizerAgent(api_key="test")
+    agent = SynthesizerAgent(client=mock_client)
     input_data = [{"id": 1}]
     
     with pytest.raises(RuntimeError) as exc:

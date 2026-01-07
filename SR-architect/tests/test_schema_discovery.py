@@ -1,14 +1,25 @@
+"""
+Tests for SchemaDiscoveryAgent.
+
+These tests verify the schema discovery and unification logic.
+"""
 import pytest
 from unittest.mock import MagicMock, patch
 from agents.schema_discovery import SchemaDiscoveryAgent, SuggestedField, UnifiedField, UnificationResult, DiscoveryResult
 
-@pytest.fixture
-def mock_utils():
-    with patch("core.utils.get_llm_client") as mock:
-        yield mock
 
-def test_unify_fields_logic(mock_utils):
-    # Setup mock LLM response
+def _create_mock_completion():
+    """Helper to create mock completion objects."""
+    mock_completion = MagicMock()
+    mock_completion.usage = MagicMock()
+    mock_completion.usage.prompt_tokens = 100
+    mock_completion.usage.completion_tokens = 50
+    mock_completion.usage.total_tokens = 150
+    return mock_completion
+
+
+def test_unify_fields_logic():
+    """Test that unify_fields correctly merges synonymous fields."""
     mock_unified_result = UnificationResult(fields=[
         UnifiedField(
             canonical_name="patient_age",
@@ -19,11 +30,13 @@ def test_unify_fields_logic(mock_utils):
         )
     ])
     
+    mock_completion = _create_mock_completion()
     mock_client = MagicMock()
-    mock_client.chat.completions.create.return_value = mock_unified_result
-    mock_utils.return_value = mock_client
+    # Return tuple (result, completion) as instructor does
+    mock_client.chat.completions.create_with_completion.return_value = (mock_unified_result, mock_completion)
     
     agent = SchemaDiscoveryAgent()
+    agent._client = mock_client  # Inject mock client
     
     raw_suggestions = [
         SuggestedField(field_name="age", description="Age", data_type="int", example_value="55", extraction_difficulty="easy", section_found="Results"),
@@ -37,17 +50,21 @@ def test_unify_fields_logic(mock_utils):
     assert "age" in unified[0].synonyms_merged
     assert unified[0].frequency == 2
 
-def test_unify_fields_empty(mock_utils):
+
+def test_unify_fields_empty():
+    """Test that empty input returns empty list."""
     agent = SchemaDiscoveryAgent()
     assert agent.unify_fields([]) == []
 
-def test_unify_fallback_on_error(mock_utils):
-    # Setup mock to raise error
+
+def test_unify_fallback_on_error():
+    """Test that unification falls back to 1-to-1 mapping on error."""
     mock_client = MagicMock()
-    mock_client.chat.completions.create.side_effect = Exception("LLM Error")
-    mock_utils.return_value = mock_client
+    mock_client.chat.completions.create_with_completion.side_effect = Exception("LLM Error")
     
     agent = SchemaDiscoveryAgent()
+    agent._client = mock_client  # Inject mock client
+    
     raw = [SuggestedField(field_name="foo", description="bar", data_type="text", example_value="baz", extraction_difficulty="easy", section_found="everywhere")]
     
     unified = agent.unify_fields(raw)

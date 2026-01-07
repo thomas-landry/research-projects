@@ -1,12 +1,16 @@
 {
   "timestamp": "2026-01-06T14:34:50.804387",
   "processed_files": [
-    "Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf",
-    "Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf",
     "Saa and Assaf - 2022 - A Rare Case of Pulmonary Nodules Diffuse Pulmonary Meningotheliomatosis.pdf",
-    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf"
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+    "Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf",
+    "Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf"
   ],
-  "failed_files": [],
+  "failed_files": [
+    "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf",
+    "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+    "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf"
+  ],
   "results": {
     "Virk et al. - 2023 - RIDDLE ME THIS A RARE CASE OF DIFFUSE PULMONARY MENINGIOTHELIOMAS.pdf": {
       "case_count": 1,
@@ -729,8 +733,8 @@
     }
   },
   "extraction_stats": {
-    "total": 7,
+    "total": 10,
     "success": 7,
-    "failed": 0
+    "failed": 3
   }
 }
