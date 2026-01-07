@@ -184,5 +184,27 @@ SR-architect/
 
 ---
 
-## 🔒 Manifest Version
-**v1.0** | Schema: SR-ARCHITECT-TASK-MANIFEST-V1
+## � Documentation Freshness Index
+
+> **Purpose**: Track which docs are current vs stale. Updated by `/docs_agent`.
+> **Rule**: Docs older than 30 days without update should be reviewed.
+
+| Document | Last Updated | Status | Owner |
+|----------|--------------|--------|-------|
+| `README.md` | 2026-01-05 | ✅ Fresh | Docs Agent |
+| `CHANGELOG.md` | 2026-01-07 | ✅ Fresh | Docs Agent |
+| `docs/standards.md` | 2026-01-05 | ✅ Fresh | Senior Dev |
+| `docs/BEGINNERS_GUIDE.md` | Unknown | ⚠️ Review | Docs Agent |
+| `docs/CODE_MAP.md` | Unknown | ⚠️ Review | Docs Agent |
+| `docs/OPTIMIZATION.md` | Unknown | ⚠️ Review | Researcher |
+| `docs/QUICK_REFERENCE.md` | Unknown | ⚠️ Review | Docs Agent |
+| `.agent/memory/task.md` | 2026-01-07 | ✅ Fresh | All Agents |
+
+**Staleness Threshold**: 30 days
+**Review Trigger**: Any agent completing work should check related docs
+
+---
+
+## �🔒 Manifest Version
+**v1.1** | Schema: SR-ARCHITECT-TASK-MANIFEST-V1
+
