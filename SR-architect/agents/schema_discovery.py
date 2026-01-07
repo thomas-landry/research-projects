@@ -403,10 +403,22 @@ def interactive_discovery(papers_dir: str, sample_size: int = 3, existing_schema
     
     # Allow adding custom fields manually
     if Confirm.ask("\nAdd more custom fields manually?", default=False):
+        console.print("[dim]Commands: 'undo' to remove last manual field[/dim]")
         while True:
             name = Prompt.ask("Field name (empty to finish)", default="")
             if not name:
                 break
+            
+            # Handle Undo
+            if name.lower().strip() == "undo":
+                # Only allow undoing fields added in THIS loop
+                if len(final_schema) > (len(existing_schema or []) + len(new_fields)):
+                    removed = final_schema.pop()
+                    console.print(f"[yellow]↩ Undid last manual field: {removed.name}[/yellow]\n")
+                else:
+                    console.print("[dim]Nothing to undo.[/dim]\n")
+                continue
+
             desc = Prompt.ask("Description")
             final_schema.append(FieldDefinition(
                 name=name.lower().replace(" ", "_"),

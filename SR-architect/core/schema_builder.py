@@ -199,6 +199,7 @@ def interactive_schema_builder() -> List[FieldDefinition]:
     
     # Custom schema building
     console.print("\n[bold]Enter your custom fields:[/bold]")
+    console.print("[dim]Commands: 'undo' to remove last, 'delete <name>' to remove specific[/dim]")
     console.print("[dim]Press Enter with empty name to finish[/dim]\n")
     
     while True:
@@ -206,6 +207,26 @@ def interactive_schema_builder() -> List[FieldDefinition]:
         if not name:
             break
         
+        # Handle Commands
+        cmd = name.lower().strip()
+        if cmd == "undo":
+            if fields:
+                removed = fields.pop()
+                console.print(f"[yellow]↩ Undid last field: {removed.name}[/yellow]\n")
+            else:
+                console.print("[dim]Nothing to undo.[/dim]\n")
+            continue
+            
+        if cmd.startswith("delete "):
+            field_to_delete = cmd.replace("delete ", "").strip()
+            initial_count = len(fields)
+            fields = [f for f in fields if f.name != field_to_delete]
+            if len(fields) < initial_count:
+                console.print(f"[red]✗ Deleted field: {field_to_delete}[/red]\n")
+            else:
+                console.print(f"[dim]Field '{field_to_delete}' not found.[/dim]\n")
+            continue
+
         # Sanitize name
         name = name.lower().replace(" ", "_").replace("-", "_")
         
