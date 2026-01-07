@@ -13,7 +13,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Adaptive Schema Discovery' (Protocol in workflow.md) ccee37d
 
 ## Phase 3: Interactive Polish & Safety
-- [ ] Task: Add "Undo" and "Delete Field" functionality to the interactive schema builder.
+- [x] Task: Add "Undo" and "Delete Field" functionality to the interactive schema builder. 681dea8
 - [ ] Task: Implement confirmation prompts for large batch jobs and schema saves.
 - [ ] Task: Enhance CLI error reporting using `rich` panels for legibility.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Interactive Polish & Safety' (Protocol in workflow.md)
