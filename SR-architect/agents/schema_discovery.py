@@ -1,14 +1,6 @@
-#!/usr/bin/env python3
-"""
-Schema Discovery Agent - Analyzes sample papers to suggest extraction variables.
-
-This implements the adaptive schema discovery pattern where the first N papers
-are analyzed to discover what data points are available, then the user approves
-a final schema before full extraction.
-"""
-
 import os
 import sys
+import random
 from pathlib import Path
 from typing import List, Optional
 from dataclasses import dataclass, field
@@ -115,7 +107,6 @@ Input Fields:
         self.api_key = api_key
         self.token_tracker = token_tracker
         self.parser = DocumentParser()
-        self._extractor = None
         self._client = None
         
         from core.utils import get_logger
@@ -135,6 +126,39 @@ Input Fields:
         )
         return self._client
     
+    def get_sample_papers(self, papers_dir: str, sample_size: int = 3, seed: Optional[int] = None) -> List[str]:
+        """
+        Robustly select N papers for schema discovery.
+        
+        - Filters for .pdf extension
+        - Filters out files < 10KB (likely corrupted or placeholder)
+        - Shuffles for representative sampling
+        """
+        papers_path = Path(papers_dir)
+        all_pdfs = list(papers_path.glob("*.pdf"))
+        
+        # Filter by size (> 10KB)
+        valid_pdfs = [p for p in all_pdfs if p.stat().st_size > 10240]
+        
+        if not valid_pdfs:
+            # Fallback to all PDFs if none are > 10KB, but log warning
+            self.logger.warning(f"No PDFs > 10KB found in {papers_dir}. Using all available PDFs.")
+            valid_pdfs = all_pdfs
+            
+        if not valid_pdfs:
+            return []
+            
+        # Shuffle
+        if seed is not None:
+            random.seed(seed)
+        else:
+            random.seed(42) # Stable default shuffle
+            
+        random.shuffle(valid_pdfs)
+        
+        selected = valid_pdfs[:sample_size]
+        return [str(p) for p in selected]
+
     def analyze_paper(self, paper_path: str) -> DiscoveryResult:
         """
         Analyze a single paper to discover possible fields.
@@ -251,16 +275,17 @@ Input Fields:
         Returns:
             List of suggested FieldDefinition objects
         """
-        papers = list(Path(papers_dir).glob("*.pdf"))[:sample_size]
+        # USE ROBUST SAMPLING
+        papers = self.get_sample_papers(papers_dir, sample_size)
         
         all_suggestions = []
         
-        for paper in papers:
+        for paper_path in papers:
             try:
-                result = self.analyze_paper(str(paper))
+                result = self.analyze_paper(paper_path)
                 all_suggestions.extend(result.suggested_fields)
             except Exception as e:
-                self.logger.error(f"Failed to analyze {paper.name}: {e}")
+                self.logger.error(f"Failed to analyze {Path(paper_path).name}: {e}")
         
         # Semantic Unification
         unified_fields = self.unify_fields(all_suggestions)
@@ -283,12 +308,10 @@ Input Fields:
                     name=uf.canonical_name,
                     description=f"{uf.description} (Merged: {', '.join(uf.synonyms_merged)})",
                     field_type=field_type,
-                    required=uf.frequency >= sample_size,
+                    required=uf.frequency >= len(papers), # Required if in all samples
                     include_quote=True,
                 ))
         
-        # Sort by frequency (implied by order of processing often, but stability is good)
-        # Here we just return them as the LLM ordered them (usually relevance or frequency)
         return definitions
 
 
