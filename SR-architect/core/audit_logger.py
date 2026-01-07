@@ -26,6 +26,7 @@ class ExtractionLogEntry:
     token_usage: Optional[Dict[str, int]] = None
     duration_seconds: float = 0.0
     error_message: Optional[str] = None
+    failure_type: Optional[str] = None
     
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -80,6 +81,7 @@ class AuditLogger:
         token_usage: Optional[Dict[str, int]] = None,
         duration_seconds: float = 0.0,
         error_message: Optional[str] = None,
+        failure_type: Optional[str] = None,
     ):
         """
         Log a single extraction event.
@@ -94,6 +96,7 @@ class AuditLogger:
             token_usage: Token usage stats
             duration_seconds: Processing time
             error_message: Error message if failed
+            failure_type: Category of failure (e.g. OOM, timeout, schema_fail)
         """
         entry = ExtractionLogEntry(
             timestamp=datetime.now().isoformat(),
@@ -106,6 +109,7 @@ class AuditLogger:
             token_usage=token_usage,
             duration_seconds=duration_seconds,
             error_message=error_message,
+            failure_type=failure_type,
         )
         
         self.entries.append(entry)
@@ -134,13 +138,20 @@ class AuditLogger:
             duration_seconds=duration,
         )
     
-    def log_error(self, filename: str, error: str, duration: float = 0.0):
+    def log_error(
+        self, 
+        filename: str, 
+        error: str, 
+        duration: float = 0.0, 
+        failure_type: str = "generic_error"
+    ):
         """Convenience method for failed extraction."""
         self.log_extraction(
             filename=filename,
             status="error",
             error_message=error,
             duration_seconds=duration,
+            failure_type=failure_type,
         )
     
     def log_skipped(self, filename: str, reason: str):
