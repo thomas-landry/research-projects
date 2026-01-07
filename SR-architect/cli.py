@@ -34,6 +34,7 @@ from core.schema_builder import (
     FieldDefinition,
     PREDEFINED_SCHEMAS,
 )
+from agents.schema_discovery import interactive_discovery
 from core.extractor import StructuredExtractor
 from core.vectorizer import ChromaVectorStore
 from core.audit_logger import AuditLogger
@@ -130,45 +131,42 @@ def extract(
         title="Configuration"
     ))
     
-    # Build schema
-    if adaptive:
-        console.print(f"\n[bold cyan]🔍 Adaptive Schema Discovery[/bold cyan]")
-        pipeline_tmp = HierarchicalExtractionPipeline(
-            provider=provider, 
-            model=model,
-            token_tracker=tracker
-        )
-        discovered_fields = pipeline_tmp.discover_schema(papers_dir, sample_size=3)
-        
-        table = Table(title="Discovered Schema")
-        table.add_column("Field")
-        table.add_column("Type")
-        table.add_column("Description")
-        for f in discovered_fields:
-            table.add_row(f.name, f.field_type.value, f.description[:40])
-        console.print(table)
-        
-        if not typer.confirm("Use this discovered schema for extraction?"):
-            console.print("[yellow]Aborted.[/yellow]")
-            raise typer.Exit()
-        fields = discovered_fields
-    elif interactive or schema == "interactive":
+    # === Schema Selection Phase ===
+    fields: List[FieldDefinition] = []
+    
+    # 1. Base Schema selection
+    if interactive or schema == "interactive":
         fields = interactive_schema_builder()
     elif schema in PREDEFINED_SCHEMAS:
         fields = PREDEFINED_SCHEMAS[schema]()
         console.print(f"[green]Using predefined schema: {schema}[/green]")
+    elif adaptive:
+        # If ONLY adaptive is set, start with empty and discover
+        fields = []
     else:
-        console.print(f"[red]Unknown schema: {schema}. Using case_report.[/red]")
-        fields = get_case_report_schema()
+        # Default case (predefined or arg)
+        fields = PREDEFINED_SCHEMAS.get(schema, get_case_report_schema)()
+        if schema not in PREDEFINED_SCHEMAS and schema != "case_report":
+             console.print(f"[yellow]Note: Using fallback case_report schema.[/yellow]")
+
+    # 2. Adaptive Discovery (optional or forced by flag)
+    if adaptive:
+        fields = interactive_discovery(papers_dir, sample_size=3, existing_schema=fields)
+    elif not resume and typer.confirm("\nWould you like to run adaptive discovery to find additional fields?", default=False):
+        fields = interactive_discovery(papers_dir, sample_size=3, existing_schema=fields)
+    
+    if not fields:
+        console.print("[red]Error: No extraction fields defined. Aborting.[/red]")
+        raise typer.Exit(1)
     
     # Show schema fields
-    if verbose:
-        table = Table(title="Extraction Schema")
-        table.add_column("Field")
-        table.add_column("Type")
+    if verbose or adaptive or interactive:
+        table = Table(title="Final Extraction Schema")
+        table.add_column("Field", style="cyan")
+        table.add_column("Type", style="green")
         table.add_column("Description")
         for f in fields:
-            table.add_row(f.name, f.field_type.value, f.description[:40])
+            table.add_row(f.name, f.field_type.value, f.description[:50])
         console.print(table)
     
     # Build dynamic model

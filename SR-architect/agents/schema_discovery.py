@@ -339,7 +339,7 @@ Input Fields:
         return definitions
 
 
-def interactive_discovery(papers_dir: str, sample_size: int = 3):
+def interactive_discovery(papers_dir: str, sample_size: int = 3, existing_schema: Optional[List[FieldDefinition]] = None):
     """
     Run interactive schema discovery with user approval.
     """
@@ -350,14 +350,22 @@ def interactive_discovery(papers_dir: str, sample_size: int = 3):
     console = Console()
     
     console.print("\n[bold cyan]🔍 Adaptive Schema Discovery[/bold cyan]")
-    console.print(f"Analyzing {sample_size} sample papers to discover extraction variables...\n")
+    
+    if existing_schema:
+        console.print(f"Analyzing {sample_size} sample papers to find variables MISSING from your current schema...\n")
+    else:
+        console.print(f"Analyzing {sample_size} sample papers to discover extraction variables...\n")
     
     # Run discovery
     agent = SchemaDiscoveryAgent()
-    suggested_fields = agent.discover_schema(papers_dir, sample_size)
+    suggested_fields = agent.discover_schema(papers_dir, sample_size, existing_schema=existing_schema)
     
+    if not suggested_fields:
+        console.print("[yellow]No new fields discovered.[/yellow]")
+        return existing_schema or []
+
     # Display suggestions
-    table = Table(title=f"Discovered Fields ({len(suggested_fields)} total)")
+    table = Table(title=f"Discovered Fields ({len(suggested_fields)} new suggestions)")
     table.add_column("#", style="dim")
     table.add_column("Field Name", style="cyan")
     table.add_column("Type", style="green")
@@ -378,19 +386,21 @@ def interactive_discovery(papers_dir: str, sample_size: int = 3):
     # User approval
     console.print("\n[bold]Review the discovered fields:[/bold]")
     
-    approved_fields = []
+    new_fields = []
     for f in suggested_fields:
-        if Confirm.ask(f"Include '{f.name}'?", default=True):
-            approved_fields.append(f)
+        if Confirm.ask(f"Add '{f.name}' to schema?", default=True):
+            new_fields.append(f)
     
-    # Allow adding custom fields
-    if Confirm.ask("\nAdd custom fields?", default=False):
+    final_schema = (existing_schema or []) + new_fields
+    
+    # Allow adding custom fields manually
+    if Confirm.ask("\nAdd more custom fields manually?", default=False):
         while True:
             name = Prompt.ask("Field name (empty to finish)", default="")
             if not name:
                 break
             desc = Prompt.ask("Description")
-            approved_fields.append(FieldDefinition(
+            final_schema.append(FieldDefinition(
                 name=name.lower().replace(" ", "_"),
                 description=desc,
                 field_type=FieldType.TEXT,
@@ -398,9 +408,9 @@ def interactive_discovery(papers_dir: str, sample_size: int = 3):
                 include_quote=True,
             ))
     
-    console.print(f"\n[green]✓ Final schema: {len(approved_fields)} fields[/green]")
+    console.print(f"\n[green]✓ Final schema: {len(final_schema)} fields[/green]")
     
-    return approved_fields
+    return final_schema
 
 
 if __name__ == "__main__":
