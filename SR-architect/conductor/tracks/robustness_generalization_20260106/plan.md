@@ -12,11 +12,11 @@
 - [x] Task: Refine discovery logic to run iteratively over the sample, accumulating new fields. f58b903
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Adaptive Schema Discovery' (Protocol in workflow.md) ccee37d
 
-## Phase 3: Interactive Polish & Safety
+## Phase 3: Interactive Polish & Safety [checkpoint: ffe8dc8]
 - [x] Task: Add "Undo" and "Delete Field" functionality to the interactive schema builder. 681dea8
 - [x] Task: Implement confirmation prompts for large batch jobs and schema saves. 49f1b79
 - [x] Task: Enhance CLI error reporting using `rich` panels for legibility. 2d74601
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Interactive Polish & Safety' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Interactive Polish & Safety' (Protocol in workflow.md) ffe8dc8
 
 ## Phase 4: API Refactoring & Generalization
 - [ ] Task: Refactor extraction logic into a clean `ExtractionService` API.
