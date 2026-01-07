@@ -298,11 +298,19 @@ Input Fields:
         papers = self.get_sample_papers(papers_dir, sample_size)
         
         all_suggestions = []
-        existing_field_names = [f.name for f in existing_schema] if existing_schema else None
+        # Track known fields to enable iterative discovery of NOVEL items
+        existing_field_names = [f.name for f in existing_schema] if existing_schema else []
+        current_known_fields = set(existing_field_names)
         
         for paper_path in papers:
             try:
-                result = self.analyze_paper(paper_path, existing_fields=existing_field_names)
+                # Pass currently known fields to prompt
+                result = self.analyze_paper(paper_path, existing_fields=list(current_known_fields))
+                
+                # Add newly found fields to knowledge base for next paper
+                for s in result.suggested_fields:
+                    current_known_fields.add(s.field_name)
+                    
                 all_suggestions.extend(result.suggested_fields)
             except Exception as e:
                 self.logger.error(f"Failed to analyze {Path(paper_path).name}: {e}")
@@ -313,8 +321,8 @@ Input Fields:
         # Build FieldDefinition list
         definitions = []
         for uf in unified_fields:
-            # Skip if already in existing_schema
-            if existing_field_names and uf.canonical_name in existing_field_names:
+            # Skip if already in existing_schema (original set)
+            if uf.canonical_name in existing_field_names:
                 continue
                 
             if uf.frequency >= min_frequency:
