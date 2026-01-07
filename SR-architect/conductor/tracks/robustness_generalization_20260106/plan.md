@@ -6,7 +6,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Logging' (Protocol in workflow.md) 72641cd
 
 ## Phase 2: Adaptive Schema Discovery
-- [ ] Task: Implement the "Sampling" logic to select N papers for discovery.
+- [x] Task: Implement the "Sampling" logic to select N papers for discovery. 826292e
 - [ ] Task: Develop the Discovery Agent prompt and extraction logic to find "novel variables".
 - [ ] Task: Integrate discovery suggestions into the CLI interactive flow.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Adaptive Schema Discovery' (Protocol in workflow.md)
