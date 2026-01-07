@@ -1,0 +1,100 @@
+{
+  "source_file": "Hirakawa et al. - 2025 - Diffuse Pulmonary Meningotheliomatosis Presenting with the Cheerios Sign Diagnosed by a Transbronchi.pdf",
+  "extraction_timestamp": "2026-01-05T00:06:13.587483",
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": 1,
+      "exact_quote": "A 48-year-old woman with Turner syndrome presented with diffuse pulmonary nodules exhibiting the Cheerios sign.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "48",
+      "exact_quote": "A 48-year-old non-smoking woman presented with an abnormal shadow on chest radiography during routine health screening.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "A 48-year-old non-smoking woman presented with an abnormal shadow on chest radiography during routine health screening.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "Asymptomatic",
+      "exact_quote": "Although the patient had few symptoms, she visited a local hospital because of the results of the routine health screening.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Transbronchial lung cryobiopsy (TBLC)",
+      "exact_quote": "TBLC was performed using a 1.9 mm cryoprobe with a 6second freezing time and the blood-blocking balloon technique. One sample was obtained from each of the right B 8b and B 9 segments where the Cheerios sign was clearly observed.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "Diffuse centrilobular granular opacities and nodular shadows in both lungs, with some nodules having central lucency with a surrounding thin wall (Cheerios sign)",
+      "exact_quote": "CT of the chest showing diffuse centrilobular granular opacities and nodular shadows in both lungs. Some nodules had central lucency with a surrounding thin wall, consistent with the 'Cheerios sign'.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Multiple small nodules measuring approximately 2 mm in diameter in the interstitium, consisting of low-grade, round to short spindle-shaped cells resembling meningeal epithelial cells, with uniform round nuclei and eosinophilic cytoplasm. No cellular atypia, necrosis, or significant inflammation observed.",
+      "exact_quote": "Histopathological examinations of both specimens revealed multiple small nodules measuring approximately 2 mm in diameter in the interstitium. The nodules consisted of low-grade, round to short spindle-shaped cells resembling meningeal epithelial cells, with uniform round nuclei and eosinophilic cytoplasm. No cellular atypia, necrosis, or significant inflammation was observed.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "Positive for epithelial membrane antigen (EMA), progesterone receptor (PgR), and CD56",
+      "exact_quote": "Immunohistochemically, these cells were positive for the epithelial membrane antigen (EMA), progesterone receptor (PgR), and CD 56",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "Discontinuation of estrogen and progesterone hormone therapy",
+      "exact_quote": "Estrogen and progesterone hormone therapy were discontinued, and the disease remained stable without treatment.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "outcome",
+      "extracted_value": "Stable disease without progression over 7-month follow-up",
+      "exact_quote": "No further disease progression was observed over a follow-up period of seven months without treatment.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "Turner syndrome, uterine polyp",
+      "exact_quote": "The patient had a history of Turner syndrome and had been receiving hormone supplementation with estrogen and progesterone since childhood. At the time of the DPM diagnosis, the patient was diagnosed with a uterine polyp.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "iterations": 1,
+    "issues_resolved": []
+  }
+}

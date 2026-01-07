@@ -1,0 +1,86 @@
+{
+  "source_file": "Fadl et al. - 2021 - Minute Pulmonary Meningothelial-like Nodules.pdf",
+  "extraction_timestamp": "2026-01-05T00:05:11.693561",
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": "1",
+      "exact_quote": "A 63-year-old woman was referred for dedicated chest CT imaging",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "63",
+      "exact_quote": "A 63-year-old woman was referred",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "A 63-year-old woman was referred",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "Incidentally discovered pulmonary nodules during abdominal CT for diarrhea",
+      "exact_quote": "incidentally discovered pulmonary nodules at an abdominal CT scan performed for evaluation of diarrhea",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Right lower lobe transbronchial cryobiopsy",
+      "exact_quote": "Right lower lobe transbronchial cryobiopsy histopathologic findings",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "Numerous small (< 6 mm), rounded, ground-glass, randomly distributed nodules with no lobe spared. Some nodules showed central lucencies with a ringlike appearance",
+      "exact_quote": "Chest CT showed numerous small ( , 6 mm), rounded, ground-glass, randomly distributed nodules with no lobe spared. Some nodules  showed  central  lucencies  with  a  ringlike  appearance",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Nodular cellular proliferation expanding the interstitium with whorllike appearance",
+      "exact_quote": "nodular cellular proliferation  expanding  the  interstitium  with  whorllike  appearance",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "Positive staining for epithelial membrane antigen and progesterone receptor, negative staining for neuroendocrine markers such as synaptophysin",
+      "exact_quote": "Immunohistochemistry  with positive staining for epithelial membrane antigen and progesterone receptor, but negative staining for neuroendocrine markers such as synaptophysin",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "Diarrhea",
+      "exact_quote": "abdominal CT scan performed for evaluation of diarrhea",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 0.9
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "iterations": 2,
+    "issues_resolved": [
+      "Iteration 1: 2 issues"
+    ]
+  }
+}

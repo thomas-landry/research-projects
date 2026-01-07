@@ -1,0 +1,94 @@
+{
+  "source_file": "Kuroki et al. - 2002 - Minute Pulmonary Meningothelial-like Nodules High-Resolution Computed Tomography and Pathologic Cor.pdf",
+  "extraction_timestamp": "2026-01-04T23:29:51.230642",
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": "1",
+      "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_age",
+      "extracted_value": "55",
+      "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female",
+      "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs in a 55-year-old nonsmoking Japanese woman.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "Incidental finding on screening",
+      "exact_quote": "A2-cm pulmonary nodule was incidentally discovered on screening chest radiographs",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "HRCT, routine contrast-enhanced chest CT, and fiberoptic bronchoscopy with cytology",
+      "exact_quote": "Both highresolution CT (HRCT) and routine contrast-enhanced chest CT were obtained (10-mm collimation; WL: -500; WW: 2,000) for staging suspected lung cancer... Fiberoptic bronchoscopy was performed with cytologic examination of material obtained from the dominant tumor in the right upper lobe, suggesting malignancy.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "imaging_findings",
+      "extracted_value": "2-cm spiculated nodule in right upper lobe with inhomogeneous enhancement and irregular border, surrounded by ground-glass opacity. Additional tiny nodules (1-3mm) of ground-glass attenuation in right upper lobe.",
+      "exact_quote": "The nodule was seen in the right upper lobe and showed inhomogeneous enhancement and an irregular border with fine spiculation. The nodule was surrounded by a zone of ground-glass opacity... tiny nodules of ground-glass (1-3 mm in diameter) attenuation in the right upper lobe",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Well-differentiated adenocarcinoma (papillary subtype) and minute pulmonary meningothelial-like nodules (MPMNs). MPMNs showed cellular proliferations of meningothelial-like cells with round to oval nuclei and indistinct cell borders.",
+      "exact_quote": "The pathologic diagnosis of the main tumor was well-differentiated adenocarcinoma, papillary subtype... These lesions consisted of cellular proliferations of meningothelial-like cells with round to oval nuclei and indistinct cell borders associated with venules, which expanded the alveolar walls and were accompanied by stromal fibrosis.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "Historical findings show MPMNs are immunoreactive for EMA and vimentin, negative for cytokeratin, S-100 protein, neuron-specific enolase, and actin. Alternative studies show positive immunoreactivity for myosin and vimentin.",
+      "exact_quote": "Gaffey et al. (2) reported that meningothelial-like nodules were immunoreactive for epithelial membrane antigen (EMA) and vimentin and were negative for cytokeratin, S-100 protein, neuron-specific enolase, and actin... In contrast, Torikata and Mukai (3) reported positive immunoreactivity for myosin and vimentin in all meningothelial-like nodules.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "Right upper lobectomy",
+      "exact_quote": "A right upper lobectomy was performed with the assumption that the patient had stage IA (T1N0M0) lung cancer.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "outcome",
+      "extracted_value": "Stable disease at 12 months follow-up",
+      "exact_quote": "Follow-up CT scan obtained 12 months after right upper lobectomy. Multiple small nodules (white arrows) are again evident and unchanged from HRCT performed 6 months postoperatively.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 0.9,
+    "consistency_score": 1.0,
+    "iterations": 1,
+    "issues_resolved": [
+      "Iteration 1: 2 issues"
+    ]
+  }
+}

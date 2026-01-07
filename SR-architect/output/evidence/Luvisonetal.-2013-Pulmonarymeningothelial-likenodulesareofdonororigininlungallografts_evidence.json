@@ -1,0 +1,68 @@
+{
+  "source_file": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+  "extraction_timestamp": "2026-01-05T00:34:29.818458",
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": 2,
+      "exact_quote": "Two cases comprised the study group.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "Female, Male",
+      "exact_quote": "One woman (Case 1) received a male lung allograft for idiopathic pulmonary /uniFB01 brosis and had MPMN identi /uniFB01 ed at 1.1 years post-transplant; the other (Case 2) was a male recipient of a female lung allograft",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "Asymptomatic",
+      "exact_quote": "Minute pulmonary meningothelial-like nodules (MPMNs) are asymptomatic small nodules representing incidental microscopic /uniFB01 ndings in lung specimens.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "transbronchial biopsy",
+      "exact_quote": "MPMNs can be seen as an incidental /uniFB01 nding in surveillance transbronchial biopsies performed on lung allograft recipients.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Nests or whorls of moderately sized epithelioid cells centered on small veins with elongated or spindled cells, oval nuclei, fine granular chromatin and inconspicuous nucleoli, with abundant eosinophilic cytoplasm showing poorly defined cell borders",
+      "exact_quote": "Microscopically, the lesions consist of nests or whorls of moderately sized epithelioid cells centered on small veins with the cells being elongated or spindled with oval nuclei, /uniFB01 ne granular chromatin and inconspicuous nucleoli, with abundant eosinophilic cytoplasm showing poorly de /uniFB01 ned cell borders.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "Positive for epithelial membrane antigen and vimentin; negative for cytokeratin, actin, S100 protein, CD34, chromogranin, synaptophysin, and CD68",
+      "exact_quote": "On the basis of immunohistochemical stains, primarily positivity for epithelial membrane antigen and vimentin, and negative studies for cytokeratin, actin, S100 protein, CD34, chromogranin and synaptophysin... Immunostains showed the MPMN cells to stain for epithelial membrane antigen and vimentin and to not express CD68, a histiocytic marker.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "Case 1: idiopathic pulmonary fibrosis; Case 2: severe smoking-induced bronchiolitis obliterans",
+      "exact_quote": "One woman (Case 1) received a male lung allograft for idiopathic pulmonary /uniFB01 brosis... the other (Case 2) was a male recipient of a female lung allograft for severe smoking-induced bronchiolitis obliterans",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 1.0,
+    "iterations": 1,
+    "issues_resolved": []
+  }
+}

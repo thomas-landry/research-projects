@@ -1,0 +1,15 @@
+{
+  "session_name": "20260105_002631",
+  "start_time": "2026-01-05T00:26:31.717177",
+  "end_time": "2026-01-05T00:30:02.751211",
+  "total_files": 15,
+  "successful": 0,
+  "failed": 15,
+  "skipped": 0,
+  "success_rate": "0.0%",
+  "total_chunks": 0,
+  "total_vectors": 0,
+  "total_duration_seconds": 420.66,
+  "avg_duration_per_file": 28.04,
+  "log_file": "output/logs/extraction_20260105_002631.jsonl"
+}

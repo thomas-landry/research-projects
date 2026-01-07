@@ -1,0 +1,86 @@
+{
+  "source_file": "Luvison et al. - 2013 - Pulmonary meningothelial-like nodules are of donor origin in lung allografts.pdf",
+  "extraction_timestamp": "2026-01-04T23:28:05.051898",
+  "evidence": [
+    {
+      "field_name": "case_count",
+      "extracted_value": "2",
+      "exact_quote": "Two cases comprised the study group.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "patient_sex",
+      "extracted_value": "1 female, 1 male",
+      "exact_quote": "One woman (Case 1) received a male lung allograft [...] the other (Case 2) was a male recipient of a female lung allograft",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "presenting_symptoms",
+      "extracted_value": "Asymptomatic",
+      "exact_quote": "Minute pulmonary meningothelial-like nodules (MPMNs) are asymptomatic small nodules representing incidental microscopic findings in lung specimens.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "diagnostic_method",
+      "extracted_value": "Transbronchial biopsy with XY chromosome in situ hybridization",
+      "exact_quote": "Dual-color fluorescence in situ hybridization for the sex chromosomes was performed using an X/Y direct labeled probe (Abbott Molecular, Des Plaines, IL)",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "histopathology",
+      "extracted_value": "Nests or whorls of moderately sized epithelioid cells centered on small veins with elongated or spindled cells, oval nuclei, fine granular chromatin and inconspicuous nucleoli, with abundant eosinophilic cytoplasm showing poorly defined cell borders",
+      "exact_quote": "Microscopically, the lesions consist of nests or whorls of moderately sized epithelioid cells centered on small veins with the cells being elongated or spindled with oval nuclei, fine granular chromatin and inconspicuous nucleoli, with abundant eosinophilic cytoplasm showing poorly defined cell borders.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "immunohistochemistry",
+      "extracted_value": "Positive for epithelial membrane antigen and vimentin; negative for cytokeratin, actin, S100 protein, CD34, chromogranin, synaptophysin, and CD68",
+      "exact_quote": "On the basis of immunohistochemical stains, primarily positivity for epithelial membrane antigen and vimentin, and negative studies for cytokeratin, actin, S100 protein, CD34, chromogranin and synaptophysin [...] Immunostains showed the MPMN cells to stain for epithelial membrane antigen and vimentin and to not express CD68, a histiocytic marker.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "treatment",
+      "extracted_value": "Lung transplantation",
+      "exact_quote": "One woman (Case 1) received a male lung allograft for idiopathic pulmonary fibrosis [...] the other (Case 2) was a male recipient of a female lung allograft",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "outcome",
+      "extracted_value": "MPMNs identified at 1.1 years post-transplant in Case 1 and 10.5 years post-transplant in Case 2",
+      "exact_quote": "One woman (Case 1) received a male lung allograft for idiopathic pulmonary fibrosis and had MPMN identified at 1.1 years post-transplant; the other (Case 2) was a male recipient of a female lung allograft for severe smoking-induced bronchiolitis obliterans and had MPMN identified 10.5 years post-transplant.",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    },
+    {
+      "field_name": "comorbidities",
+      "extracted_value": "Case 1: idiopathic pulmonary fibrosis; Case 2: severe smoking-induced bronchiolitis obliterans",
+      "exact_quote": "One woman (Case 1) received a male lung allograft for idiopathic pulmonary fibrosis [...] the other (Case 2) was a male recipient of a female lung allograft for severe smoking-induced bronchiolitis obliterans",
+      "page_number": null,
+      "chunk_index": null,
+      "confidence": 1.0
+    }
+  ],
+  "validation": {
+    "accuracy_score": 1.0,
+    "consistency_score": 0.9,
+    "iterations": 1,
+    "issues_resolved": [
+      "Iteration 1: 2 issues"
+    ]
+  }
+}
