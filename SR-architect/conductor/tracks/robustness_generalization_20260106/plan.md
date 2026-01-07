@@ -9,6 +9,7 @@
 - [x] Task: Implement the "Sampling" logic to select N papers for discovery. 826292e
 - [x] Task: Develop the Discovery Agent prompt and extraction logic to find "novel variables". 892c06c
 - [x] Task: Integrate discovery suggestions into the CLI interactive flow. bc311ad
+- [x] Task: Refine discovery logic to run iteratively over the sample, accumulating new fields. f58b903
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Adaptive Schema Discovery' (Protocol in workflow.md)
 
 ## Phase 3: Interactive Polish & Safety
