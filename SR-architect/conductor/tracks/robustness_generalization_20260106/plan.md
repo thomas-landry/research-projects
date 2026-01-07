@@ -5,12 +5,12 @@
 - [x] Task: Create a base `DiscoveryAgent` interface. 336d4ea
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Logging' (Protocol in workflow.md) 72641cd
 
-## Phase 2: Adaptive Schema Discovery
+## Phase 2: Adaptive Schema Discovery [checkpoint: ccee37d]
 - [x] Task: Implement the "Sampling" logic to select N papers for discovery. 826292e
 - [x] Task: Develop the Discovery Agent prompt and extraction logic to find "novel variables". 892c06c
 - [x] Task: Integrate discovery suggestions into the CLI interactive flow. bc311ad
 - [x] Task: Refine discovery logic to run iteratively over the sample, accumulating new fields. f58b903
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Adaptive Schema Discovery' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Adaptive Schema Discovery' (Protocol in workflow.md) ccee37d
 
 ## Phase 3: Interactive Polish & Safety
 - [ ] Task: Add "Undo" and "Delete Field" functionality to the interactive schema builder.
