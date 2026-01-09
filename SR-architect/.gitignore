@@ -9,9 +9,16 @@ __pycache__/
 venv/
 env/
 
+# Cache directories
+.cache/
+
 # Output directories (can be large)
-output/vector_store/
+output/
+!output/.gitkeep
 *.lance
+*.log
+*.csv
+*.jsonl
 
 # IDE
 .vscode/
