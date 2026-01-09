@@ -8,9 +8,9 @@ efficiently filtering out irrelevant content before detailed extraction.
 
 import os
 import json
-from typing import List, Dict, Any, Optional, Type
 from dataclasses import dataclass
-from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional, Type, Annotated
+from pydantic import BaseModel, Field, BeforeValidator, ValidationInfo
 
 from core import utils
 from .parser import DocumentChunk
@@ -32,9 +32,31 @@ class ChunkRelevance(BaseModel):
     reason: str
 
 
+def _coerce_relevance_list(v: Any) -> List[Dict[str, Any]]:
+    """
+    Coerce simplified LLM output (list of strings/ints) into ChunkRelevance objects.
+    Handle: ["0", "1", "0"] -> [{"index": 0, "relevant": 0, "reason": "inferred"}, ...]
+    """
+    if isinstance(v, list) and v:
+        # Check if it's a list of primitives (str or int)
+        if isinstance(v[0], (str, int)) and not isinstance(v[0], dict):
+            coerced = []
+            for i, val in enumerate(v):
+                # Clean value
+                val_str = str(val).strip().lower()
+                is_relevant = 1 if val_str in ('1', 'true', 'yes') else 0
+                
+                coerced.append({
+                    "index": i,
+                    "relevant": is_relevant,
+                    "reason": "Inferred from simplified output"
+                })
+            return coerced
+    return v
+
 class RelevanceResponse(BaseModel):
     """Batch response for relevance classification."""
-    classifications: List[ChunkRelevance]
+    classifications: Annotated[List[ChunkRelevance], BeforeValidator(_coerce_relevance_list)]
 
 
 class RelevanceClassifier:
@@ -132,7 +154,7 @@ It's better to include slightly irrelevant content than to miss important data."
         schema_fields: List[str],
     ) -> str:
         """Build the user prompt for a batch of chunks."""
-        fields_str = ", ".join(schema_fields[:20])  # Limit field list
+        fields_str = ", ".join(schema_fields)  # Include all fields for context
         
         chunks_str = ""
         for i, chunk in enumerate(chunks):

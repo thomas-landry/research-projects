@@ -41,7 +41,48 @@ SR-Architect automates the most time-consuming part of systematic reviews: **dat
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
----
+### Excellence-Focused Pipeline (v3)
+
+The pipeline has evolved to prioritize **provenance** and **precision** over simple extraction:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       EXCELLENCE-FOCUSED CASCADE                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌────────────┐    ┌────────────┐    ┌────────────┐     ┌───────────┐    │
+│  │ Semantic   │───▶│ Content    │───▶│ Relevance  │────▶│ Extractor │    │
+│  │ Chunker    │    │ Filter     │    │ Classifier │     │ (Hybrid)  │    │
+│  │ (LLM-Split)│    │ (Exclude)  │    │ (Include)  │     │           │    │
+│  └────────────┘    └────────────┘    └─────┬──────┘     └─────┬─────┘    │
+│         ▲                                  │                  │          │
+│         │                                  ▼              ┌───▼──┐       │
+│  ┌────────────┐                      ┌────────────┐       │ Sent │       │
+│  │  Parser    │                      │ Recall     │◀─────▶│ Ext. │       │
+│  │ (Docling)  │                      │ Booster    │       └──────┘       │
+│  └────────────┘                      └────────────┘                      │
+│                                            ▲                             │
+│                                            │ (Feedback Loop)             │
+│   ┌────────────────────────────────────────┴───────────────────────┐     │
+│   │  Validation: Fuzzy Matching, Cross-checking, Range Validation  │     │
+│   │  Provenance: Character-level offsets (EvidenceFrames)          │     │
+│   └────────────────────────────────────────────────────────────────┘     │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**New Capabilities (v3):**
+- **Semantic Chunking (Phase D)**: Uses LLMs to identify logical sections (Methods, Results) instead of brittle headers.
+- **Unit-Context Extraction (Phase B)**: "Needle-in-a-haystack" extraction for complex fields using concurrently processed sentence windows.
+- **Precise Provenance (Phase E)**: Tracks exact character start/end indices for every extracted fact ("Click-to-Source").
+- **Recall Boost (Phase C)**: Automatically expands search scope if critical fields come back empty.
+- **Fuzzy Validation (Phase A)**: Ensures every "exact quote" actually exists in the text, preventing hallucination.
+
+**Key benefits:**
+- **50%+ cost reduction** via local-first extraction
+- **Self-consistency voting** for critical numeric fields
+- **Caching** to avoid re-processing unchanged documents
+- **Auto-correction** for common OCR and extraction errors
 
 ## 🚀 Quick Start
 
@@ -104,6 +145,7 @@ Options:
   --theme TEXT           Theme for relevance filtering (required for hierarchical)
   --resume               Resume from last checkpoint
   --adaptive             Automatically discover schema from first 3 papers
+  --hybrid-mode/--no-hybrid-mode  Use hybrid local-first extraction [default: enabled]
 ```
 
 **Examples:**

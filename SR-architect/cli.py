@@ -18,7 +18,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskPr
 from rich.table import Table
 from rich.panel import Panel
 
-from core.config import settings
+from core.config import settings, MODEL_ALIASES
 from core import (
     DocumentParser, 
     HierarchicalExtractionPipeline, 
@@ -34,6 +34,12 @@ from core.schema_builder import (
     interactive_schema_builder,
     FieldDefinition,
     PREDEFINED_SCHEMAS,
+    infer_schema_from_csv,
+)
+from core.schema_chunker import (
+    chunk_schema,
+    merge_extraction_results,
+    should_chunk_schema,
 )
 from agents.schema_discovery import interactive_discovery
 from core.extractor import StructuredExtractor
@@ -90,6 +96,13 @@ def extract(
     workers: int = typer.Option(settings.WORKERS, "--workers", "-w", help="Number of parallel workers (default: 1)"),
     examples: Optional[str] = typer.Option(None, "--examples", "-e", help="Path to few-shot examples text file"),
     adaptive: bool = typer.Option(False, "--adaptive", help="Automatically discover schema from sample papers"),
+    # Hybrid extraction mode (Phase 5)
+    hybrid_mode: bool = typer.Option(True, "--hybrid-mode/--no-hybrid-mode", help="Use hybrid local-first extraction (default: enabled)"),
+    # Cost guardrails (COST-001)
+    max_cost: Optional[float] = typer.Option(None, "--max-cost", help="Maximum cost in USD. Abort if estimate exceeds. (e.g., 5.0)"),
+    # Schema chunking for large schemas
+    chunk_schema_flag: bool = typer.Option(True, "--chunk-schema/--no-chunk-schema", help="Auto-chunk large schemas (>30 fields) for cost optimization"),
+    max_fields_per_chunk: int = typer.Option(25, "--max-fields-per-chunk", help="Maximum fields per chunk (default: 25)"),
 ):
     """
     Extract structured data from PDFs for systematic review.
@@ -97,8 +110,21 @@ def extract(
     Example:
         python cli.py extract ../DPM-systematic-review/papers -o results.csv
     """
+
     load_env()
 
+    # Resolve model alias
+    if model and model in MODEL_ALIASES:
+        # Check for local models specifically
+        if model in ["llama3", "llama2", "mistral"]: 
+           # Could add specific logic here if needed, but for now just map
+           pass
+        
+        resolved_model = MODEL_ALIASES[model]
+        if verbose:
+            console.print(f"[dim]Resolved model alias '{model}' to: {resolved_model}[/dim]")
+        model = resolved_model
+    
     # Initialize logging
     log_file = Path(output).parent / "sr_architect.log"
     setup_logging(level="DEBUG" if verbose else None, log_file=log_file)
@@ -128,6 +154,7 @@ def extract(
         f"Papers: {len(pdf_files)} PDFs\n"
         f"Schema: {schema}\n"
         f"Provider: {provider}\n"
+        f"Hybrid Mode: {'[green]Enabled[/green]' if hybrid_mode else '[yellow]Disabled (Sonnet-only)[/yellow]'}\n"
         f"Output: {output}",
         title="Configuration"
     ))
@@ -141,6 +168,9 @@ def extract(
     elif schema in PREDEFINED_SCHEMAS:
         fields = PREDEFINED_SCHEMAS[schema]()
         console.print(f"[green]Using predefined schema: {schema}[/green]")
+    elif schema.lower().endswith(".csv") and Path(schema).exists():
+        console.print(f"[green]Inferring schema from output template: {schema}[/green]")
+        fields = infer_schema_from_csv(schema)
     elif adaptive:
         # If ONLY adaptive is set, start with empty and discover
         fields = []
@@ -170,13 +200,24 @@ def extract(
             table.add_row(f.name, f.field_type.value, f.description[:50])
         console.print(table)
     
-    # Confirmation for large batches
-    if len(pdf_files) > 25 and not resume:
-        console.print(f"\n[bold yellow]⚠ WARNING: Large Batch Detected ({len(pdf_files)} papers)[/bold yellow]")
-        console.print("Processing many papers can take significant time and API tokens.")
-        if not typer.confirm("Do you want to proceed with the full batch?"):
-            console.print("[yellow]Aborted.[/yellow]")
-            raise typer.Exit()
+    # === Schema Chunking Detection ===
+    schema_chunks = None
+    if chunk_schema_flag and should_chunk_schema(fields):
+        schema_chunks = chunk_schema(fields, max_fields_per_chunk)
+        console.print(f"\n[bold yellow]📦 Large Schema Detected[/bold yellow]")
+        console.print(f"  Total fields: {len(fields)}")
+        console.print(f"  Chunks: {len(schema_chunks)}")
+        console.print(f"  Fields per chunk: ~{max_fields_per_chunk}")
+        console.print(f"  [dim]This will run {len(schema_chunks)} extractions per paper for cost optimization.[/dim]")
+    
+    
+    # Token-based cost estimation is shown below in the detailed table
+    # No hardcoded estimates - we rely on actual model pricing
+    
+    # The detailed cost estimator will calculate the actual cost based on:
+    # - Model pricing (from token tracker)
+    # - Estimated tokens per document
+    # - Number of chunks (if schema chunking is enabled)
 
     # Initialize Service
     service = ExtractionService(
@@ -205,12 +246,24 @@ def extract(
     if not resume:
         # Hierarchical runs are more expensive (discovery + filter + extract + audit)
         passes = 4 if hierarchical else 1
+        
+        # Account for schema chunking - each chunk requires a full extraction pass
+        if schema_chunks:
+            passes *= len(schema_chunks)
+        
         estimate = tracker.estimate_extraction_cost(
             num_documents=len(pdf_files),
             model=model or settings.LLM_MODEL or "anthropic/claude-3.5-sonnet",
             num_passes=passes
         )
         console.print(tracker.display_cost_report(estimate))
+        
+        # Check max-cost guardrail with token-based estimate
+        if max_cost is not None and estimate.get('total_cost_usd', 0) > max_cost:
+            console.print(f"\n[bold red]❌ ABORTED: Estimated cost (${estimate['total_cost_usd']:.2f}) exceeds --max-cost (${max_cost:.2f})[/bold red]")
+            console.print("[dim]Tip: Reduce with --limit, use --no-chunk-schema, or increase --max-cost[/dim]")
+            raise typer.Exit(1)
+        
         if not typer.confirm("Continue with extraction?"):
             raise typer.Exit()
     
@@ -241,6 +294,9 @@ def extract(
             resume=resume,
             examples=examples_content,
             vectorize=vectorize,
+            limit=limit,  # COST-001 fix: pass limit to service
+            hybrid_mode=hybrid_mode,  # COST-001 fix: enable local-first extraction
+            schema_chunks=schema_chunks,  # Schema chunking for cost optimization
             callback=progress_callback
         )
     
@@ -260,6 +316,18 @@ def extract(
     table.add_row("Extraction failures", str(len(execution_summary["failed_files"])))
     table.add_row("Total tokens", f"{summary['total_tokens']:,}")
     table.add_row("Total cost (USD)", f"${summary['total_cost_usd']:.4f}")
+    # Hybrid mode stats (Phase 5)
+    if hybrid_mode:
+        table.add_row("─" * 20, "─" * 12)
+        table.add_row("[cyan]Hybrid Mode[/cyan]", "[green]Enabled[/green]")
+        tier_stats = execution_summary.get("tier_stats", {})
+        if tier_stats:
+            local_pct = tier_stats.get("local_percentage", 0)
+            table.add_row("Local extraction %", f"{local_pct:.1f}%")
+            table.add_row("Cloud escalations", str(tier_stats.get("cloud_calls", 0)))
+        cache_stats = execution_summary.get("cache_stats", {})
+        if cache_stats:
+            table.add_row("Cache hit rate", f"{cache_stats.get('hit_rate', 0):.1f}%")
     console.print(table)
     
     console.print(tracker.display_session_summary())

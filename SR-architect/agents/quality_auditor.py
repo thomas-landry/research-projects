@@ -75,14 +75,17 @@ class QualityAuditorAgent:
         self._async_client = get_async_llm_client(self.provider)
         return self._async_client
 
-    def audit_extraction(self, data: Dict[str, Any], evidence: List[Dict[str, Any]]) -> AuditReport:
+    def audit_extraction(self, data: Dict[str, Any], evidence: List[Dict[str, Any]], source_text: Optional[str] = None) -> AuditReport:
         """
         Audit a full extraction result.
         
         Args:
             data: The extracted dictionary
             evidence: List of evidence items (field, value, quote, confidence)
+            source_text: The full text of the document/chunk to verify quotes against
         """
+        from core.text_utils import find_best_substring_match
+        
         audits = []
         
         # We process each field that has evidence
@@ -94,8 +97,27 @@ class QualityAuditorAgent:
             # Skip if no quote (can't audit)
             if not quote:
                 continue
+
+            # 1. Verify Quote Existence (Deterministically)
+            quote_status = "verified"
+            if source_text:
+                matched_text, score, span = find_best_substring_match(source_text, quote, threshold=0.8)
+                if matched_text:
+                    if score < 1.0:
+                        quote = matched_text  # Auto-correct to exact text
+                        quote_status = f"fuzzy_matched (score={score:.2f})"
+                else:
+                    # Quote not found in text
+                    audits.append(FieldAudit(
+                        field_name=field_name,
+                        is_correct=False,
+                        confidence=1.0,
+                        explanation=f"Quote not found in source text (best match score < 0.8). This is a hallucination.",
+                        severity="high"
+                    ))
+                    continue
                 
-            # Perform audit
+            # 2. Verify Logic (LLM)
             prompt = self.AUDIT_PROMPT.format(
                 field=field_name,
                 value=str(value),
@@ -124,6 +146,8 @@ class QualityAuditorAgent:
                 
                 # Check consistency: result.field_name should match
                 result.field_name = field_name 
+                if quote_status.startswith("fuzzy"):
+                     result.explanation = f"{result.explanation} [Note: Quote was fuzzy matched]"
                 audits.append(result)
                 
             except Exception as e:
@@ -144,15 +168,17 @@ class QualityAuditorAgent:
             passed=score >= 0.8 and critical_errors == 0
         )
 
-    async def audit_extraction_async(self, data: Dict[str, Any], evidence: List[Dict[str, Any]]) -> AuditReport:
+    async def audit_extraction_async(self, data: Dict[str, Any], evidence: List[Dict[str, Any]], source_text: Optional[str] = None) -> AuditReport:
         """
         Audit a full extraction result (Async).
         
         Args:
             data: The extracted dictionary
             evidence: List of evidence items
+            source_text: The full text of the document/chunk to verify quotes against
         """
         import asyncio
+        from core.text_utils import find_best_substring_match
         
         # Helper for a single field audit
         async def audit_field(item):
@@ -162,7 +188,26 @@ class QualityAuditorAgent:
             
             if not quote:
                 return None
-                
+            
+            # 1. Verify Quote Existence (Deterministically)
+            quote_status = "verified"
+            if source_text:
+                matched_text, score, span = find_best_substring_match(source_text, quote, threshold=0.8)
+                if matched_text:
+                    if score < 1.0:
+                        quote = matched_text  # Auto-correct to exact text
+                        quote_status = f"fuzzy_matched (score={score:.2f})"
+                else:
+                    # Quote not found in text
+                    return FieldAudit(
+                        field_name=field_name,
+                        is_correct=False,
+                        confidence=1.0,
+                        explanation=f"Quote not found in source text (best match score < 0.8). This is a hallucination.",
+                        severity="high"
+                    )
+
+            # 2. Verify Logic (LLM)
             prompt = self.AUDIT_PROMPT.format(
                 field=field_name,
                 value=str(value),
@@ -190,6 +235,8 @@ class QualityAuditorAgent:
                         operation="quality_audit_async"
                     )
                 result.field_name = field_name
+                if quote_status.startswith("fuzzy"):
+                     result.explanation = f"{result.explanation} [Note: Quote was fuzzy matched]"
                 return result
             except Exception as e:
                 self.logger.error(f"Async Audit failed for {field_name}: {e}")

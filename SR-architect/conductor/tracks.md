@@ -4,7 +4,14 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [x] Track: Token Optimization & Hybrid Local/Cloud Architecture
+## [ ] Track: Pipeline Optimization v2 (Streamlined)
+*Link: [./tracks/pipeline_optimization_v2_20250107/](./tracks/pipeline_optimization_v2_20250107/)*
+*Status: New - Supersedes token_optimization track with simplified 5-phase plan*
+*Documents: [spec.md](./tracks/pipeline_optimization_v2_20250107/spec.md) | [plan.md](./tracks/pipeline_optimization_v2_20250107/plan.md) | [evaluation.md](./tracks/pipeline_optimization_v2_20250107/evaluation.md)*
+
+---
+
+## [x] Track: Token Optimization & Hybrid Local/Cloud Architecture (SUPERSEDED)
 *Link: [./archive/token_optimization_20260106/](./archive/token_optimization_20260106/)*
 
 ## [x] Track: Memory Optimization

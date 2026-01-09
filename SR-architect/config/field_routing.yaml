@@ -1,0 +1,273 @@
+# Field Routing Configuration for Hybrid Extraction Pipeline
+# This file defines which extraction tier handles each field
+#
+# Tiers:
+#   0 - Regex/Heuristic (no LLM)
+#   1 - Local LLM (Ollama - lightweight or standard)
+#   2 - Cloud LLM (cheap - gpt-4o-mini)
+#   3 - Cloud LLM (premium - claude-3.5-sonnet)
+#
+# Confidence thresholds determine when to escalate to next tier
+
+# =============================================================================
+# TIER 0: Regex/Heuristic Extraction (No LLM)
+# =============================================================================
+tier_0_regex:
+  description: "Deterministic extraction using regex patterns"
+  fields:
+    - name: doi
+      pattern: '10\.\d{4,}/[^\s]+'
+      validation: null
+      
+    - name: publication_year
+      pattern: '(19|20)\d{2}'
+      validation: 
+        range: [1900, 2026]
+      context_required: true  # Must be near date/publication context
+      
+    - name: journal_name
+      source: pdf_metadata  # Extract from PDF metadata first
+      fallback_pattern: null
+
+tier_0_regex_validated:
+  description: "Regex extraction with validation rules"
+  fields:
+    - name: sample_size_raw
+      pattern: '[Nn]\s*=\s*(\d+)'
+      validation:
+        range: [1, 100000]
+      context_keywords: ["patients", "participants", "subjects", "enrolled"]
+      
+    - name: age_mean_sd
+      pattern: '(\d+\.?\d*)\s*[±+/-]\s*(\d+\.?\d*)\s*years?'
+      validation:
+        mean_range: [0, 120]
+        sd_range: [0, 50]
+        
+    - name: sex_ratio
+      pattern: '(\d+)\s*(males?|M|men).*?(\d+)\s*(females?|F|women)'
+      validation:
+        sum_check: true  # male + female should ~= sample_size
+
+# =============================================================================
+# TIER 1: Local LLM - Lightweight (Qwen3-4B - Updated per model_evaluation.md)
+# =============================================================================
+tier_1_lightweight:
+  description: "Simple fields using fast local model"
+  model: "qwen3:4b"  # Qwen3-4B rivals Qwen2.5-72B performance
+  confidence_threshold: 0.90
+  max_context_tokens: 2048
+  temperature: 0.1
+  
+  fields:
+    - name: study_type_simple
+      description: "Basic study classification"
+      allowed_values: ["RCT", "Observational", "Case Report", "Case Series", "Review"]
+      
+    - name: single_center_bool
+      description: "Whether study is single or multi-center"
+      type: boolean
+      
+    - name: prospective_bool
+      description: "Whether study is prospective or retrospective"
+      type: boolean
+      
+    - name: country
+      description: "Country where study was conducted"
+      type: string
+      
+    - name: disease_category
+      description: "Primary disease category"
+      type: string
+
+# =============================================================================
+# TIER 1: Local LLM - Standard (Qwen3-14B - Updated per model_evaluation.md)
+# =============================================================================
+tier_1_standard:
+  description: "Complex fields using primary local model"
+  model: "qwen3:14b"  # Qwen3-14B ≈ Qwen2.5-32B performance
+  confidence_threshold: 0.85
+  max_context_tokens: 4096
+  temperature: 0.1
+  
+  fields:
+    - name: inclusion_criteria
+      description: "Patient inclusion criteria"
+      type: text_list
+      max_items: 10
+      
+    - name: exclusion_criteria
+      description: "Patient exclusion criteria"
+      type: text_list
+      max_items: 10
+      
+    - name: primary_outcome
+      description: "Primary outcome measure"
+      type: text
+      max_length: 500
+      
+    - name: intervention_description
+      description: "Description of intervention/treatment"
+      type: text
+      max_length: 500
+      
+    - name: comparator_description
+      description: "Description of comparator/control"
+      type: text
+      max_length: 500
+      
+    - name: follow_up_duration
+      description: "Duration of follow-up"
+      type: duration
+      
+    - name: study_design_detailed
+      description: "Detailed study design classification"
+      type: text
+
+  # Self-consistency settings for critical numeric fields
+  self_consistency:
+    enabled_fields: [sample_size_analyzed, mean_age, primary_outcome_value]
+    n_samples: 3
+    temperature: 0.3
+    tolerance: 0.05  # Accept if all values within 5%
+
+# =============================================================================
+# TIER 2: Cloud LLM - Cheap (gpt-4o-mini)
+# =============================================================================
+tier_2_cloud_cheap:
+  description: "Moderate complexity fields using cheap cloud model"
+  model: "gpt-4o-mini"
+  confidence_threshold: 0.80
+  max_context_tokens: 8192
+  temperature: 0.1
+  
+  escalate_from: tier_1_standard
+  escalation_conditions:
+    - confidence_below: 0.85
+    - validation_failed: true
+  
+  fields:
+    - name: secondary_outcomes
+      description: "Secondary outcome measures"
+      type: text_list
+      max_items: 10
+      
+    - name: adverse_events
+      description: "Reported adverse events"
+      type: text_list
+      
+    - name: subgroup_analyses
+      description: "Subgroup analysis results"
+      type: structured
+      
+    - name: statistical_methods
+      description: "Statistical methods used"
+      type: text
+
+# =============================================================================
+# TIER 3: Cloud LLM - Premium (claude-3.5-sonnet)
+# =============================================================================
+tier_3_cloud_premium:
+  description: "High complexity fields requiring premium model"
+  model: "claude-3.5-sonnet"
+  confidence_threshold: 0.75  # Lower threshold - this is last resort
+  max_context_tokens: 16384
+  temperature: 0.1
+  
+  # Some fields go directly to Tier 3
+  direct_route_fields:
+    - histopathology_classification
+    - figure_interpretation
+    - complex_eligibility_logic
+    - nested_subgroup_data
+    
+  direct_route_conditions:
+    document_complexity_above: 0.8
+    field_has_table_dependency: true
+    previous_tier_failures_gte: 2
+  
+  fields:
+    - name: histopathology_classification
+      description: "Histopathological classification and staging"
+      type: structured
+      requires_medical_expertise: true
+      
+    - name: figure_interpretation
+      description: "Data extracted from figures"
+      type: structured
+      may_require_vision: true
+      
+    - name: complex_eligibility_logic
+      description: "Complex inclusion/exclusion with AND/OR logic"
+      type: structured
+      
+    - name: nested_subgroup_data
+      description: "Multi-level subgroup results"
+      type: structured
+
+# =============================================================================
+# GLOBAL SETTINGS
+# =============================================================================
+global:
+  # Default escalation behavior
+  escalation:
+    max_attempts_per_tier: 2
+    escalation_delay_ms: 100
+    
+  # Manual review queue
+  manual_review:
+    trigger_conditions:
+      - all_tiers_failed: true
+      - confidence_below: 0.5
+      - validation_critical_fail: true
+    
+  # Caching
+  cache:
+    enabled: true
+    ttl_days: 30
+    invalidate_on_schema_change: true
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+validation_rules:
+  range_checks:
+    sample_size: [1, 100000]
+    mean_age: [0, 120]
+    follow_up_months: [0, 600]
+    mortality_rate: [0, 1]
+    
+  cross_field:
+    - rule: analyzed_n <= enrolled_n
+      fields: [sample_size_analyzed, sample_size_enrolled]
+    - rule: min_age <= mean_age <= max_age
+      fields: [age_min, age_mean, age_max]
+      
+  study_type_aware:
+    RCT:
+      required: [randomization_method, blinding]
+    Cohort:
+      required: [comparator_description]
+    Case_Report:
+      optional: [sample_size]  # Often N=1
+
+# =============================================================================
+# AUTO-CORRECTION RULES
+# =============================================================================
+auto_corrections:
+  ocr_fixes:
+    sample_size:
+      - pattern: 'l(\d+)'
+        replacement: '1\1'
+      - pattern: 'O(\d+)'
+        replacement: '0\1'
+      - pattern: '(\d+),(\d{3})'
+        replacement: '\1\2'
+        
+  normalization:
+    mortality_rate:
+      - condition: value > 1
+        action: divide_by_100
+    percentage_fields:
+      - condition: value > 100
+        action: flag_for_review

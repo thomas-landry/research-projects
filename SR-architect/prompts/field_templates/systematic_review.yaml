@@ -1,0 +1,145 @@
+# Field Templates for Schema-Aware Extraction
+#
+# These templates provide few-shot examples and extraction rules
+# for critical systematic review fields.
+
+# ============ NUMERIC FIELDS ============
+
+sample_size:
+  description: "Total number of participants/subjects in the study"
+  field_type: integer
+  extraction_rules:
+    - "Extract the total enrolled/included participant count"
+    - "Prefer 'N=' notation if present"
+    - "For case reports, count = 1"
+    - "For systematic reviews, sum individual studies if aggregated not given"
+  few_shot_examples:
+    - input: "A total of 150 patients were enrolled in the study."
+      output: 150
+      quote: "150 patients were enrolled"
+    - input: "The study included N=42 subjects meeting inclusion criteria."
+      output: 42
+      quote: "N=42 subjects"
+    - input: "We describe a case of a 57-year-old female..."
+      output: 1
+      quote: "We describe a case"
+
+case_count:
+  description: "Number of cases reported (for case reports/series)"
+  field_type: integer
+  extraction_rules:
+    - "Count individual cases described"
+    - "For single case report, value = 1"
+    - "Match explicit case mentions: 'X cases of...'"
+  few_shot_examples:
+    - input: "We identified 25 cases of diffuse pulmonary meningotheliomatosis."
+      output: 25
+      quote: "25 cases of diffuse pulmonary"
+    - input: "Here we present a case of a 61-year-old female..."
+      output: 1
+      quote: "present a case of"
+
+mean_age:
+  description: "Mean or median age of study participants"
+  field_type: float
+  extraction_rules:
+    - "Extract mean, median, or age range"
+    - "Prefer mean if both given"
+    - "Include units (years) if specified"
+    - "For imprecise ages ('50s'), use midpoint if necessary"
+  few_shot_examples:
+    - input: "The median age was 59.5 years (range 37-73)."
+      output: 59.5
+      quote: "median age was 59.5 years"
+    - input: "A 63-year-old female presented with..."
+      output: 63
+      quote: "63-year-old female"
+    - input: "Patients were aged 50-70 years."
+      output: "50-70"
+      quote: "aged 50-70 years"
+
+# ============ CATEGORICAL FIELDS ============
+
+patient_sex:
+  description: "Sex of study participants"
+  field_type: categorical
+  allowed_values: ["Male", "Female", "Mixed", "Not reported"]
+  extraction_rules:
+    - "Extract explicitly stated sex"
+    - "Use 'Mixed' for multiple participants of different sexes"
+    - "Map synonyms: 'woman'='Female', 'man'='Male'"
+  few_shot_examples:
+    - input: "A 57-year-old woman presented with cough."
+      output: "Female"
+      quote: "57-year-old woman"
+    - input: "Of 25 patients, 23 were female and 2 were male."
+      output: "Mixed"
+      quote: "23 were female and 2 were male"
+
+study_type:
+  description: "Type of study design"
+  field_type: categorical
+  allowed_values:
+    - "RCT"
+    - "Cohort"
+    - "Case-control"
+    - "Case report"
+    - "Case series"
+    - "Systematic review"
+    - "Meta-analysis"
+    - "Cross-sectional"
+  extraction_rules:
+    - "Identify from methods section or title"
+    - "Case report = single patient described in detail"
+    - "Case series = multiple cases without control"
+  few_shot_examples:
+    - input: "We describe a case of a 58-year-old female..."
+      output: "Case report"
+    - input: "A systematic review of 25 published cases..."
+      output: "Systematic review"
+
+# ============ TEXT FIELDS ============
+
+presenting_symptoms:
+  description: "Chief complaint and presenting symptoms"
+  field_type: text
+  extraction_rules:
+    - "Extract primary reason for seeking care"
+    - "Include symptom duration if mentioned"
+    - "List multiple symptoms separated by commas"
+  few_shot_examples:
+    - input: "The patient presented with chronic cough for 4 months and dyspnea on exertion."
+      output: "Chronic cough (4 months), dyspnea on exertion"
+      quote: "chronic cough for 4 months and dyspnea on exertion"
+    - input: "Pulmonary nodules were incidentally discovered on CT."
+      output: "Asymptomatic (incidental finding)"
+      quote: "incidentally discovered"
+
+diagnostic_method:
+  description: "Method(s) used to establish diagnosis"
+  field_type: text
+  extraction_rules:
+    - "List all diagnostic modalities used"
+    - "Include imaging, biopsy, lab tests"
+    - "Specify if multiple methods used"
+  few_shot_examples:
+    - input: "VATS-guided wedge resection was performed with biopsies from right lung."
+      output: "VATS wedge resection with biopsy"
+      quote: "VATS-guided wedge resection"
+
+# ============ RATE FIELDS ============
+
+mortality_rate:
+  description: "Death rate among study participants"
+  field_type: rate
+  extraction_rules:
+    - "Express as decimal (0-1) not percentage"
+    - "Convert percentages: 45% = 0.45"
+    - "Specify follow-up period if mentioned"
+  few_shot_examples:
+    - input: "The 30-day mortality rate was 12%."
+      output: 0.12
+      quote: "mortality rate was 12%"
+    - input: "3 of 25 patients died during follow-up."
+      output: 0.12
+      quote: "3 of 25 patients died"

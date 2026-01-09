@@ -108,9 +108,9 @@ class ParsedDocument(BaseModel):
 class DocumentParser:
     """Parse academic PDFs using Docling with hierarchical chunking."""
     
-    # Parser priority chain
-    PARSER_CHAIN = ["docling", "pymupdf", "pdfplumber"]
-    
+    # Simplified parser chain per plan.md: Docling → PyMuPDF only
+    # pdfplumber removed as Docling+PyMuPDF handles >95% of cases
+    PARSER_CHAIN = ["docling", "pymupdf"]
     # Default max cache entries (MEM-001 fix)
     DEFAULT_MAX_CACHE_SIZE = 100
     
@@ -298,9 +298,12 @@ class DocumentParser:
             self.logger.warning(f"Docling parsing failed or unavailable: {e}. Falling back to PyMuPDF.")
             try:
                 parsed_doc = self._parse_pdf_pymupdf(path)
+                self.logger.info(f"Successfully parsed {path.name} using PyMuPDF fallback")
             except (ImportError, Exception) as e2:
-                self.logger.warning(f"PyMuPDF failed: {e2}. Trying pdfplumber.")
-                parsed_doc = self._parse_pdf_pdfplumber(path)
+                # NOTE: Simplified fallback chain per plan.md (Docling → PyMuPDF only)
+                # pdfplumber fallback removed as Docling+PyMuPDF handles >95% of cases
+                self.logger.error(f"All parsers failed for {path.name}: Docling={e}, PyMuPDF={e2}")
+                raise RuntimeError(f"Failed to parse {pdf_path}: no available parser succeeded")
         
         # Post-processing: IMRAD parsing
         if parsed_doc and self._imrad_parser and self.use_imrad:

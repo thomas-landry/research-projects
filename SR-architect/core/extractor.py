@@ -21,6 +21,8 @@ class EvidenceItem(BaseModel):
     exact_quote: Optional[str] = Field(default="", description="Verbatim quote from source text supporting this value")
     page_number: Optional[int] = Field(default=None, description="Page number if known")
     chunk_index: Optional[int] = Field(default=None, description="Index of source chunk")
+    start_char: Optional[int] = Field(default=None, description="Start character index in source")
+    end_char: Optional[int] = Field(default=None, description="End character index in source")
     confidence: float = Field(ge=0.0, le=1.0, default=0.9, description="Confidence in extraction accuracy")
     
     @field_validator('exact_quote', mode='before')

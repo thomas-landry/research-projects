@@ -1,0 +1,233 @@
+# SR-Architect Configuration Example
+# Copy to config.yaml and customize for your environment
+#
+# Documentation: docs/HYBRID_PIPELINE.md
+# 
+# ============================================================
+
+# ============ LLM Provider Settings ============
+llm:
+  # Primary provider: "openrouter" or "ollama"
+  provider: "ollama"
+  
+  # Default model for extraction
+  model: "qwen3:14b"
+  
+  # Temperature for extraction (lower = more deterministic)
+  temperature: 0.1
+  
+  # Maximum tokens for generation
+  max_tokens: 4096
+
+# ============ Ollama Settings (Local LLM) ============
+ollama:
+  # Ollama server URL
+  base_url: "http://localhost:11434"
+  
+  # Primary local model (default: Qwen3-14B)
+  # Recommended: qwen3:14b (~9GB VRAM at Q4_K_M)
+  primary_model: "qwen3:14b"
+  
+  # Lightweight model for simple fields
+  # Recommended: qwen3:4b (~3GB VRAM at Q4_K_M)  
+  lightweight_model: "qwen3:4b"
+  
+  # Maximum concurrent requests
+  concurrency: 2
+  
+  # Request timeout (seconds)
+  timeout: 120
+  
+  # VRAM limit (GB) - set based on your GPU
+  # vram_limit: 12
+
+# ============ Cloud LLM Settings ============
+openrouter:
+  # API key (or set OPENROUTER_API_KEY env var)
+  api_key: "${OPENROUTER_API_KEY}"
+  
+  # Cloud model for escalation
+  model: "anthropic/claude-3.5-sonnet"
+  
+  # Maximum tokens
+  max_tokens: 4096
+  
+  # Rate limit (requests per minute)
+  rate_limit: 60
+
+# ============ Hybrid Pipeline Settings ============
+hybrid:
+  # Enable hybrid mode (local-first with cloud escalation)
+  enabled: true
+  
+  # Confidence threshold for local model acceptance
+  # Below this, escalate to cloud
+  confidence_threshold: 0.85
+  
+  # Enable self-consistency voting for critical fields
+  self_consistency:
+    enabled: true
+    num_votes: 3
+    temperature: 0.3
+    tolerance: 0.05  # 5% variance tolerance
+    
+  # Fields requiring self-consistency voting
+  critical_fields:
+    - sample_size
+    - case_count
+    - mean_age
+    - median_age
+    - mortality_rate
+    - survival_rate
+
+# ============ Tier Routing ============
+# See also: config/field_routing.yaml for detailed field mappings
+tiers:
+  # Tier 0: Regex extraction (no LLM)
+  tier_0:
+    enabled: true
+    fields:
+      - doi
+      - publication_year
+      - case_count
+      - sample_size
+      - patient_age
+  
+  # Tier 1: Lightweight local model
+  tier_1_lightweight:
+    model: "qwen3:4b"
+    confidence_threshold: 0.90
+    fields:
+      - patient_sex
+      - study_type
+      - country
+      
+  # Tier 1: Standard local model
+  tier_1_standard:
+    model: "qwen3:14b"
+    confidence_threshold: 0.85
+    
+  # Tier 2: Cloud model escalation
+  tier_2:
+    model: "anthropic/claude-3.5-sonnet"
+    confidence_threshold: 0.80
+    
+  # Tier 3: Manual review queue
+  tier_3:
+    enabled: true
+    queue_path: ".cache/manual_review.db"
+
+# ============ Caching Settings ============
+cache:
+  # Enable extraction caching
+  enabled: true
+  
+  # Cache database path
+  db_path: ".cache/extraction_cache.db"
+  
+  # Parser version (increment to invalidate parse cache)
+  parser_version: "1.0.0"
+  
+  # Schema version (increment to invalidate extraction cache)
+  schema_version: "1.0.0"
+  
+  # Maximum cache age (days) - 0 = no expiration
+  max_age_days: 0
+  
+  # Log cache hit/miss stats
+  log_stats: true
+
+# ============ Validation Settings ============
+validation:
+  # Enable automatic validation
+  enabled: true
+  
+  # Enable auto-correction of common errors
+  auto_correct: true
+  
+  # Range checks for numeric fields
+  range_checks:
+    sample_size: [1, 100000]
+    mean_age: [0, 120]
+    mortality_rate: [0, 1]
+    
+  # Cross-field validation rules
+  cross_field_rules:
+    - "analyzed_n <= enrolled_n"
+    - "mortality_rate + survival_rate <= 1.0"
+
+# ============ Parser Settings ============
+parser:
+  # Use OCR for scanned documents
+  use_ocr: false
+  
+  # Apply IMRAD section parsing
+  use_imrad: false
+  
+  # Extract tables from PDFs
+  extract_tables: true
+  
+  # Maximum cache size (number of documents)
+  max_cache_size: 100
+  
+  # Fallback chain: docling -> pymupdf
+  parsers:
+    - docling
+    - pymupdf
+
+# ============ Content Filter Settings ============
+content_filter:
+  # Sections to strip before extraction
+  strip_sections:
+    - references
+    - acknowledgments
+    - bibliography
+    - supplementary
+    - author_info
+    
+  # Minimum content ratio after filtering (0-1)
+  min_content_ratio: 0.3
+
+# ============ Extraction Settings ============
+extraction:
+  # Default schema
+  default_schema: "case_report"
+  
+  # Hierarchical extraction mode
+  hierarchical: false
+  
+  # Maximum iterations for checker feedback
+  max_iterations: 3
+  
+  # Score threshold for validation pass
+  score_threshold: 0.85
+  
+  # Number of parallel workers
+  workers: 1
+  
+  # Enable vectorization to ChromaDB
+  vectorize: true
+
+# ============ Output Settings ============
+output:
+  # Default output directory
+  directory: "./output"
+  
+  # CSV output file
+  csv_file: "extraction_results.csv"
+  
+  # Enable JSON output alongside CSV
+  json_output: false
+  
+  # Log file path
+  log_file: "sr_architect.log"
+  
+  # Token usage tracking
+  token_log: "token_usage.jsonl"
+
+# ============ API Keys ============
+# Set via environment variables (recommended) or here
+# api_keys:
+#   openrouter: "${OPENROUTER_API_KEY}"
+#   anthropic: "${ANTHROPIC_API_KEY}"
+#   openai: "${OPENAI_API_KEY}"

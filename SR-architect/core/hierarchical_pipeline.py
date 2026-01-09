@@ -10,9 +10,10 @@ Refactored to be stateless and component-driven.
 """
 
 import json
+import hashlib
 from datetime import datetime
 from core import utils
-from typing import Type, TypeVar, Optional, Dict, Any, List
+from typing import Type, TypeVar, Optional, Dict, Any, List, Set
 from dataclasses import dataclass, field
 from pathlib import Path
 from pydantic import BaseModel
@@ -21,8 +22,14 @@ from core.config import settings
 from .parser import ParsedDocument, DocumentChunk
 from .content_filter import ContentFilter, FilterResult
 from .relevance_classifier import RelevanceClassifier, RelevanceResult
+from core.data_types import PipelineResult, IterationRecord, ExtractionLog, ExtractionWarning
+from core.semantic_chunker import SemanticChunker
 from .extractor import StructuredExtractor, ExtractionWithEvidence, EvidenceItem
 from .extraction_checker import ExtractionChecker, CheckerResult
+from .abstract_first_extractor import AbstractFirstExtractor, AbstractExtractionResult
+from .pubmed_fetcher import PubMedFetcher
+from .two_pass_extractor import TwoPassExtractor, ModelCascader, ExtractionTier
+from core.sentence_extractor import SentenceExtractor
 
 # Agents
 from agents.schema_discovery import SchemaDiscoveryAgent, FieldDefinition
@@ -34,117 +41,7 @@ from agents.section_locator import SectionLocatorAgent
 T = TypeVar('T', bound=BaseModel)
 
 
-@dataclass
-class IterationRecord:
-    """Record of a single extraction iteration."""
-    iteration_number: int
-    accuracy_score: float
-    consistency_score: float
-    overall_score: float
-    issues_count: int
-    suggestions: List[str]
 
-
-@dataclass
-class PipelineResult:
-    """Complete result from the hierarchical extraction pipeline."""
-    # Core outputs
-    final_data: Dict[str, Any]
-    evidence: List[Dict[str, Any]]
-    
-    # Validation info
-    final_accuracy_score: float
-    final_consistency_score: float
-    final_overall_score: float
-    passed_validation: bool
-    
-    # Pipeline metadata
-    iterations: int
-    iteration_history: List[IterationRecord] = field(default_factory=list)
-    
-    # Token/filtering stats
-    content_filter_stats: Dict[str, Any] = field(default_factory=dict)
-    relevance_stats: Dict[str, Any] = field(default_factory=dict)
-    
-    # Warnings
-    warnings: List[str] = field(default_factory=list)
-    
-    # Source info
-    source_filename: str = ""
-    extraction_timestamp: str = ""
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to serializable dictionary."""
-        return {
-            "final_data": self.final_data,
-            "evidence": self.evidence,
-            "validation": {
-                "accuracy_score": self.final_accuracy_score,
-                "consistency_score": self.final_consistency_score,
-                "overall_score": self.final_overall_score,
-                "passed": self.passed_validation,
-                "iterations": self.iterations,
-            },
-            "iteration_history": [
-                {
-                    "iteration": r.iteration_number,
-                    "accuracy": r.accuracy_score,
-                    "consistency": r.consistency_score,
-                    "overall": r.overall_score,
-                    "issues": r.issues_count,
-                }
-                for r in self.iteration_history
-            ],
-            "stats": {
-                "content_filter": self.content_filter_stats,
-                "relevance": self.relevance_stats,
-            },
-            "warnings": self.warnings,
-            "source_filename": self.source_filename,
-            "extraction_timestamp": self.extraction_timestamp,
-        }
-    
-    def save_evidence_json(self, output_dir: str) -> str:
-        """Save evidence to a JSON sidecar file."""
-        output_path = Path(output_dir)
-        output_path.mkdir(parents=True, exist_ok=True)
-        
-        # BUG-005 FIX: Sanitize filename to prevent path traversal
-        if self.source_filename:
-            # Extract only the filename, stripping any directory components
-            safe_name = Path(self.source_filename).name
-            # Remove any remaining dangerous characters (keep alphanumeric, dots, underscores, hyphens)
-            safe_name = "".join(c for c in safe_name if c.isalnum() or c in "._-")
-            basename = Path(safe_name).stem if safe_name else "extraction"
-        else:
-            basename = "extraction"
-        
-        evidence_file = output_path / f"{basename}_evidence.json"
-        
-        # Final safety check: ensure file is within output directory
-        if not evidence_file.resolve().is_relative_to(output_path.resolve()):
-            raise ValueError(f"Invalid filename would escape output directory: {self.source_filename}")
-        
-        evidence_data = {
-            "source_file": self.source_filename,
-            "extraction_timestamp": self.extraction_timestamp,
-            "evidence": self.evidence,
-            "validation": {
-                "accuracy_score": self.final_accuracy_score,
-                "consistency_score": self.final_consistency_score,
-                "iterations": self.iterations,
-                "issues_resolved": [
-                    f"Iteration {r.iteration_number}: {r.issues_count} issues"
-                    for r in self.iteration_history
-                    if r.issues_count > 0
-                ],
-            }
-        }
-        
-        with open(evidence_file, 'w') as f:
-            json.dump(evidence_data, f, indent=2)
-        
-        return str(evidence_file)
 
 
 class HierarchicalExtractionPipeline:
@@ -224,7 +121,81 @@ class HierarchicalExtractionPipeline:
             token_tracker=self.token_tracker
         )
         
+        # Initialize abstract-first extraction components
+        self.abstract_extractor = AbstractFirstExtractor()
+        self.pubmed_fetcher = PubMedFetcher()
+        
+        # Initialize two-pass extractor for hybrid mode
+        self.two_pass_extractor = TwoPassExtractor(
+            local_model="qwen3:14b",  # Qwen3-14B per model_evaluation.md
+            cloud_model="gpt-4o-mini",
+        )
+        self.hybrid_mode = False  # Enable via set_hybrid_mode()
+        
+        # Initialize sentence extractor for Excellence integration
+        self.sentence_extractor = SentenceExtractor(
+            provider=provider,
+            model=model, # Consider using cheaper model for sentence level?
+            token_tracker=self.token_tracker
+        )
+        
+        # Initialize semantic chunker for Phase D
+        self.semantic_chunker = SemanticChunker(
+            client=utils.get_async_llm_client(provider=provider)
+        )
+        
+        # Document fingerprint cache for duplicate detection
+        self._fingerprint_cache: Dict[str, PipelineResult] = {}
+        
         self.logger = utils.get_logger("HierarchicalPipeline")
+    
+    def set_hybrid_mode(self, enabled: bool = True) -> None:
+        """
+        Enable or disable hybrid extraction mode.
+        
+        When enabled, uses TwoPassExtractor for local-first extraction.
+        """
+        self.hybrid_mode = enabled
+        self.logger.info(f"Hybrid extraction mode: {'ENABLED' if enabled else 'DISABLED'}")
+
+    async def segment_document(self, text: str, doc_id: Optional[str] = None) -> List[DocumentChunk]:
+        """
+        Segment the document into logical sections using LLM-based semantic chunking (Phase D).
+        """
+        return await self.semantic_chunker.chunk_document_async(text, doc_id)
+    
+    def _compute_fingerprint(self, text: str, max_chars: int = 10000) -> str:
+        """
+        Compute document fingerprint for duplicate detection.
+        
+        Args:
+            text: Document text
+            max_chars: Max characters to use for fingerprint
+            
+        Returns:
+            SHA256 hash of first N characters
+        """
+        content = text[:max_chars].encode('utf-8')
+        return hashlib.sha256(content).hexdigest()
+    
+    def _check_duplicate(self, fingerprint: str) -> Optional[PipelineResult]:
+        """
+        Check if document has already been processed.
+        
+        Args:
+            fingerprint: Document fingerprint
+            
+        Returns:
+            Cached PipelineResult if duplicate, None otherwise
+        """
+        if fingerprint in self._fingerprint_cache:
+            self.logger.info(f"Document duplicate detected (fingerprint: {fingerprint[:8]}...)")
+            return self._fingerprint_cache[fingerprint]
+        return None
+    
+    def _cache_result(self, fingerprint: str, result: PipelineResult) -> None:
+        """Cache extraction result by fingerprint."""
+        self._fingerprint_cache[fingerprint] = result
     
     def _build_context(self, chunks: List[DocumentChunk], max_chars: int = settings.MAX_CONTEXT_CHARS) -> str:
         """Build extraction context from relevant chunks."""
@@ -428,6 +399,30 @@ class HierarchicalExtractionPipeline:
                 best_check = check_result
             
             # Check if passed
+            # === NEW: Phase C Recall Boost ===
+            if check_result.passed:
+                missing_fields = []
+                if hasattr(schema, 'model_fields'):
+                    expected_fields = set(schema.model_fields.keys())
+                    extracted_fields = set(extraction.data.keys())
+                    for field in expected_fields:
+                        val = extraction.data.get(field)
+                        if val is None or val == "" or field not in extracted_fields:
+                            missing_fields.append(field)
+                
+                if missing_fields:
+                    newly_missing = []
+                    for mf in missing_fields:
+                        already_requested = any(mf in p for p in previous_prompts)
+                        if not already_requested:
+                            newly_missing.append(mf)
+                    
+                    if newly_missing:
+                        self.logger.info(f"    Recall Boost: Detected missing fields {newly_missing}, triggering re-extraction.")
+                        check_result.passed = False
+                        recall_prompt = f"The following fields were missing or empty: {', '.join(newly_missing)}. Please review the text again specifically for these values."
+                        check_result.suggestions.append(recall_prompt)
+
             if check_result.passed:
                 self.logger.info(f"  ✓ Passed validation on iteration {iteration + 1}")
                 break
@@ -532,12 +527,78 @@ class HierarchicalExtractionPipeline:
             previous_prompts = revision_prompts.copy() if revision_prompts else []
             
             try:
-                extraction = await self.extractor.extract_with_evidence_async(
-                    context, 
-                    schema, 
-                    filename=document.filename,
-                    revision_prompts=revision_prompts if revision_prompts else None,
-                )
+                # Hybrid Mode Strategy
+                if self.hybrid_mode:
+                    self.logger.info("    Hybrid Mode: Running parallel Sentence Extraction...")
+                    
+                    # 1. Start Sentence Extraction (Async) on full text
+                    # We run this blindly for now, or could filter by field.
+                    # Best to run concurrent with main extraction if possible?
+                    # The current architecture expects 'extraction' object to proceed.
+                    # Let's run sequence for now for simplicity, or gather.
+                    
+                    full_text = self._build_context(relevant_chunks, max_chars=100000) # Get full text
+                    # Use chunks directly
+                    
+                    # Define complex fields to prioritize from sentence extractor
+                    COMPLEX_FIELDS = {
+                        "histopathology", "immunohistochemistry", "imaging_findings",
+                        "presenting_symptoms", "treatment", "outcome", "diagnostic_method"
+                    }
+                    
+                    # Run both standard and sentence extraction in parallel
+                    extraction_task = self.extractor.extract_with_evidence_async(
+                        context, 
+                        schema, 
+                        filename=document.filename,
+                        revision_prompts=revision_prompts if revision_prompts else None,
+                    )
+                    
+                    sentence_task = self.sentence_extractor.extract(relevant_chunks)
+                    
+                    standard_result, sentence_frames = await asyncio.gather(extraction_task, sentence_task)
+                    
+                    # Merge results: Overwrite standard result with sentence result for complex fields
+                    # Convert frames to evidence format
+                    
+                    extraction = standard_result
+                    
+                    # Process sentence frames
+                    for frame in sentence_frames:
+                        text = frame.text
+                        attr = frame.content
+                        field_type = attr.get("entity_type")
+                        
+                        if field_type and text and field_type in COMPLEX_FIELDS:
+                            # Update data
+                            extraction.data[field_type] = text
+                            
+                            # Filter out old evidence
+                            extraction.evidence = [e for e in extraction.evidence if e.field_name != field_type]
+                            
+                            # Add new evidence with provenance
+                            from .extractor import EvidenceItem
+                            extraction.evidence.append(EvidenceItem(
+                                field_name=field_type,
+                                extracted_value=text,
+                                exact_quote=text,
+                                confidence=0.95,
+                                start_char=frame.start_char,
+                                end_char=frame.end_char,
+                                context=None
+                            ))
+                            
+                    self.logger.info(f"    Hybrid merge complete. {len(sentence_frames)} sentence frames processed.")
+                    
+                else:
+                    # Legacy Mode
+                    extraction = await self.extractor.extract_with_evidence_async(
+                        context, 
+                        schema, 
+                        filename=document.filename,
+                        revision_prompts=revision_prompts if revision_prompts else None,
+                    )
+                    
             except Exception as e:
                 warnings.append(f"Async extraction failed on iteration {iteration + 1}: {str(e)}")
                 self.logger.info(f"    ERROR: {str(e)}")
@@ -590,6 +651,31 @@ class HierarchicalExtractionPipeline:
                 best_result = extraction
                 best_check = check_result
             
+            # === NEW: Phase C Recall Boost ===
+            if check_result.passed:
+                missing_fields = []
+                if hasattr(schema, 'model_fields'):
+                    expected_fields = set(schema.model_fields.keys())
+                    extracted_fields = set(extraction.data.keys())
+                    for field in expected_fields:
+                        val = extraction.data.get(field)
+                        if val is None or val == "" or field not in extracted_fields:
+                            missing_fields.append(field)
+                
+                if missing_fields:
+                    newly_missing = []
+                    for mf in missing_fields:
+                        already_requested = any(mf in p for p in previous_prompts)
+                        if not already_requested:
+                            newly_missing.append(mf)
+                    
+                    if newly_missing:
+                        self.logger.info(f"    Recall Boost: Detected missing fields {newly_missing}, triggering re-extraction.")
+                        check_result.passed = False
+                        check_result.overall_score *= 0.9 # Penalize for incompleteness
+                        recall_prompt = f"The following fields were missing or empty: {', '.join(newly_missing)}. Please review the text again specifically for these values."
+                        check_result.suggestions.append(recall_prompt)
+
             if check_result.passed:
                 self.logger.info(f"  ✓ Passed validation on iteration {iteration + 1}")
                 break

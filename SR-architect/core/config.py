@@ -43,3 +43,12 @@ class Settings(BaseSettings):
 
 # Singleton instance
 settings = Settings()
+
+MODEL_ALIASES = {
+    "gemini": "google/gemini-2.0-flash-lite-001",
+    "flash": "google/gemini-2.0-flash-lite-001",
+    "sonnet": "anthropic/claude-3.5-sonnet",
+    "haiku": "anthropic/claude-3-haiku",
+    "gpt4o": "openai/gpt-4o",
+    "llama3": "llama3.1:8b",
+}

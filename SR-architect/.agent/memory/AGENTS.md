@@ -1,5 +1,7 @@
 # SR-Architect Agent Context
 
+> ⚠️ **All agents MUST read [lessons_learned.md](lessons_learned.md) before executing tasks.**
+
 ## Project Identity
 
 SR-Architect is an **Agentic ETL pipeline** for systematic review data extraction. It transforms screened PDFs into analysis-ready structured data with near-100% accuracy and full audit trails.

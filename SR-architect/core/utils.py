@@ -252,5 +252,82 @@ def get_async_llm_client(
         raise RuntimeError(f"Failed to initialize Async LLM client for {provider}: {e}")
 
 
+# === Robust JSON Parsing (from llm-ie) ===
+
+def _find_dict_strings(text: str) -> List[str]:
+    """
+    Extracts balanced JSON-like dictionaries from a string, even if nested.
+    """
+    open_brace = 0
+    start = -1
+    json_objects = []
+
+    for i, char in enumerate(text):
+        if char == '{':
+            if open_brace == 0:
+                start = i 
+            open_brace += 1
+        elif char == '}':
+            open_brace -= 1
+            if open_brace == 0 and start != -1:
+                json_objects.append(text[start:i + 1])
+                start = -1
+
+    return json_objects
+
+def extract_json(gen_text: str) -> List[Dict[str, Any]]:
+    """ 
+    Extracts and repairs JSON objects from generated text.
+    Uses json_repair for handling malformed LLM outputs.
+    """
+    import json_repair
+    
+    out = []
+    # simplified logic: try repairing whole text first
+    try:
+        parsed = json_repair.repair_json(gen_text, return_objects=True)
+        if isinstance(parsed, list):
+            return parsed
+        if isinstance(parsed, dict):
+            return [parsed]
+    except Exception:
+        pass
+        
+    # Fallback: Extract individual dict-like strings
+    dict_str_list = _find_dict_strings(gen_text)
+    for dict_str in dict_str_list:
+        try:
+            dict_obj = json_repair.repair_json(dict_str, return_objects=True)
+            if isinstance(dict_obj, dict):
+                out.append(dict_obj)
+            elif isinstance(dict_obj, list):
+                out.extend(dict_obj)
+        except Exception as e:
+            logger.warning(f"Failed to repair JSON segment: {e}")
+            
+    return out
+
+def apply_prompt_template(prompt_template: str, text_content: Any) -> str:
+    """
+    Apply text_content to prompt_template placeholder {{...}}.
+    Adaptation of llm-ie logic.
+    """
+    import re
+    pattern = re.compile(r'{{(.*?)}}')
+    
+    if isinstance(text_content, str):
+        # Single replacement
+        return pattern.sub(lambda m: text_content, prompt_template)
+    
+    if isinstance(text_content, dict):
+        # Key-based replacement
+        def replace(match):
+            key = match.group(1).strip()
+            return str(text_content.get(key, match.group(0)))
+        return pattern.sub(replace, prompt_template)
+        
+    return prompt_template
+
+
 
 

@@ -8,7 +8,10 @@ Creates Pydantic models at runtime based on user input.
 from dataclasses import dataclass
 from typing import Dict, Any, List, Optional, Type, get_type_hints, Union, Annotated
 from pydantic import BaseModel, Field, create_model, BeforeValidator
+from pydantic import BaseModel, Field, create_model, BeforeValidator
 from enum import Enum
+import pandas as pd
+import re
 
 
 class FieldType(str, Enum):
@@ -105,12 +108,14 @@ def build_extraction_model(
         # Note: Flexible types are already Optional-ish due to logic, 
         # but we keep the structure for consistency.
         
-        # Handle optional fields
+        # Always allow None/Null for LLM extraction robustness
+        python_type = Optional[python_type]
+        
+        # Handle optional fields (Key presence)
         if not field_def.required:
-            python_type = Optional[python_type]
             default = None
         else:
-            default = ...  # Required field marker
+            default = ...  # Required field marker (Key must be present in JSON)
         
         # Main field
         field_definitions[field_def.name] = (
@@ -311,6 +316,75 @@ def interactive_schema_builder() -> List[FieldDefinition]:
         
         console.print(table)
     
+    return fields
+
+
+def infer_schema_from_csv(csv_path: str, header_line: int = 1) -> List[FieldDefinition]:
+    """
+    Infer extraction schema from a template CSV.
+    
+    Args:
+        csv_path: Path to the CSV file
+        header_line: 0-indexed line number containing headers (default 1 for 2nd line)
+        
+    Returns:
+        List of FieldDefinition objects
+    """
+    # Read CSV, skipping metadata lines if needed
+    try:
+        df = pd.read_csv(csv_path, header=header_line)
+    except Exception as e:
+        print(f"Error reading CSV: {e}")
+        # Fallback to reading with default header if header_line fails or is wrong
+        df = pd.read_csv(csv_path)
+
+    fields = []
+    
+    for col in df.columns:
+        # Clean column name
+        raw_name = str(col).strip()
+        if not raw_name or "Unnamed" in raw_name:
+            continue
+            
+        clean_name = re.sub(r'[^a-zA-Z0-9_]', '_', raw_name.lower())
+        clean_name = re.sub(r'_+', '_', clean_name).strip('_')
+        
+        # Infer type from non-null values
+        sample_values = df[col].dropna()
+        
+        field_type = FieldType.TEXT # Default
+        
+        if not sample_values.empty:
+            # Check for boolean/integer flags (0/1)
+            is_binary = sample_values.apply(lambda x: str(x).strip() in ['0', '1', '0.0', '1.0']).all()
+            
+            if is_binary:
+                field_type = FieldType.INTEGER
+            elif pd.api.types.is_numeric_dtype(sample_values):
+                # Distinguish int vs float
+                if all(sample_values % 1 == 0):
+                    field_type = FieldType.INTEGER
+                else:
+                    field_type = FieldType.FLOAT
+            else:
+                # Check if it looks like a list
+                # (Simple heuristic: contains commas or semicolons?)
+                # For now, default to TEXT as our parsers handle coercing to string
+                field_type = FieldType.TEXT
+
+        # Determine if required (heuristic: if all rows have value)
+        # However, for template CSVs, often they are empty or have sparse examples.
+        # Safer to make everything optional unless specified otherwise.
+        required = True 
+
+        fields.append(FieldDefinition(
+            name=clean_name,
+            description=f"Extracted from column '{raw_name}'",
+            field_type=field_type,
+            required=required,
+            include_quote=True # Default to True for traceability
+        ))
+        
     return fields
 
 

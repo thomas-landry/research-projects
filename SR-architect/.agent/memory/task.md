@@ -150,6 +150,11 @@ OUTPUT: Update README.md, create CHANGELOG.md
 | 2026-01-07T11:45 | Docs Agent | All Agents | **Freshness Review**: Updated CODE_MAP.md and OPTIMIZATION.md. Verified 4 other docs. All docs now ✅ Fresh. |
 | 2026-01-07T11:48 | Orchestrator | All Agents | **Manifest Sync**: Added completed Phase 7 (Memory Optimization) to shared task list. |
 | 2026-01-07T11:55 | Senior Dev | Orchestrator | **Fix Complete**: Resolved TEST-001 and TEST-002. All tests passing. Track archived. |
+| 2026-01-08T07:15 | Orchestrator | All Agents | **Track Started**: Pipeline Optimization v2. Verified Phase 2 components exist. Routing to Senior Dev for remaining tasks. |
+| 2026-01-08T07:22 | Orchestrator | Senior Dev | **Verification Complete**: 121 tests passed. Phase 2 components verified: PubMedFetcher, ContentFilter, ComplexityClassifier, field_routing.yaml. Proceed with AbstractFirstExtractor. |
+| 2026-01-08T07:30 | Senior Dev | Orchestrator | **Phase 2.A Complete**: AbstractFirstExtractor (7 tests), document fingerprinting, pipeline integration. 128 tests pass. Ready for Phase 3. |
+| 2026-01-08T07:35 | Senior Dev | Orchestrator | **Phase 3 Progress**: TwoPassExtractor (6 tests) and ModelCascader implemented. 134 tests pass. Local-first extraction strategy ready. |
+| 2026-01-08T08:15 | Senior Dev | Orchestrator | **Phase 4 Complete**: CacheManager (SQLite), ValidationRules, AutoCorrector. 148 tests pass (+14 new). |
 
 ---
 
@@ -222,6 +227,37 @@ SR-architect/
 
 ---
 
-## �🔒 Manifest Version
-**v1.1** | Schema: SR-ARCHITECT-TASK-MANIFEST-V1
+## Phase 8: Pipeline Optimization v2 🚀 IN PROGRESS
+Owner: `Orchestrator → Senior Dev`
+Track: `conductor/tracks/pipeline_optimization_v2_20250107/`
+
+### Phase 2.A: Smart Parsing & Metadata (Current)
+- [x] Verify existing `PubMedFetcher` implementation
+- [x] Verify existing `ContentFilter` implementation  
+- [x] Verify existing `ComplexityClassifier` implementation
+- [x] Verify existing `field_routing.yaml` configuration
+- [x] Create `AbstractFirstExtractor` for abstract-based extraction ✅ 2026-01-08
+- [x] Add document fingerprinting for duplicate detection ✅ 2026-01-08
+- [x] Verify parsing improvements against golden dataset ✅ 79.5% semantic match
+
+### Phase 3.A: Hybrid Extraction Core ✅ COMPLETE
+- [x] Implement `TwoPassExtractor` with local-first strategy ✅ 2026-01-08
+- [x] Create `ModelCascader` for tier escalation ✅ 2026-01-08
+- [x] Integrate TwoPassExtractor into pipeline ✅ 2026-01-08
+- [x] Added `set_hybrid_mode()` toggle ✅ 2026-01-08
+- [x] Updated to Qwen3-14B per model_evaluation.md ✅ 2026-01-08
+
+### Phase 4.A: Caching & Validation ✅ COMPLETE
+- [x] Create SQLite schema in `CacheManager` ✅ 2026-01-08
+- [x] Implement `CacheManager` class (document/field cache) ✅ 2026-01-08
+- [x] Implement `ValidationRules` (range/cross-field checks) ✅ 2026-01-08
+- [x] Implement `AutoCorrector` (OCR/percentage fixes) ✅ 2026-01-08
+- [x] All 14 Phase 4 tests pass ✅ 2026-01-08
+
+### Phase 5.A: Integration & Documentation 🚀 READY
+
+---
+
+## 🔒 Manifest Version
+**v1.2** | Schema: SR-ARCHITECT-TASK-MANIFEST-V1
 

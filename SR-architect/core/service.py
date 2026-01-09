@@ -12,6 +12,7 @@ from .state_manager import StateManager
 from .token_tracker import TokenTracker
 from .audit_logger import AuditLogger
 from .schema_builder import build_extraction_model, FieldDefinition
+from .schema_chunker import merge_extraction_results
 from .utils import get_logger, setup_logging
 
 logger = get_logger("ExtractionService")
@@ -63,6 +64,8 @@ class ExtractionService:
         examples: Optional[str] = None,
         vectorize: bool = True,
         limit: Optional[int] = None,
+        hybrid_mode: bool = True,  # COST-001: Enable hybrid local-first extraction
+        schema_chunks: Optional[List[List[FieldDefinition]]] = None,  # Schema chunking for cost optimization
         callback: Optional[Callable[[str, Any, str], None]] = None
     ) -> Dict[str, Any]:
         """
@@ -100,6 +103,11 @@ class ExtractionService:
             examples=examples,
             token_tracker=self.tracker
         )
+        
+        # COST-001: Enable hybrid mode for local-first extraction
+        if hybrid_mode:
+            pipeline.set_hybrid_mode(True)
+            logger.info("Hybrid mode ENABLED: prioritizing local models (Ollama)")
         
         # For non-hierarchical mode, we still use the pipeline's components 
         # but call extract_document which handles the logic.
@@ -169,24 +177,95 @@ class ExtractionService:
                 if callback:
                     callback(filename, data, status)
 
-            if hierarchical:
-                import asyncio
-                asyncio.run(batch_executor.process_batch_async(
-                    documents=parsed_docs,
-                    schema=ExtractionModel,
-                    theme=theme,
-                    resume=resume,
-                    callback=internal_callback,
-                    concurrency_limit=workers
-                ))
+            # Handle schema chunking if enabled
+            if schema_chunks:
+                logger.info(f"Schema chunking enabled: {len(schema_chunks)} chunks")
+                
+                # Store chunk results per document
+                chunk_results_by_doc = {}
+                
+                for chunk_idx, chunk_fields in enumerate(schema_chunks):
+                    logger.info(f"Processing chunk {chunk_idx + 1}/{len(schema_chunks)}")
+                    
+                    # Build model for this chunk
+                    ChunkModel = build_extraction_model(chunk_fields, f"ChunkModel_{chunk_idx}")
+                    
+                    # Run extraction for this chunk
+                    def chunk_callback(filename, data, status):
+                        if status == "success":
+                            if filename not in chunk_results_by_doc:
+                                chunk_results_by_doc[filename] = []
+                            
+                            extracted_data = data
+                            if "final_data" in data:
+                                extracted_data = data["final_data"]
+                            
+                            chunk_results_by_doc[filename].append(extracted_data)
+                        else:
+                            failed_files.append((filename, f"Chunk {chunk_idx}: {str(data)}"))
+                    
+                    if hierarchical:
+                        import asyncio
+                        asyncio.run(batch_executor.process_batch_async(
+                            documents=parsed_docs,
+                            schema=ChunkModel,
+                            theme=theme,
+                            resume=False,  # Don't resume for chunks
+                            callback=chunk_callback,
+                            concurrency_limit=workers
+                        ))
+                    else:
+                        batch_executor.process_batch(
+                            documents=parsed_docs,
+                            schema=ChunkModel,
+                            theme=theme,
+                            resume=False,
+                            callback=chunk_callback
+                        )
+                
+                # Merge chunk results and write to CSV
+                for filename, chunk_results in chunk_results_by_doc.items():
+                    merged_data = merge_extraction_results(chunk_results)
+                    row = {k: v for k, v in merged_data.items() if k in fieldnames}
+                    writer.writerow(row)
+                    f.flush()
+                    
+                    # Call user callback
+                    if callback:
+                        callback(filename, merged_data, "success")
+                    
+                    # Handle Vectorization
+                    if vector_store:
+                        doc = next((d for d in parsed_docs if d.filename == filename), None)
+                        if doc:
+                            try:
+                                import asyncio
+                                import functools
+                                loop = asyncio.get_running_loop()
+                                func = functools.partial(vector_store.add_chunks_from_parsed_doc, doc, extracted_data=merged_data)
+                                loop.run_in_executor(None, func)
+                            except RuntimeError:
+                                vector_store.add_chunks_from_parsed_doc(doc, extracted_data=merged_data)
             else:
-                batch_executor.process_batch(
-                    documents=parsed_docs,
-                    schema=ExtractionModel,
-                    theme=theme,
-                    resume=resume,
-                    callback=internal_callback
-                )
+                # Normal (non-chunked) extraction
+                if hierarchical:
+                    import asyncio
+                    asyncio.run(batch_executor.process_batch_async(
+                        documents=parsed_docs,
+                        schema=ExtractionModel,
+                        theme=theme,
+                        resume=resume,
+                        callback=internal_callback,
+                        concurrency_limit=workers
+                    ))
+                else:
+                    batch_executor.process_batch(
+                        documents=parsed_docs,
+                        schema=ExtractionModel,
+                        theme=theme,
+                        resume=resume,
+                        callback=internal_callback
+                    )
                 
         # 9. Return Summary
         summary = self.tracker.get_session_summary()
