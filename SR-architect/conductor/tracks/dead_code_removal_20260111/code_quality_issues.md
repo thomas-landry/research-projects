@@ -57,9 +57,12 @@
 | `core/extraction_checker.py` | 508 | Split validation logic by type |
 | `core/parser.py` | 499 | Split parsing strategies |
 | `core/binary_deriver.py` | 603 | Extract domain-specific rules |
+| `agents/orchestrator_pi.py` | 488 | Split into: orchestrator_core.py, orchestrator_phases.py |
+| `agents/schema_discovery.py` | 468 | Split into: discovery_agent.py, field_unification.py |
 | `core/token_tracker.py` | 462 | Split tracking vs. pricing logic |
 | `core/relevance_classifier.py` | 468 | Split classification strategies |
 | `core/cache_manager.py` | 415 | Split caching strategies |
+| `agents/screener.py` | 406 | Split screening strategies |
 | `core/schema_builder.py` | 402 | Split type coercion vs. model building |
 
 ### Magic Numbers

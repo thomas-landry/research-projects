@@ -47,6 +47,16 @@
 | `core/complexity_classifier.py` | 7.4KB | ⚠️ Test-only (`verify_phase2_integration.py`) | **REVIEW** - Keep if future feature |
 | `core/fuzzy_deduplicator.py` | 4.4KB | ⚠️ Test-only (`verify_phase3_integration.py`) | **REVIEW** - Keep if future feature |
 
+### Agents Directory - Unused Modules
+
+| File | Size | Usage | Action |
+|------|------|-------|--------|
+| `agents/researcher_analysis.py` | 79 lines | ❌ No imports found (standalone script) | **DELETE** ✅ |
+| `agents/conflict_resolver.py` | 113 lines | ⚠️ Imported in hierarchical_pipeline.py but **never used** | **DELETE** ✅ |
+| `agents/section_locator.py` | 92 lines | ⚠️ Imported in hierarchical_pipeline.py but **never used** | **DELETE** ✅ |
+
+**Note**: `meta_analyst.py` IS used (hierarchical_pipeline.py:792) - KEEP ✅
+
 ### Associated Test Files
 | File | Reason | Action |
 |------|--------|--------|
@@ -105,23 +115,25 @@
 
 ## Summary
 
-**Total Dead Files**: 11 (was 8, updated after continued scan)  
-**Total Dead Code (LOC)**: ~3,900+ lines  
-**Unused Imports**: 12+  
+**Total Dead Files**: 14 (was 11, updated after agents/ scan)  
+**Total Dead Code (LOC)**: ~4,200+ lines  
+**Unused Imports**: 15+  
 **Unused Variables**: 10+
 
 **Files to Delete**:
 1. `core/abstract_first_extractor.py` (14.5KB)
 2. `core/pubmed_fetcher.py` (11.8KB)
-3. `core/auto_corrector.py` (6.2KB) - NEW
-4. `core/validation_rules.py` (7.6KB) - NEW
-5. `core/self_consistency.py` (9.2KB) - NEW
-6. `tests/test_abstract_first.py`
-7. `tests/test_two_pass_gemini.py`
-8. `tests/test_two_pass_premium.py`
-9. `agents/researcher_analysis.py`
-10. `debug_openrouter_pricing.py`
-11. `temp_healy/` directory
+3. `core/auto_corrector.py` (6.2KB)
+4. `core/validation_rules.py` (7.6KB)
+5. `core/self_consistency.py` (9.2KB)
+6. `agents/researcher_analysis.py` (79 lines) - NEW
+7. `agents/conflict_resolver.py` (113 lines) - NEW
+8. `agents/section_locator.py` (92 lines) - NEW
+9. `tests/test_abstract_first.py`
+10. `tests/test_two_pass_gemini.py`
+11. `tests/test_two_pass_premium.py`
+12. `debug_openrouter_pricing.py`
+13. `temp_healy/` directory
 
 **Files to Restore Integration**:
 - `core/regex_extractor.py` (integration deleted, needs restore)
