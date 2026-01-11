@@ -31,20 +31,36 @@
 
 ---
 
-## 🟡 Code Smells
+## 🟡 Code Smells (Refactor-for-Clarity Scan)
+
+### Deep Nesting (>3 levels of indentation)
+| File | Lines | Nesting Depth | Recommendation |
+|------|-------|---------------|----------------|
+| `core/hierarchical_pipeline.py` | 380+ instances | 4-5 levels | Extract nested logic into helper methods |
+| `core/service.py` | Lines 271-357 | 4-5 levels | Extract schema chunking to separate method |
+| `core/extraction_checker.py` | Multiple | 4 levels | Use early returns to reduce nesting |
 
 ### Large Functions (>50 lines doing multiple things)
 | File | Function | Lines | Issues |
 |------|----------|-------|--------|
-| `core/service.py` | `run_extraction` | ~235 (159-393) | Does everything: setup, parsing, execution, callbacks, vectorization. Needs extraction into smaller methods |
-| `core/hierarchical_pipeline.py` | `extract_document` | ~260 (301-562) | Main extraction loop with nested conditionals. Extract validation, caching, recall boost logic |
-| `core/hierarchical_pipeline.py` | `extract_document_async` | ~230 (564-793) | Duplicate of sync version with async. Consider shared logic |
+| `core/service.py` | `run_extraction` | ~225 (53-278) | Does everything: setup, parsing, execution, callbacks, vectorization. **NEEDS EXTRACTION** |
+| `core/hierarchical_pipeline.py` | `extract_document` | ~185 (291-476) | Main extraction loop with nested conditionals. Extract validation, caching, recall boost logic |
+| `core/hierarchical_pipeline.py` | `extract_document_async` | ~242 (478-720) | Duplicate of sync version with async. Consider shared logic |
+| `core/extraction_checker.py` | File total | 508 lines | Multiple large validation functions |
+| `core/extractor.py` | File total | 654 lines | Needs modularization |
 
-### Deep Nesting (>3 levels)
-| File | Location | Issue |
-|------|----------|-------|
-| `core/service.py` | Lines 271-357 | Schema chunking logic nested 4-5 levels deep |
-| `core/hierarchical_pipeline.py` | Lines 467-492 | Recall boost logic with nested if/for loops |
+### Very Large Files (>400 lines)
+| File | Lines | Recommendation |
+|------|-------|----------------|
+| `core/hierarchical_pipeline.py` | 824 | Split into: pipeline_core.py, pipeline_async.py, pipeline_utils.py |
+| `core/extractor.py` | 654 | Split into: extractor_base.py, extractor_structured.py |
+| `core/extraction_checker.py` | 508 | Split validation logic by type |
+| `core/parser.py` | 499 | Split parsing strategies |
+| `core/binary_deriver.py` | 603 | Extract domain-specific rules |
+| `core/token_tracker.py` | 462 | Split tracking vs. pricing logic |
+| `core/relevance_classifier.py` | 468 | Split classification strategies |
+| `core/cache_manager.py` | 415 | Split caching strategies |
+| `core/schema_builder.py` | 402 | Split type coercion vs. model building |
 
 ### Magic Numbers
 | File | Line | Value | Should Be |
@@ -53,12 +69,15 @@
 | `core/client.py` | 51 | `sleep(1)` | `PROCESS_KILL_GRACE_PERIOD = 1.0` |
 | `core/client.py` | 157 | `sleep(2)`, `range(5)` | `OLLAMA_RESTART_POLL_INTERVAL = 2.0`, `OLLAMA_RESTART_MAX_ATTEMPTS = 5` |
 | `core/service.py` | 173 | `hybrid_mode: bool = True` | Should be from settings, not hardcoded default |
+| `core/hierarchical_pipeline.py` | 110 | `"anthropic/claude-3-haiku"` hardcoded | Use constant `FALLBACK_MODEL` |
+| `core/hierarchical_pipeline.py` | 130-131 | `"qwen3:14b"`, `"gpt-4o-mini"` | Use config constants |
 
 ### Ambiguous Names
 | File | Variable | Better Name |
 |------|----------|-------------|
 | `core/service.py` | `f` (line 255) | `csv_file` or `output_file` |
 | `core/service.py` | `i` (line 156) | `attempt` or `retry_count` |
+| Multiple files | `data`, `result`, `res` | Context-specific names |
 
 ---
 
