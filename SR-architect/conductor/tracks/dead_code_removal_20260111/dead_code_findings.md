@@ -132,8 +132,9 @@
 9. `tests/test_abstract_first.py`
 10. `tests/test_two_pass_gemini.py`
 11. `tests/test_two_pass_premium.py`
-12. `debug_openrouter_pricing.py`
-13. `temp_healy/` directory
+12. `temp_healy/` directory
+
+**Note**: `debug_openrouter_pricing.py` confirmed missing/already deleted.
 
 **Files to Restore Integration**:
 - `core/regex_extractor.py` (integration deleted, needs restore)

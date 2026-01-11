@@ -64,6 +64,7 @@
 | `core/cache_manager.py` | 415 | Split caching strategies |
 | `agents/screener.py` | 406 | Split screening strategies |
 | `core/schema_builder.py` | 402 | Split type coercion vs. model building |
+| `cli.py` | 588 | Split into command modules (extract, query, etc.) |
 
 ### Magic Numbers
 | File | Line | Value | Should Be |

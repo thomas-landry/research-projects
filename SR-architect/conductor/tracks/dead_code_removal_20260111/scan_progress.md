@@ -10,11 +10,12 @@
 - [x] `agents/` - Full scan with refactor-for-clarity standards (12 files)
 - [x] `schemas/` - Schema definitions (3 files - all active)
 - [x] `prompts/` - Prompt templates (2 files + 1 dir - all active)
+- [x] Root-level scripts (cli.py, prisma_cli.py - 4 files)
 - [x] Schema branching bug - FIXED (139 bugs resolved)
 - [x] Code quality scan - 70+ issues documented
 
 ### 🔄 In Progress
-- [ ] Root-level scripts (cli.py, prisma_cli.py, etc.)
+- [ ] Restoration of deleted integration (regex, twopass)
 
 ### ⏳ Pending
 - [ ] `conductor/` - Workflow and track management
