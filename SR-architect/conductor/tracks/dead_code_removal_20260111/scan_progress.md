@@ -33,15 +33,17 @@
 
 ## Scan Statistics
 
-**Files Scanned**: 12 / ~80 production files  
-**Issues Found**: 45+ code quality issues, 8 dead code files  
-**Dead Code Items**: 8 files confirmed (3 core modules + 3 tests + 2 scripts)  
+**Files Scanned**: 18 / ~80 production files  
+**Issues Found**: 45+ code quality issues, 11 dead code files  
+**Dead Code Items**: 11 files confirmed (6 core modules + 3 tests + 2 scripts)  
 **Code Quality Issues**: 45+ (anti-patterns, code smells, hardcoded values)
+**Regression Found**: 2 extractors with deleted integration (regex, twopass)
 
-**Current Focus**: Scanning `core/` directory for unused modules and dead code
+**Current Focus**: Continuing systematic scan of `core/` directory
 
 ## Next Actions
-1. Complete detailed scan of remaining `core/` files
+1. Complete detailed scan of remaining `core/` files (27 remaining)
 2. Scan `agents/` directory  
 3. Create removal plan for dead code
-4. Address high-priority code quality issues
+4. Create restoration plan for deleted integration
+5. Address high-priority code quality issues

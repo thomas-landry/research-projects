@@ -1,19 +1,51 @@
 # Dead Code Findings Log
 
-**Last Updated**: 2026-01-11 14:35  
-**Status**: Verified
+**Last Updated**: 2026-01-11 14:48  
+**Status**: Verified + Regression Found
+
+---
+
+## 🔴 CRITICAL REGRESSION DISCOVERED
+
+**Integration Code Deleted**: Between commits c45ec9e → HEAD (cleanup commits c86a233/a420b5e)
+
+| Component | Status | Tests | Integration | Action |
+|-----------|--------|-------|-------------|--------|
+| `regex_extractor.py` | ✅ Working | 12/12 passing | ❌ **DELETED** | **RESTORE** integration |
+| `two_pass_extractor.py` | ✅ Working | 6/6 passing | ❌ **DELETED** | **RESTORE** integration |
+
+**What was deleted**:
+- Line 32: `from .regex_extractor import RegexExtractor, RegexResult`
+- Lines 153-155: RegexExtractor initialization
+- Line 387+: Tier 0 extraction logic
+- Integration code that calls the extractors
+
+**Impact**: Pipeline optimization (60-70% cost reduction) is NOT active despite working code.
+
+**Recovery**: Can restore from commit c45ec9e
 
 ---
 
 ## Confirmed Dead Code
 
-### Core Extractors (Legacy)
-| File | Size | Reason | Action |
-|------|------|--------|--------|
-| `core/abstract_first_extractor.py` | 14.5KB | Imported in `hierarchical_pipeline.py:29`. Instantiated as `self.abstract_extractor` (line 129) but **never called**. | **DELETE** ✅ |
-| `core/two_pass_extractor.py` | 22.3KB | Imported in `hierarchical_pipeline.py:31`. Instantiated as `self.two_pass_extractor` (line 140) but **never called**. | **DELETE** ✅ |
-| `core/pubmed_fetcher.py` | 11.8KB | Only used by `abstract_first_extractor.py` (dead code). Also instantiated in `hierarchical_pipeline.py:130` but **never called**. | **DELETE** ✅ |
-| ~~`core/regex_extractor.py`~~ | 9.5KB | **ACTIVELY USED** - Called in `hierarchical_pipeline.py:387`. Part of Tier 0 extraction (pipeline optimization). | **KEEP** ❌ |
+### Core Extractors - Status Update
+
+| File | Size | Tests | Integration | Action |
+|------|------|-------|-------------|--------|
+| `core/abstract_first_extractor.py` | 14.5KB | 6/8 passing | ❌ Never integrated | **DELETE** ✅ |
+| `core/pubmed_fetcher.py` | 11.8KB | N/A | ❌ Only used by abstract_first | **DELETE** ✅ |
+| ~~`core/two_pass_extractor.py`~~ | 22.3KB | ✅ 6/6 passing | ❌ **Integration deleted** | **RESTORE** then KEEP |
+| ~~`core/regex_extractor.py`~~ | 9.5KB | ✅ 12/12 passing | ❌ **Integration deleted** | **RESTORE** then KEEP |
+
+### Additional Unused Core Modules
+
+| File | Size | Usage | Action |
+|------|------|-------|--------|
+| `core/auto_corrector.py` | 6.2KB | ❌ No imports found | **DELETE** ✅ |
+| `core/validation_rules.py` | 7.6KB | ❌ No imports found | **DELETE** ✅ |
+| `core/self_consistency.py` | 9.2KB | ❌ No imports found | **DELETE** ✅ |
+| `core/complexity_classifier.py` | 7.4KB | ⚠️ Test-only (`verify_phase2_integration.py`) | **REVIEW** - Keep if future feature |
+| `core/fuzzy_deduplicator.py` | 4.4KB | ⚠️ Test-only (`verify_phase3_integration.py`) | **REVIEW** - Keep if future feature |
 
 ### Associated Test Files
 | File | Reason | Action |
@@ -73,19 +105,28 @@
 
 ## Summary
 
-**Total Dead Files**: 8 (was 9, corrected after verification)  
-**Total Dead Code (LOC)**: ~3,200+ lines (corrected)  
+**Total Dead Files**: 11 (was 8, updated after continued scan)  
+**Total Dead Code (LOC)**: ~3,900+ lines  
 **Unused Imports**: 12+  
 **Unused Variables**: 10+
 
 **Files to Delete**:
 1. `core/abstract_first_extractor.py` (14.5KB)
-2. `core/two_pass_extractor.py` (22.3KB)
-3. `core/pubmed_fetcher.py` (11.8KB)
-4. `tests/test_abstract_first.py`
-5. `tests/test_two_pass_gemini.py`
-6. `tests/test_two_pass_premium.py`
-7. `agents/researcher_analysis.py`
-8. `debug_openrouter_pricing.py`
+2. `core/pubmed_fetcher.py` (11.8KB)
+3. `core/auto_corrector.py` (6.2KB) - NEW
+4. `core/validation_rules.py` (7.6KB) - NEW
+5. `core/self_consistency.py` (9.2KB) - NEW
+6. `tests/test_abstract_first.py`
+7. `tests/test_two_pass_gemini.py`
+8. `tests/test_two_pass_premium.py`
+9. `agents/researcher_analysis.py`
+10. `debug_openrouter_pricing.py`
+11. `temp_healy/` directory
 
-**Correction Note**: `regex_extractor.py` and `test_regex_integration.py` are **ACTIVE CODE** (used in Tier 0 extraction), not dead code.
+**Files to Restore Integration**:
+- `core/regex_extractor.py` (integration deleted, needs restore)
+- `core/two_pass_extractor.py` (integration deleted, needs restore)
+
+**Files to Review** (test-only usage):
+- `core/complexity_classifier.py` - Keep if future feature
+- `core/fuzzy_deduplicator.py` - Keep if future feature
