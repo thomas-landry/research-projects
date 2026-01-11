@@ -42,7 +42,32 @@ Autonomous agents performing specific lifecycle tasks.
 | `core/vectorizer.py` | ChromaDB wrapper for semantic search. |
 | `core/audit_logger.py` | Structured logging for audits. |
 | `core/parser.py` | PDF parsing (Docling/PyMuPDF). |
-| `core/pubmed_fetcher.py`| PubMed API client with caching and session reuse. |
+| `core/pubmed_fetcher.py`| PubMed API client with caching and session reuse. | **DEAD CODE** - Only used by abstract_first_extractor (also dead) |
+
+## 🔴 Dead Code (To Be Removed)
+| File | Reason | LOC | Action |
+|------|--------|-----|--------|
+| `core/abstract_first_extractor.py` | Never integrated into pipeline | 312 | DELETE |
+| `core/pubmed_fetcher.py` | Only used by abstract_first (dead) | 250 | DELETE |
+| `core/auto_corrector.py` | No imports found | 210 | DELETE |
+| `core/validation_rules.py` | No imports found | 210 | DELETE |
+| `core/self_consistency.py` | No imports found | 286 | DELETE |
+| `tests/test_abstract_first.py` | Tests dead code | - | DELETE |
+| `tests/test_two_pass_gemini.py` | Tests dead code | - | DELETE |
+| `tests/test_two_pass_premium.py` | Tests dead code | - | DELETE |
+| `agents/researcher_analysis.py` | Standalone, never imported | - | DELETE |
+| `debug_openrouter_pricing.py` | One-time debug utility | - | DELETE |
+| `temp_healy/` | Temporary directory | - | DELETE |
+
+**Total**: 11 files, ~3,900 LOC
+
+## ⚠️ Regression Discovered
+| File | Status | Issue | Action |
+|------|--------|-------|--------|
+| `core/regex_extractor.py` | ✅ Working (12/12 tests) | Integration DELETED in cleanup commits | **RESTORE** from c45ec9e |
+| `core/two_pass_extractor.py` | ✅ Working (6/6 tests) | Integration DELETED in cleanup commits | **RESTORE** from c45ec9e |
+
+**Impact**: Pipeline optimization (60-70% cost reduction) is NOT active despite working code.
 
 ## ⚪️ Future / Experimental (Inactive but Valuable)
 | File | Role | Recommendation |
