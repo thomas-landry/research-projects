@@ -360,6 +360,7 @@ class HierarchicalExtractionPipeline:
                     schema, 
                     filename=document.filename,
                     revision_prompts=revision_prompts if revision_prompts else None,
+                    pre_filled_fields=pre_filled_fields,  # Pass Tier 0 results
                 )
             except Exception as e:
                 warnings.append(f"Extraction failed on iteration {iteration + 1}: {str(e)}")
@@ -533,6 +534,19 @@ class HierarchicalExtractionPipeline:
             
         # === Stage 3: Extraction with Feedback Loop (Async) ===
         context = self._build_context(relevant_chunks)
+        
+        # === Tier 0: Regex Extraction (Async) ===
+        self.logger.info("Tier 0: Regex extraction for structured fields (async)...")
+        regex_results = self.regex_extractor.extract_all(context)
+        pre_filled_fields = {}
+        for field_name, result in regex_results.items():
+            if result.confidence >= 0.90:  # High confidence threshold
+                pre_filled_fields[field_name] = result.value
+                self.logger.info(f"  Regex extracted {field_name}: {result.value} (conf={result.confidence:.2f})")
+        
+        if pre_filled_fields:
+            self.logger.info(f"  Tier 0 extracted {len(pre_filled_fields)} fields via regex")
+        
         revision_prompts: List[str] = []
         iteration_history: List[IterationRecord] = []
         
@@ -570,6 +584,7 @@ class HierarchicalExtractionPipeline:
                         schema, 
                         filename=document.filename,
                         revision_prompts=revision_prompts if revision_prompts else None,
+                        pre_filled_fields=pre_filled_fields,  # Pass Tier 0 results
                     )
                     
                     sentence_task = self.sentence_extractor.extract(relevant_chunks)
@@ -615,6 +630,7 @@ class HierarchicalExtractionPipeline:
                         schema, 
                         filename=document.filename,
                         revision_prompts=revision_prompts if revision_prompts else None,
+                        pre_filled_fields=pre_filled_fields,  # Pass Tier 0 results
                     )
                     
             except Exception as e:

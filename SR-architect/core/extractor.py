@@ -417,6 +417,7 @@ You will receive text and must output:
         schema: Type[T],
         filename: Optional[str] = None,
         revision_prompts: Optional[List[str]] = None,
+        pre_filled_fields: Optional[Dict[str, Any]] = None,
     ) -> ExtractionWithEvidence:
         """
         Extract structured data with self-proving evidence citations.
@@ -426,6 +427,7 @@ You will receive text and must output:
             schema: Pydantic model class defining extraction schema
             filename: Source filename for metadata
             revision_prompts: Optional feedback from checker for corrections
+            pre_filled_fields: Optional dict of fields pre-extracted via Tier 0 (regex)
             
         Returns:
             ExtractionWithEvidence with data, evidence list, and metadata
@@ -437,6 +439,11 @@ You will receive text and must output:
         if revision_prompts:
             revision_text = "\n".join(f"- {p}" for p in revision_prompts)
             user_content += f"\n\n--- REVISION INSTRUCTIONS ---\nPlease fix the following issues from the previous extraction:\n{revision_text}\n\nBe especially careful with these corrections."
+        
+        # Add pre-filled fields to prompt if provided
+        if pre_filled_fields:
+            prefilled_text = "\n".join(f"  - {k}: {v}" for k, v in pre_filled_fields.items())
+            user_content += f"\n\n--- PRE-EXTRACTED FIELDS (Tier 0) ---\nThe following fields have been pre-extracted with high confidence via regex patterns. Use these values unless you find conflicting information in the text:\n{prefilled_text}"
         
         # Get schema field names for the prompt
         schema_fields = list(schema.model_fields.keys()) if hasattr(schema, 'model_fields') else []
@@ -469,6 +476,14 @@ You will receive text and must output:
             
             # Convert to dict
             data_dict = data_result.model_dump()
+            
+            # Merge pre-filled fields into result (Tier 0 integration)
+            if pre_filled_fields:
+                for field, value in pre_filled_fields.items():
+                    # Only use pre-filled if LLM didn't extract or returned None/empty
+                    if field not in data_dict or data_dict[field] is None or data_dict[field] == "":
+                        data_dict[field] = value
+                        self.logger.debug(f"Using Tier 0 pre-filled value for {field}: {value}")
             
             # Add filename if present
             if filename:
@@ -532,9 +547,20 @@ Provide evidence citations for each extracted value. For each field that has a n
         schema: Type[T],
         filename: Optional[str] = None,
         revision_prompts: Optional[List[str]] = None,
+        pre_filled_fields: Optional[Dict[str, Any]] = None,
     ) -> ExtractionWithEvidence:
         """
         Extract structured data with self-proving evidence citations (Async).
+        
+        Args:
+            text: Document text to extract from
+            schema: Pydantic model class defining extraction schema
+            filename: Source filename for metadata
+            revision_prompts: Optional feedback from checker for corrections
+            pre_filled_fields: Optional dict of fields pre-extracted via Tier 0 (regex)
+            
+        Returns:
+            ExtractionWithEvidence with data, evidence list, and metadata
         """
         # Build the user message
         user_content = f"Extract data from the following academic paper text:\n\n{text}"
@@ -542,6 +568,11 @@ Provide evidence citations for each extracted value. For each field that has a n
         if revision_prompts:
             revision_text = "\n".join(f"- {p}" for p in revision_prompts)
             user_content += f"\n\n--- REVISION INSTRUCTIONS ---\nPlease fix the following issues from the previous extraction:\n{revision_text}\n\nBe especially careful with these corrections."
+        
+        # Add pre-filled fields to prompt if provided
+        if pre_filled_fields:
+            prefilled_text = "\n".join(f"  - {k}: {v}" for k, v in pre_filled_fields.items())
+            user_content += f"\n\n--- PRE-EXTRACTED FIELDS (Tier 0) ---\nThe following fields have been pre-extracted with high confidence via regex patterns. Use these values unless you find conflicting information in the text:\n{prefilled_text}"
         
         schema_fields = list(schema.model_fields.keys()) if hasattr(schema, 'model_fields') else []
         fields_info = f"\n\nFields to extract: {', '.join(schema_fields)}" if schema_fields else ""
@@ -571,6 +602,15 @@ Provide evidence citations for each extracted value. For each field that has a n
                 await self._track_usage_async(self.model, success=True, usage=usage_dict, filename=filename)
 
             data_dict = data_result.model_dump()
+            
+            # Merge pre-filled fields into result (Tier 0 integration)
+            if pre_filled_fields:
+                for field, value in pre_filled_fields.items():
+                    # Only use pre-filled if LLM didn't extract or returned None/empty
+                    if field not in data_dict or data_dict[field] is None or data_dict[field] == "":
+                        data_dict[field] = value
+                        self.logger.debug(f"Using Tier 0 pre-filled value for {field}: {value}")
+            
             if filename:
                 data_dict["filename"] = filename
             
