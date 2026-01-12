@@ -26,6 +26,7 @@ from core.data_types import PipelineResult, IterationRecord, ExtractionLog, Extr
 from core.semantic_chunker import SemanticChunker
 from .extractor import StructuredExtractor, ExtractionWithEvidence, EvidenceItem
 from .extraction_checker import ExtractionChecker, CheckerResult
+from .regex_extractor import RegexExtractor, RegexResult
 from .abstract_first_extractor import AbstractFirstExtractor, AbstractExtractionResult
 from .pubmed_fetcher import PubMedFetcher
 from .two_pass_extractor import TwoPassExtractor, ModelCascader, ExtractionTier
@@ -131,6 +132,10 @@ class HierarchicalExtractionPipeline:
             cloud_model="gpt-4o-mini",
         )
         self.hybrid_mode = False  # Enable via set_hybrid_mode()
+        
+        # Initialize Tier 0 regex extractor for cost optimization
+        self.regex_extractor = RegexExtractor()
+        
         
         # Initialize sentence extractor for Excellence integration
         self.sentence_extractor = SentenceExtractor(
