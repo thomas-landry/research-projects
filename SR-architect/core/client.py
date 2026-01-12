@@ -180,7 +180,8 @@ class LLMClientFactory:
         import instructor
         from openai import OpenAI
         
-        key = api_key or os.getenv("OPENROUTER_API_KEY")
+        from core.config import settings
+        key = api_key or settings.OPENROUTER_API_KEY
         if not key:
             raise ValueError("OPENROUTER_API_KEY not set")
             
@@ -200,7 +201,7 @@ class LLMClientFactory:
         from openai import OpenAI
         
         client_args = {
-            "api_key": api_key or os.getenv("OPENAI_API_KEY")
+            "api_key": api_key or settings.OPENAI_API_KEY
         }
         if base_url:
             client_args["base_url"] = base_url
@@ -218,7 +219,7 @@ class LLMClientFactory:
             url = base_url or settings.OLLAMA_BASE_URL
             return {"base_url": url, "api_key": api_key or "ollama"}
         elif provider == "openrouter":
-            key = api_key or os.getenv("OPENROUTER_API_KEY")
+            key = api_key or settings.OPENROUTER_API_KEY
             return {"base_url": base_url or "https://openrouter.ai/api/v1", "api_key": key}
         else:
-            return {"api_key": api_key or os.getenv("OPENAI_API_KEY")}
+            return {"api_key": api_key or settings.OPENAI_API_KEY}

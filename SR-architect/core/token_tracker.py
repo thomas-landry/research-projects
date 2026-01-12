@@ -92,7 +92,8 @@ class TokenTracker:
             api_key: OpenRouter API key for fetching live pricing
             log_file: Optional file to persist usage logs
         """
-        self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
+        from core.config import settings
+        self.api_key = api_key or settings.OPENROUTER_API_KEY
         self.log_file = log_file
         
         # Session tracking

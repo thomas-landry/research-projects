@@ -98,14 +98,15 @@ It's better to include slightly irrelevant content than to miss important data."
         utils.load_env()
         
         self.provider = provider.lower()
-        self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
+        from core.config import settings
+        self.api_key = api_key or settings.OPENROUTER_API_KEY
         
         if model:
             self.model = model
         elif self.provider == "openrouter":
-            self.model = os.getenv("OPENROUTER_MODEL", "anthropic/claude-sonnet-4-20250514")
+            self.model = settings.OPENROUTER_MODEL
         elif self.provider == "ollama":
-            self.model = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
+            self.model = settings.OLLAMA_MODEL
         else:
             self.model = "gpt-4o"
         

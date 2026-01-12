@@ -40,8 +40,9 @@ class LibrarianAgent:
         load_env()
         self.logger = get_logger("LibrarianAgent")
         
-        self.email = email or os.getenv("NCBI_EMAIL", "researcher@example.com")
-        self.api_key = api_key or os.getenv("NCBI_API_KEY")
+        from core.config import settings
+        self.email = email or settings.NCBI_EMAIL
+        self.api_key = api_key or settings.NCBI_API_KEY
 
         if not self.email:
              self.logger.warning("No email provided for NCBI API. Rate limits may be lower.")
