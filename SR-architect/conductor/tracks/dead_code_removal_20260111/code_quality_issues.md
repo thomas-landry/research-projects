@@ -163,3 +163,31 @@
 2. Centralize configuration
 3. Refactor large functions
 4. Address anti-patterns
+
+## Recent Completion: Task 4.5 (2026-01-12)
+
+### ✅ Split hierarchical_pipeline.py
+
+**Status**: COMPLETE  
+**File**: `core/hierarchical_pipeline.py` (860 lines)  
+**Result**: Created modular `core/pipeline/` structure with 7 files (1,163 total lines)
+
+**Changes**:
+- Created dependency injection pattern (ExtractionExecutor)
+- Extracted pure functions (stages.py)
+- Eliminated 90 lines of sync/async duplication
+- Reduced max nesting from 5 → 3 levels
+- Extracted magic number 0.8 → QUALITY_AUDIT_PENALTY
+- Added complete type hints and docstrings
+- Maintained backward compatibility
+
+**Files Created**:
+1. `core/pipeline/core.py` (430 lines)
+2. `core/pipeline/stages.py` (156 lines)
+3. `core/pipeline/extraction/executor.py` (245 lines)
+4. `core/pipeline/extraction/validation.py` (190 lines)
+5. `core/pipeline/extraction/helpers.py` (87 lines)
+6. `core/pipeline/__init__.py` + `extraction/__init__.py`
+
+**Documentation**: See `task4.5_complete.md`
+

@@ -1,6 +1,8 @@
 # Core module exports
 from .parser import DocumentParser, ParsedDocument, DocumentChunk
-from .hierarchical_pipeline import HierarchicalExtractionPipeline, PipelineResult
+# Import from new modular pipeline structure (backward compatibility)
+from .pipeline import HierarchicalExtractionPipeline
+from .data_types import PipelineResult
 from .batch_processor import BatchExecutor
 from .state_manager import StateManager, PipelineCheckpoint
 from .content_filter import ContentFilter
