@@ -169,7 +169,7 @@ class HierarchicalExtractionPipeline:
         """
         return await self.semantic_chunker.chunk_document_async(text, doc_id)
     
-    def _compute_fingerprint(self, text: str, max_chars: int = 10000) -> str:
+    def _compute_fingerprint(self, text: str, max_chars: int = None) -> str:
         """
         Compute document fingerprint for duplicate detection.
         
@@ -180,8 +180,10 @@ class HierarchicalExtractionPipeline:
         Returns:
             SHA256 hash of first N characters
         """
-        content = text[:max_chars].encode('utf-8')
-        return hashlib.sha256(content).hexdigest()
+        if max_chars is None:
+            max_chars = settings.CACHE_HASH_CHARS
+        sample = text[:max_chars].encode('utf-8')
+        return hashlib.sha256(sample).hexdigest()
     
     def _check_duplicate(self, fingerprint: str) -> Optional[PipelineResult]:
         """
@@ -334,7 +336,7 @@ class HierarchicalExtractionPipeline:
         regex_results = self.regex_extractor.extract_all(context)
         pre_filled_fields = {}
         for field_name, result in regex_results.items():
-            if result.confidence >= 0.90:  # High confidence threshold
+            if result.confidence >= settings.CONFIDENCE_THRESHOLD_MID:  # High confidence threshold
                 pre_filled_fields[field_name] = result.value
                 self.logger.info(f"  Regex extracted {field_name}: {result.value} (conf={result.confidence:.2f})")
         
@@ -540,7 +542,7 @@ class HierarchicalExtractionPipeline:
         regex_results = self.regex_extractor.extract_all(context)
         pre_filled_fields = {}
         for field_name, result in regex_results.items():
-            if result.confidence >= 0.90:  # High confidence threshold
+            if result.confidence >= settings.CONFIDENCE_THRESHOLD_MID:  # High confidence threshold
                 pre_filled_fields[field_name] = result.value
                 self.logger.info(f"  Regex extracted {field_name}: {result.value} (conf={result.confidence:.2f})")
         
@@ -615,7 +617,7 @@ class HierarchicalExtractionPipeline:
                                 field_name=field_type,
                                 extracted_value=text,
                                 exact_quote=text,
-                                confidence=0.95,
+                                confidence=settings.CONFIDENCE_THRESHOLD_HIGH,
                                 start_char=frame.start_char,
                                 end_char=frame.end_char,
                                 context=None
