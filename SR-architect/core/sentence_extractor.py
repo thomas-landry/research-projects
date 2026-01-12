@@ -20,6 +20,7 @@ from pydantic import BaseModel
 from core.parser import DocumentChunk
 from core.utils import get_async_llm_client, get_logger
 from core.data_types import EvidenceFrame
+from core import constants
 
 logger = get_logger("SentenceExtractor")
 
@@ -42,8 +43,8 @@ Output validation:
         self,
         provider: str = "openrouter",
         model: str = "google/gemini-2.0-flash-001", 
-        context_window_size: int = 2,
-        concurrency_limit: int = 10,
+        context_window_size: int = None,
+        concurrency_limit: int = None,
         token_tracker: Optional[Any] = None
     ):
         """
@@ -56,6 +57,10 @@ Output validation:
         """
         self.provider = provider
         self.model = model
+        if context_window_size is None:
+            context_window_size = constants.SENTENCE_CONTEXT_WINDOW
+        if concurrency_limit is None:
+            concurrency_limit = constants.SENTENCE_CONCURRENCY_LIMIT
         self.context_window_size = context_window_size
         self.concurrency_limit = concurrency_limit
         self.token_tracker = token_tracker

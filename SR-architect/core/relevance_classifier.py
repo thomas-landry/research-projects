@@ -13,6 +13,7 @@ from typing import List, Dict, Any, Optional, Type, Annotated
 from pydantic import BaseModel, Field, BeforeValidator, ValidationInfo
 
 from core import utils
+from core import constants
 from .parser import DocumentChunk
 
 
@@ -81,8 +82,8 @@ It's better to include slightly irrelevant content than to miss important data."
         provider: str = "openrouter",
         model: Optional[str] = None,
         api_key: Optional[str] = None,
-        batch_size: int = 10,
-        preview_chars: int = 500,
+        batch_size: int = None,
+        preview_chars: int = None,
         token_tracker: Optional["TokenTracker"] = None,
     ):
         """
@@ -110,6 +111,10 @@ It's better to include slightly irrelevant content than to miss important data."
         else:
             self.model = "gpt-4o"
         
+        if batch_size is None:
+            batch_size = constants.RELEVANCE_BATCH_SIZE
+        if preview_chars is None:
+            preview_chars = constants.RELEVANCE_PREVIEW_CHARS
         self.batch_size = batch_size
         self.preview_chars = preview_chars
         self.token_tracker = token_tracker
