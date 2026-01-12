@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from pydantic import BaseModel, Field, field_validator
 
 from .parser import DocumentChunk
+from .config import settings
+from core import constants
 
 
 class Issue(BaseModel):
@@ -125,8 +127,8 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
         provider: str = "openrouter",
         model: Optional[str] = None,
         api_key: Optional[str] = None,
-        accuracy_weight: float = 0.6,
-        consistency_weight: float = 0.4,
+        accuracy_weight: float = None,
+        consistency_weight: float = None,
         token_tracker: Optional["TokenTracker"] = None,
     ):
         """
@@ -143,8 +145,8 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
         self.api_key = api_key
         self.model = model or "gpt-4o"  # Default fallback, specific defaults handled in utils or env
         
-        self.accuracy_weight = accuracy_weight
-        self.consistency_weight = consistency_weight
+        self.accuracy_weight = accuracy_weight if accuracy_weight is not None else constants.VALIDATION_WEIGHT_COMPLETENESS
+        self.consistency_weight = consistency_weight if consistency_weight is not None else constants.VALIDATION_WEIGHT_ACCURACY
         self.token_tracker = token_tracker
         self._instructor_client = None
         self._async_instructor_client = None
@@ -180,8 +182,10 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
         )
         return self._async_instructor_client
     
-    def _format_source_text(self, chunks: List[DocumentChunk], max_chars: int = 8000) -> str:
+    def _format_source_text(self, chunks: List[DocumentChunk], max_chars: int = None) -> str:
         """Format source chunks for the checker prompt."""
+        if max_chars is None:
+            max_chars = settings.MAX_CHUNK_CHARS
         text_parts = []
         total_chars = 0
         
@@ -231,7 +235,7 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
         extracted_data: Dict[str, Any],
         evidence: List[Dict[str, Any]],
         theme: str,
-        threshold: float = 0.9,
+        threshold: float = None,
     ) -> CheckerResult:
         """
         Validate extraction accuracy and consistency.
@@ -246,6 +250,8 @@ If no issues are found, return high scores and empty issues/suggestions lists.""
         Returns:
             CheckerResult with scores, issues, and suggestions
         """
+        if threshold is None:
+            threshold = settings.EXTRACTION_MIN_CONFIDENCE
         client = self.client
         
         source_text = self._format_source_text(source_chunks)
@@ -274,7 +280,7 @@ Provide scores, issues, and specific revision suggestions."""
                 model=self.model,
                 messages=[{"role": "user", "content": user_prompt}],
                 response_model=CheckerResponse,
-                max_retries=2,
+                max_retries=constants.MAX_LLM_RETRIES_ASYNC,
                 extra_body={"usage": {"include": True}}
             )
             
@@ -327,11 +333,13 @@ Provide scores, issues, and specific revision suggestions."""
         extracted_data: Dict[str, Any],
         evidence: List[Dict[str, Any]],
         theme: str,
-        threshold: float = 0.9,
+        threshold: float = None,
     ) -> CheckerResult:
         """
         Validate extraction accuracy and consistency (Async).
         """
+        if threshold is None:
+            threshold = settings.EXTRACTION_MIN_CONFIDENCE
         client = self.async_client
         
         source_text = self._format_source_text(source_chunks)
@@ -360,7 +368,7 @@ Provide scores, issues, and specific revision suggestions."""
                 model=self.model,
                 messages=[{"role": "user", "content": user_prompt}],
                 response_model=CheckerResponse,
-                max_retries=2,
+                max_retries=constants.MAX_LLM_RETRIES_ASYNC,
                 extra_body={"usage": {"include": True}}
             )
             
