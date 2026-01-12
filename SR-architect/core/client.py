@@ -28,8 +28,14 @@ class OllamaHealthCheck:
             # Check version
             resp = requests.get(f"{url}api/version", timeout=2.0)
             return resp.status_code == 200
-        except Exception:
-            # Using debug usually, but useful to know when it fails during dev
+        except requests.Timeout as e:
+            logger.debug(f"Ollama health check timeout after 2.0s: {e}")
+            return False
+        except requests.ConnectionError as e:
+            logger.debug(f"Ollama health check connection failed: {e}")
+            return False
+        except requests.RequestException as e:
+            logger.warning(f"Ollama health check failed with unexpected error: {e}", exc_info=True)
             return False
 
     @staticmethod

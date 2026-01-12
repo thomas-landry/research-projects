@@ -1,6 +1,8 @@
 
 import os
 import csv
+import asyncio
+import functools
 from pathlib import Path
 from typing import List, Optional, Type, Dict, Any, Callable
 
@@ -163,14 +165,16 @@ class ExtractionService:
                         doc = next((d for d in parsed_docs if d.filename == filename), None)
                         if doc:
                             try:
-                                import asyncio
-                                import functools
                                 loop = asyncio.get_running_loop()
                                 func = functools.partial(vector_store.add_chunks_from_parsed_doc, doc, extracted_data=extracted_data)
                                 loop.run_in_executor(None, func)
-                            except RuntimeError:
-                                # Fallback if no loop (sync mode)
+                            except RuntimeError as e:
+                                # No event loop - fallback to sync
+                                logger.debug(f"No async loop available, using sync vectorization: {e}")
                                 vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
+                            except Exception as e:
+                                # Vectorization failed - log but don't fail extraction
+                                logger.error(f"Vectorization failed for {filename}: {e}", exc_info=True)
                 else:
                     failed_files.append((filename, str(data)))
                 
@@ -205,7 +209,6 @@ class ExtractionService:
                             failed_files.append((filename, f"Chunk {chunk_idx}: {str(data)}"))
                     
                     if hierarchical:
-                        import asyncio
                         asyncio.run(batch_executor.process_batch_async(
                             documents=parsed_docs,
                             schema=ChunkModel,
@@ -239,17 +242,17 @@ class ExtractionService:
                         doc = next((d for d in parsed_docs if d.filename == filename), None)
                         if doc:
                             try:
-                                import asyncio
-                                import functools
                                 loop = asyncio.get_running_loop()
                                 func = functools.partial(vector_store.add_chunks_from_parsed_doc, doc, extracted_data=merged_data)
                                 loop.run_in_executor(None, func)
-                            except RuntimeError:
+                            except RuntimeError as e:
+                                logger.debug(f"No async loop available, using sync vectorization: {e}")
                                 vector_store.add_chunks_from_parsed_doc(doc, extracted_data=merged_data)
+                            except Exception as e:
+                                logger.error(f"Vectorization failed for {filename}: {e}", exc_info=True)
             else:
                 # Normal (non-chunked) extraction
                 if hierarchical:
-                    import asyncio
                     asyncio.run(batch_executor.process_batch_async(
                         documents=parsed_docs,
                         schema=ExtractionModel,
