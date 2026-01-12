@@ -159,6 +159,54 @@ class Settings(BaseSettings):
         description="Directory for log files"
     )
     
+    # ========== Extraction Thresholds ==========
+    CONFIDENCE_THRESHOLD_HIGH: float = Field(
+        default=0.95,
+        description="High confidence threshold for extraction acceptance"
+    )
+    CONFIDENCE_THRESHOLD_MID: float = Field(
+        default=0.90,
+        description="Medium confidence threshold for regex extraction"
+    )
+    EXTRACTION_MIN_CONFIDENCE: float = Field(
+        default=0.9,
+        description="Minimum confidence for validation"
+    )
+    
+    # ========== Context and Chunk Limits ==========
+    MAX_CONTEXT_CHARS: int = Field(
+        default=15000,
+        description="Maximum characters for extraction context"
+    )
+    MAX_CHUNK_CHARS: int = Field(
+        default=8000,
+        description="Maximum characters per chunk for validation"
+    )
+    MAX_VALIDATION_CHARS: int = Field(
+        default=10000,
+        description="Maximum characters for validation context"
+    )
+    
+    # ========== Parser Settings ==========
+    DOCLING_CHUNK_SIZE: int = Field(
+        default=1000,
+        description="Chunk size for Docling parser"
+    )
+    DOCLING_MAX_CHARS: int = Field(
+        default=15000,
+        description="Maximum characters for Docling parsing"
+    )
+    PARSER_CACHE_MAX_SIZE: int = Field(
+        default=100,
+        description="Maximum number of cached parsed documents"
+    )
+    
+    # ========== Cache Settings ==========
+    CACHE_HASH_CHARS: int = Field(
+        default=10000,
+        description="Characters to use for document hash computation"
+    )
+    
     # ========== Token Calculation Settings ==========
     CHARS_PER_TOKEN_ESTIMATE: int = Field(
         default=4,
