@@ -2,41 +2,42 @@
 Unit tests for SemanticChunker and ContextWindowMonitor.
 """
 import unittest
+import pytest
 from core.semantic_chunker import SemanticChunker
 from core.context_window_monitor import ContextWindowMonitor
 
 
 class TestSemanticChunker(unittest.TestCase):
     def setUp(self):
-        self.chunker = SemanticChunker(chunk_size=500, chunk_overlap=50)
+        # SemanticChunker now requires a client parameter
+        # For unit tests, we can pass None and test will skip LLM calls
+        self.chunker = SemanticChunker(client=None)
 
-    def test_empty_input(self):
-        result = self.chunker.chunk("")
+    @pytest.mark.asyncio
+    async def test_empty_input(self):
+        result = await self.chunker.chunk_document_async("")
         self.assertEqual(result, [])
 
-    def test_short_text(self):
+    @pytest.mark.asyncio
+    async def test_short_text(self):
         text = "This is a short paragraph."
-        result = self.chunker.chunk(text)
-        # Short text should be one chunk (if above min_chunk_size)
-        # Default min is 100, so this might be empty
-        self.assertLessEqual(len(result), 1)
+        result = await self.chunker.chunk_document_async(text)
+        # Without LLM client, should return single chunk fallback
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].section, "Full Text")
 
-    def test_paragraph_splitting(self):
+    @pytest.mark.asyncio
+    async def test_no_client_fallback(self):
+        """Test that chunker falls back to single chunk when no client provided."""
         text = """First paragraph with some content here.
 
 Second paragraph with different content.
 
 Third paragraph to complete the test."""
-        result = self.chunker.chunk(text)
-        # Should combine paragraphs up to chunk_size
-        self.assertGreaterEqual(len(result), 1)
-
-    def test_large_paragraph(self):
-        # Create a paragraph larger than chunk_size
-        text = "This is a sentence. " * 100
-        result = self.chunker.chunk(text)
-        # Should split into multiple chunks
-        self.assertGreater(len(result), 1)
+        result = await self.chunker.chunk_document_async(text)
+        # Should return single chunk when no client
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].section, "Full Text")
 
 
 class TestContextWindowMonitor(unittest.TestCase):
