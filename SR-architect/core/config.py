@@ -200,6 +200,18 @@ class Settings(BaseSettings):
         default=100,
         description="Maximum number of cached parsed documents"
     )
+    PARSER_CHUNK_SIZE: int = Field(
+        default=1000,
+        description="Default chunk size for parser text splitting"
+    )
+    PARSER_CHUNK_OVERLAP: int = Field(
+        default=200,
+        description="Overlap between parser chunks"
+    )
+    PARSER_EXTRACTION_CONTEXT_MAX_CHARS: int = Field(
+        default=15000,
+        description="Maximum characters for parser extraction context"
+    )
     
     # ========== Cache Settings ==========
     CACHE_HASH_CHARS: int = Field(

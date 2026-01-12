@@ -10,7 +10,12 @@ import json
 import hashlib
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from dataclasses import dataclass, field
 from pydantic import BaseModel, Field
+
+from .config import settings
+from .text_splitter import split_text_into_chunks
+from .utils import get_logger
 
 try:
     from bs4 import BeautifulSoup
@@ -26,9 +31,6 @@ try:
     import pdfplumber
 except ImportError:
     pdfplumber = None
-
-from core.text_splitter import split_text_into_chunks
-from core.utils import get_logger
 
 
 class DocumentChunk(BaseModel):
@@ -81,7 +83,7 @@ class ParsedDocument(BaseModel):
                 result_chunks.append(chunk.text or "")
         return "\n\n".join(result_chunks)
     
-    def get_extraction_context(self, max_chars: int = 15000) -> str:
+    def get_extraction_context(self, max_chars: int = settings.PARSER_EXTRACTION_CONTEXT_MAX_CHARS) -> str:
         """Get the most relevant text for extraction (Abstract + Methods + Results)."""
         context_parts = []
         
@@ -111,8 +113,6 @@ class DocumentParser:
     # Simplified parser chain per plan.md: Docling → PyMuPDF only
     # pdfplumber removed as Docling+PyMuPDF handles >95% of cases
     PARSER_CHAIN = ["docling", "pymupdf"]
-    # Default max cache entries (MEM-001 fix)
-    DEFAULT_MAX_CACHE_SIZE = 100
     
     def __init__(
         self, 
@@ -120,7 +120,7 @@ class DocumentParser:
         cache_dir: str = ".cache/parsed_docs",
         use_imrad: bool = False,
         extract_tables: bool = True,
-        max_cache_size: int = DEFAULT_MAX_CACHE_SIZE,
+        max_cache_size: int = None,
     ):
         """
         Initialize the parser.
@@ -136,6 +136,8 @@ class DocumentParser:
         self.cache_dir = Path(cache_dir)
         self.use_imrad = use_imrad
         self.extract_tables = extract_tables
+        if max_cache_size is None:
+            max_cache_size = settings.PARSER_CACHE_MAX_SIZE
         self.max_cache_size = max_cache_size
         self.logger = get_logger("DocumentParser")
         self._converter = None
@@ -337,7 +339,7 @@ class DocumentParser:
                 full_text += text + "\n\n"
                 
                 # Chunk the page text
-                page_chunks = split_text_into_chunks(text, chunk_size=1000, chunk_overlap=200)
+                page_chunks = split_text_into_chunks(text, chunk_size=settings.PARSER_CHUNK_SIZE, chunk_overlap=settings.PARSER_CHUNK_OVERLAP)
                 for chunk_text in page_chunks:
                     chunks.append(DocumentChunk(
                         text=chunk_text,
@@ -418,7 +420,7 @@ class DocumentParser:
             full_text += text + "\n\n"
             
             # Robust chunking for each page
-            page_chunks = split_text_into_chunks(text, chunk_size=1000, chunk_overlap=200)
+            page_chunks = split_text_into_chunks(text, chunk_size=settings.PARSER_CHUNK_SIZE, chunk_overlap=settings.PARSER_CHUNK_OVERLAP)
             
             for chunk_text in page_chunks:
                 chunks.append(DocumentChunk(
@@ -440,12 +442,15 @@ class DocumentParser:
             }
         )
     
-    def _simple_chunk(self, text: str, filename: str, chunk_size: int = 1000) -> List[DocumentChunk]:
+    def _simple_chunk(self, text: str, filename: str, chunk_size: Optional[int] = None) -> List[DocumentChunk]:
         """Simple fallback chunking."""
         if not text:
             return []
             
-        text_chunks = split_text_into_chunks(text, chunk_size=chunk_size, chunk_overlap=200)
+        if chunk_size is None:
+            chunk_size = settings.PARSER_CHUNK_SIZE
+
+        text_chunks = split_text_into_chunks(text, chunk_size=chunk_size, chunk_overlap=settings.PARSER_CHUNK_OVERLAP)
         chunks = []
         
         for i, chunk_text in enumerate(text_chunks):
