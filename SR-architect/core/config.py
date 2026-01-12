@@ -22,7 +22,7 @@ Default LLM:
     - Fallback: Claude 3 Haiku (if Gemini fails)
 """
 
-from typing import Optional
+from typing import Optional, Dict
 from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -158,6 +158,46 @@ class Settings(BaseSettings):
         default=Path("./output/logs"),
         description="Directory for log files"
     )
+    
+    # ========== Token Calculation Settings ==========
+    CHARS_PER_TOKEN_ESTIMATE: int = Field(
+        default=4,
+        description="Approximate characters per token for estimation (fallback when tiktoken unavailable)"
+    )
+    TOKENS_PER_MILLION: int = Field(
+        default=1_000_000,
+        description="Tokens per million for pricing calculations"
+    )
+    
+    # ========== Default Estimation Parameters ==========
+    DEFAULT_TOKENS_PER_DOCUMENT: int = Field(
+        default=10000,
+        description="Default token count per document for cost estimation"
+    )
+    DEFAULT_OUTPUT_TOKENS: int = Field(
+        default=2000,
+        description="Default output tokens per extraction for cost estimation"
+    )
+    
+    # ========== API URLs ==========
+    OPENROUTER_MODELS_API: str = Field(
+        default="https://openrouter.ai/api/v1/models",
+        description="OpenRouter models API endpoint for pricing data"
+    )
+    
+    # ========== Fallback Pricing ==========
+    # CRITICAL: These are FALLBACK values only. Always fetch from API first.
+    # Pricing is per 1M tokens (prompt and completion)
+    FALLBACK_PRICING: Dict[str, Dict[str, float]] = {
+        "anthropic/claude-sonnet-4-20250514": {"prompt": 3.0, "completion": 15.0},
+        "anthropic/claude-3.5-sonnet": {"prompt": 3.0, "completion": 15.0},
+        "anthropic/claude-3.5-sonnet-20240620": {"prompt": 3.0, "completion": 15.0},
+        "anthropic/claude-3-haiku": {"prompt": 0.25, "completion": 1.25},
+        "openai/gpt-4o": {"prompt": 2.5, "completion": 10.0},
+        "openai/gpt-4o-mini": {"prompt": 0.15, "completion": 0.6},
+        "google/gemini-2.0-flash-exp:free": {"prompt": 0.0, "completion": 0.0},
+        "google/gemini-2.0-flash-lite-001": {"prompt": 0.0, "completion": 0.0},
+    }
     
     # ========== Pydantic Settings Config ==========
     model_config = SettingsConfigDict(

@@ -19,16 +19,10 @@ from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from pydantic import BaseModel
 
+from core.config import settings
+from core.utils import get_logger
 
-# Default pricing for Claude Sonnet (fallback if API unavailable)
-DEFAULT_PRICING = {
-    "anthropic/claude-sonnet-4-20250514": {"prompt": 3.0, "completion": 15.0},
-    "anthropic/claude-3.5-sonnet": {"prompt": 3.0, "completion": 15.0},
-    "anthropic/claude-3.5-sonnet-20240620": {"prompt": 3.0, "completion": 15.0},
-    "anthropic/claude-3-haiku": {"prompt": 0.25, "completion": 1.25},
-    "openai/gpt-4o": {"prompt": 2.5, "completion": 10.0},
-    "openai/gpt-4o-mini": {"prompt": 0.15, "completion": 0.6},
-}
+logger = get_logger("TokenTracker")
 
 
 @dataclass
@@ -106,13 +100,20 @@ class TokenTracker:
     def estimate_tokens(self, text: str, model: str = "gpt-4o") -> int:
         """
         Estimate token count using tiktoken if available.
+        Falls back to character-based estimation if tiktoken is unavailable.
+        
+        Args:
+            text: Text to estimate tokens for
+            model: Model name for tiktoken encoding selection
+            
+        Returns:
+            Estimated token count
         """
         try:
             import tiktoken
             # Map openrouter models to tiktoken encodings
             if "claude" in model:
-                # Claude doesn't have public tiktoken, approx with cl100k_base or just chars
-                # But tiktoken is better than char div.
+                # Claude doesn't have public tiktoken, use cl100k_base approximation
                 encoding = tiktoken.get_encoding("cl100k_base")
             else:
                 try:
@@ -121,10 +122,11 @@ class TokenTracker:
                     encoding = tiktoken.get_encoding("cl100k_base")
             return len(encoding.encode(text))
         except ImportError:
-            # Fallback
-            return len(text) // 4
-        except Exception:
-            return len(text) // 4
+            logger.debug("tiktoken not available, using character-based estimation")
+            return len(text) // settings.CHARS_PER_TOKEN_ESTIMATE
+        except Exception as e:
+            logger.warning(f"Token estimation failed: {e}, using fallback")
+            return len(text) // settings.CHARS_PER_TOKEN_ESTIMATE
 
     def get_model_pricing(self, model: str) -> Dict[str, float]:
         """
@@ -143,39 +145,47 @@ class TokenTracker:
         if model in self._pricing_cache:
             return self._pricing_cache[model]
         
-        # Try to fetch from OpenRouter API
+        # Try to fetch from OpenRouter API (ALWAYS try API first)
         try:
             if self.api_key:
                 response = requests.get(
-                    "https://openrouter.ai/api/v1/models",
+                    settings.OPENROUTER_MODELS_API,
                     headers={"Authorization": f"Bearer {self.api_key}"},
                     timeout=5
                 )
                 if response.status_code == 200:
                     models_data = response.json().get("data", [])
-                    for m in models_data:
-                        if m.get("id") == model:
-                            pricing = m.get("pricing", {})
+                    for model_data in models_data:
+                        if model_data.get("id") == model:
+                            pricing = model_data.get("pricing", {})
                             result = {
-                                "prompt": float(pricing.get("prompt", 0)) * 1_000_000,
-                                "completion": float(pricing.get("completion", 0)) * 1_000_000,
+                                "prompt": float(pricing.get("prompt", 0)) * settings.TOKENS_PER_MILLION,
+                                "completion": float(pricing.get("completion", 0)) * settings.TOKENS_PER_MILLION,
                             }
                             self._pricing_cache[model] = result
+                            logger.debug(f"Fetched pricing for {model} from OpenRouter API")
                             return result
-        except Exception:
-            pass  # Fall back to defaults
+        except requests.Timeout as e:
+            logger.warning(f"OpenRouter API timeout while fetching pricing: {e}")
+        except requests.RequestException as e:
+            logger.warning(f"OpenRouter API request failed: {e}", exc_info=True)
+        except Exception as e:
+            logger.error(f"Unexpected error fetching model pricing: {e}", exc_info=True)
         
-        # Use default pricing
-        if model in DEFAULT_PRICING:
-            return DEFAULT_PRICING[model]
+        # Use fallback pricing (only if API failed)
+        if model in settings.FALLBACK_PRICING:
+            logger.debug(f"Using fallback pricing for {model}")
+            return settings.FALLBACK_PRICING[model]
         
         # Try partial match
-        for key, value in DEFAULT_PRICING.items():
+        for key, value in settings.FALLBACK_PRICING.items():
             if key in model or model in key:
+                logger.debug(f"Using partial match fallback pricing: {key} for {model}")
                 return value
         
-        # Ultimate fallback - Claude Sonnet pricing
-        return DEFAULT_PRICING["anthropic/claude-3.5-sonnet"]
+        # Ultimate fallback - use default model pricing
+        logger.warning(f"No pricing found for {model}, using default model pricing")
+        return settings.FALLBACK_PRICING[settings.OPENROUTER_MODEL]
     
     def calculate_cost(
         self,
@@ -196,8 +206,8 @@ class TokenTracker:
         """
         pricing = self.get_model_pricing(model)
         
-        prompt_cost = (prompt_tokens / 1_000_000) * pricing["prompt"]
-        completion_cost = (completion_tokens / 1_000_000) * pricing["completion"]
+        prompt_cost = (prompt_tokens / settings.TOKENS_PER_MILLION) * pricing["prompt"]
+        completion_cost = (completion_tokens / settings.TOKENS_PER_MILLION) * pricing["completion"]
         
         return prompt_cost + completion_cost
     
@@ -244,7 +254,15 @@ class TokenTracker:
         
         return record
 
-    def _create_record(self, usage, model, filename, operation, tier, field) -> UsageRecord:
+    def _create_record(
+        self,
+        usage: Dict[str, Any],
+        model: str,
+        filename: Optional[str],
+        operation: str,
+        tier: Optional[str],
+        field: Optional[str]
+    ) -> UsageRecord:
         """Helper to create UsageRecord object."""
         prompt_tokens = usage.get("prompt_tokens", 0)
         completion_tokens = usage.get("completion_tokens", 0)
@@ -280,9 +298,9 @@ class TokenTracker:
     def estimate_extraction_cost(
         self,
         num_documents: int,
-        avg_tokens_per_doc: int = 10000,
-        avg_output_tokens: int = 2000,
-        model: str = "anthropic/claude-sonnet-4-20250514",
+        avg_tokens_per_doc: int = None,
+        avg_output_tokens: int = None,
+        model: str = None,
         num_passes: int = 1,
     ) -> CostEstimate:
         """
@@ -298,6 +316,14 @@ class TokenTracker:
         Returns:
             CostEstimate with breakdown
         """
+        # Use config defaults if not provided
+        if avg_tokens_per_doc is None:
+            avg_tokens_per_doc = settings.DEFAULT_TOKENS_PER_DOCUMENT
+        if avg_output_tokens is None:
+            avg_output_tokens = settings.DEFAULT_OUTPUT_TOKENS
+        if model is None:
+            model = settings.OPENROUTER_MODEL
+        
         total_input = num_documents * avg_tokens_per_doc * num_passes
         total_output = num_documents * avg_output_tokens * num_passes
         total_tokens = total_input + total_output
@@ -305,7 +331,7 @@ class TokenTracker:
         cost = self.calculate_cost(total_input, total_output, model)
         
         # Confidence based on estimation quality
-        if avg_tokens_per_doc == 10000:  # Using default
+        if avg_tokens_per_doc == settings.DEFAULT_TOKENS_PER_DOCUMENT:  # Using default
             confidence = "medium"
         else:
             confidence = "high"
@@ -420,8 +446,8 @@ def estimate_document_tokens(text: str) -> int:
     """
     Estimate token count for a document using approximate tokenization.
     
-    Uses ~4 chars per token as a rough estimate for English text.
-    For more accuracy, use tiktoken library.
+    Uses character-based estimation as a rough estimate for English text.
+    For more accuracy, use tiktoken library via TokenTracker.estimate_tokens().
     
     Args:
         text: Document text
@@ -429,8 +455,8 @@ def estimate_document_tokens(text: str) -> int:
     Returns:
         Estimated token count
     """
-    # Simple approximation: ~4 characters per token for English
-    return len(text) // 4
+    # Simple approximation using config constant
+    return len(text) // settings.CHARS_PER_TOKEN_ESTIMATE
 
 
 if __name__ == "__main__":
