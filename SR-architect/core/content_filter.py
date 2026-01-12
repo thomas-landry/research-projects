@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 # Import from sibling module
 from .parser import DocumentChunk
+from .config import settings
 
 
 @dataclass
@@ -59,7 +60,7 @@ class ContentFilter:
         self,
         exclude_patterns: List[str] = None,
         content_patterns: List[str] = None,
-        chars_per_token: float = 4.0,  # Approximate chars per token
+        chars_per_token: float = None,  # Approximate chars per token
     ):
         """
         Initialize the content filter.
@@ -77,6 +78,8 @@ class ContentFilter:
             re.compile(p, re.IGNORECASE)
             for p in (content_patterns or self.CONTENT_EXCLUDE_PATTERNS)
         ]
+        if chars_per_token is None:
+            chars_per_token = settings.CHARS_PER_TOKEN_ESTIMATE
         self.chars_per_token = chars_per_token
     
     def _should_exclude_section(self, section: str) -> bool:

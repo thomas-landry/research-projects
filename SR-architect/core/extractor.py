@@ -10,6 +10,7 @@ from typing import Type, TypeVar, Optional, Dict, Any, List
 from pydantic import BaseModel, Field, field_validator
 from core import utils
 from core.parser import ParsedDocument
+from core import constants
 
 T = TypeVar('T', bound=BaseModel)
 
@@ -77,6 +78,7 @@ Extract the requested fields according to the provided schema."""
         base_url: Optional[str] = None,
         examples: Optional[str] = None,
         token_tracker: Optional["TokenTracker"] = None,
+        max_retries: Optional[int] = None,
     ):
         """
         Initialize the extractor logic.
@@ -105,6 +107,9 @@ Extract the requested fields according to the provided schema."""
             self.model = settings.OLLAMA_MODEL
         else:
             self.model = "gpt-4o"
+        if max_retries is None:
+            max_retries = constants.MAX_LLM_RETRIES
+        self.max_retries = max_retries
         
         self._client = None
         self._instructor_client = None
@@ -240,7 +245,7 @@ Extract the requested fields according to the provided schema."""
                 model=self.model,
                 messages=messages,
                 response_model=schema,
-                max_retries=2,
+                max_retries=constants.MAX_LLM_RETRIES_ASYNC,
                 extra_body={"usage": {"include": True}}
             )
             
@@ -298,7 +303,7 @@ Extract the requested fields according to the provided schema."""
                 model=self.model,
                 messages=messages,
                 response_model=schema,
-                max_retries=2,
+                max_retries=constants.MAX_LLM_RETRIES_ASYNC,
                 extra_body={"usage": {"include": True}}
             )
             
@@ -347,7 +352,7 @@ Extract the requested fields according to the provided schema."""
         text: str,
         schema: Type[T],
         filename: Optional[str] = None,
-        max_retries: int = 2,
+        max_retries: int = None,
     ) -> T:
         """Sync with retry."""
         last_error = None
@@ -367,7 +372,7 @@ Extract the requested fields according to the provided schema."""
         text: str,
         schema: Type[T],
         filename: Optional[str] = None,
-        max_retries: int = 2,
+        max_retries: int = None,
     ) -> T:
         """
         Extract with automatic retry on failure (Async).

@@ -22,6 +22,7 @@ from contextlib import contextmanager
 import threading
 
 from core.utils import get_logger
+from core.config import settings
 
 logger = get_logger("CacheManager")
 
@@ -409,7 +410,9 @@ class CacheManager:
         }
     
     @staticmethod
-    def compute_doc_hash(text: str, max_chars: int = 10000) -> str:
+    def compute_doc_hash(text: str, max_chars: int = None) -> str:
         """Compute document hash for cache key."""
-        content = text[:max_chars].encode('utf-8')
-        return hashlib.sha256(content).hexdigest()
+        if max_chars is None:
+            max_chars = settings.CACHE_HASH_CHARS
+        sample = text[:max_chars].encode('utf-8')
+        return hashlib.sha256(sample).hexdigest()
