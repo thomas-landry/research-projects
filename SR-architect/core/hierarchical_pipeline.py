@@ -25,7 +25,7 @@ from .relevance_classifier import RelevanceClassifier, RelevanceResult
 from core.data_types import PipelineResult, IterationRecord, ExtractionLog, ExtractionWarning
 from core.semantic_chunker import SemanticChunker
 from .extractor import StructuredExtractor, ExtractionWithEvidence, EvidenceItem
-from .extraction_checker import ExtractionChecker, CheckerResult
+from .validation import ExtractionChecker, CheckerResult
 from .regex_extractor import RegexExtractor, RegexResult
 from .abstract_first_extractor import AbstractFirstExtractor, AbstractExtractionResult
 from .pubmed_fetcher import PubMedFetcher

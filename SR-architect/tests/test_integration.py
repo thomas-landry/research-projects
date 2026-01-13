@@ -34,7 +34,7 @@ def test_pipeline_integration_full_flow():
     We mock the LLM client but keep the pipeline logic intact.
     """
     from core.relevance_classifier import RelevanceResponse, ChunkRelevance
-    from core.extraction_checker import CheckerResponse
+    from core.validation.models import CheckerResponse
     from core.extractor import EvidenceItem
     from agents.quality_auditor import FieldAudit
     
@@ -118,7 +118,7 @@ def test_pipeline_integration_full_flow():
 def test_pipeline_with_real_pdf_parsing():
     """Verify that we can parse a real PDF and pass it through the pipeline (mocked LLM)."""
     from core.relevance_classifier import RelevanceResponse, ChunkRelevance
-    from core.extraction_checker import CheckerResponse
+    from core.validation.models import CheckerResponse
     from core.extractor import EvidenceItem
     from agents.quality_auditor import FieldAudit
     

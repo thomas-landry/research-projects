@@ -46,7 +46,7 @@ async def test_recall_boost_trigger(mock_pipeline_recall):
     
     pipeline.extractor.extract_with_evidence_async.side_effect = [result1, result2]
     
-    from core.extraction_checker import CheckerResult
+    from core.validation import CheckerResult
     
     # Checker passes on Iteration 1 (no errors in existing data)
     check1 = CheckerResult(

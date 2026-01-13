@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 try:
     from core.extractor import StructuredExtractor
-    from core.extraction_checker import ExtractionChecker
+    from core.validation import ExtractionChecker
     from agents.screener import ScreenerAgent, PICOCriteria
     print("✅ Imports successful")
 except ImportError as e:
