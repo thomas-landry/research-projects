@@ -33,7 +33,7 @@ def test_pipeline_integration_full_flow():
     Test the HierarchicalExtractionPipeline end-to-end with a real-ish flow.
     We mock the LLM client but keep the pipeline logic intact.
     """
-    from core.relevance_classifier import RelevanceResponse, ChunkRelevance
+    from core.classification import RelevanceResponse, ChunkRelevance
     from core.validation.models import CheckerResponse
     from core.extractors.models import EvidenceItem
     from agents.quality_auditor import FieldAudit
@@ -117,7 +117,7 @@ def test_pipeline_integration_full_flow():
 @pytest.mark.skip(reason="Requires precise mock orchestration across multiple pipeline stages")
 def test_pipeline_with_real_pdf_parsing():
     """Verify that we can parse a real PDF and pass it through the pipeline (mocked LLM)."""
-    from core.relevance_classifier import RelevanceResponse, ChunkRelevance
+    from core.classification import RelevanceResponse, ChunkRelevance
     from core.validation.models import CheckerResponse
     from core.extractors.models import EvidenceItem
     from agents.quality_auditor import FieldAudit

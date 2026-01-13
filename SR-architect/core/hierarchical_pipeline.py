@@ -21,7 +21,7 @@ from core.config import settings
 
 from .parser import ParsedDocument, DocumentChunk
 from .content_filter import ContentFilter, FilterResult
-from .relevance_classifier import RelevanceClassifier, RelevanceResult
+from .classification import RelevanceClassifier, RelevanceResult
 from core.data_types import PipelineResult, IterationRecord, ExtractionLog, ExtractionWarning
 from core.semantic_chunker import SemanticChunker
 from .extractors import StructuredExtractor, ExtractionWithEvidence, EvidenceItem

@@ -1,5 +1,5 @@
 
-from core.relevance_classifier import RelevanceResponse
+from core.classification import RelevanceResponse
 import pytest
 
 def test_validator_coercion():

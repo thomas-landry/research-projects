@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 from core.parser import DocumentParser, ParsedDocument, DocumentChunk
 from core.hierarchical_pipeline import HierarchicalExtractionPipeline, PipelineResult
-from core.relevance_classifier import RelevanceClassifier, RelevanceResult
+from core.classification import RelevanceClassifier, RelevanceResult
 from core.vectorizer import ChromaVectorStore, VectorDocument
 from core.extractors import StructuredExtractor
 

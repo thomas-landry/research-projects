@@ -17,7 +17,7 @@ from core import utils
 from core.config import settings
 from core.parser import ParsedDocument, DocumentChunk
 from core.content_filter import ContentFilter
-from core.relevance_classifier import RelevanceClassifier
+from core.classification import RelevanceClassifier
 from core.data_types import PipelineResult
 from core.semantic_chunker import SemanticChunker
 from core.extractors import StructuredExtractor
