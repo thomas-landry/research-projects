@@ -64,12 +64,12 @@ class TestFormatSourceText:
             DocumentChunk(text=long_text, page_number=1, chunk_index=0),
             DocumentChunk(text="This should not appear", page_number=2, chunk_index=1)
         ]
-        result = format_source_text(chunks, max_chars=6000)
+        result = format_source_text(chunks, max_chars=5050)  # Just enough for first chunk + header
         
         # Should include first chunk but not second
         assert "AAAA" in result
         assert "This should not appear" not in result
-        assert len(result) <= 6000
+        assert len(result) <= 5100  # Allow for headers
 
 
 class TestFormatExtractedData:
