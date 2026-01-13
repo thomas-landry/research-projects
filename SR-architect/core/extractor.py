@@ -14,6 +14,9 @@ from core import constants
 
 T = TypeVar('T', bound=BaseModel)
 
+# Evidence extraction constants
+EVIDENCE_CONTEXT_MAX_CHARS = 12000  # Max characters for evidence extraction to avoid token limits
+
 
 class EvidenceItem(BaseModel):
     """Citation evidence for a single extracted value."""
@@ -28,7 +31,7 @@ class EvidenceItem(BaseModel):
     
     @field_validator('exact_quote', mode='before')
     @classmethod
-    def coerce_quote_to_string(cls, v):
+    def coerce_quote_to_string(cls, v) -> str:
         """Coerce None to empty string for robustness with local LLMs."""
         if v is None:
             return ""
@@ -40,6 +43,11 @@ class ExtractionWithEvidence(BaseModel):
     data: Dict[str, Any] = Field(description="The extracted field values")
     evidence: List[EvidenceItem] = Field(default_factory=list, description="Evidence citations for each value")
     extraction_metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class EvidenceResponse(BaseModel):
+    """Response model for evidence extraction."""
+    evidence: List[EvidenceItem]
 
 
 # Using utils.load_env
@@ -497,10 +505,13 @@ You will receive text and must output:
             
             # Now extract evidence for each field
             # Use proportional truncation based on data location hints
-            evidence_context = text[:12000]
-            if len(text) > 12000:
+            evidence_context = text[:EVIDENCE_CONTEXT_MAX_CHARS]
+            if len(text) > EVIDENCE_CONTEXT_MAX_CHARS:
                 # Log warning about truncation
-                self.logger.warning(f"Text truncated from {len(text)} to 12000 chars for evidence extraction")
+                self.logger.warning(
+                    f"Text truncated from {len(text)} to {EVIDENCE_CONTEXT_MAX_CHARS} "
+                    f"chars for evidence extraction"
+                )
 
             evidence_messages = [
                 {"role": "system", "content": self.self_proving_prompt},
@@ -512,10 +523,6 @@ And these extracted values:
 
 Provide evidence citations for each extracted value. For each field that has a non-null value, cite the exact quote from the text that supports it."""},
             ]
-            
-            # Create a dynamic model for evidence response
-            class EvidenceResponse(BaseModel):
-                evidence: List[EvidenceItem]
             
             evidence_result, completion_ev = self.client.chat.completions.create_with_completion(
                 model=self.model,
@@ -621,14 +628,11 @@ Provide evidence citations for each extracted value. For each field that has a n
                 data_dict["filename"] = filename
             
             # Evidence extraction
-            evidence_context = text[:12000]
+            evidence_context = text[:EVIDENCE_CONTEXT_MAX_CHARS]
             evidence_messages = [
                 {"role": "system", "content": self.self_proving_prompt},
                 {"role": "user", "content": f"Based on this text:\n{evidence_context}\n\nAnd these extracted values:\n{data_dict}\n\nProvide evidence citations for each extracted value."},
             ]
-            
-            class EvidenceResponse(BaseModel):
-                evidence: List[EvidenceItem]
             
             ev_result, completion_ev = await self.async_client.chat.completions.create_with_completion(
                 model=self.model,
