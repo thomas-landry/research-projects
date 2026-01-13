@@ -75,14 +75,14 @@ class TestCheckerResponse:
         )
         assert response.accuracy_score == 0.0
         
-        # Invalid scores should raise validation error
-        with pytest.raises(Exception):  # Pydantic ValidationError
-            CheckerResponse(
-                accuracy_score=1.5,  # Out of bounds
-                consistency_score=0.8,
-                issues=[],
-                suggestions=[]
-            )
+        # Out of bounds scores should be clamped to [0, 1]
+        response = CheckerResponse(
+            accuracy_score=1.5,  # Out of bounds
+            consistency_score=0.8,
+            issues=[],
+            suggestions=[]
+        )
+        assert response.accuracy_score == 1.0  # Clamped to max
     
     def test_coerce_score_to_float(self):
         """Should coerce None scores to 0.0."""
