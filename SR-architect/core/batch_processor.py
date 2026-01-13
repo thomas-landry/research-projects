@@ -4,6 +4,7 @@ from typing import List, Type, TypeVar, Optional, Callable, Dict, Any
 from .parser import ParsedDocument
 from .state_manager import StateManager
 from core import utils
+from core.constants import CIRCUIT_BREAKER_THRESHOLD
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Type variable for the schema
@@ -37,6 +38,135 @@ class CircuitBreaker:
             self.failure_count = 0
             self.is_open = False
 
+class ExecutionHandler:
+    """
+    Shared execution logic for batch processing.
+    
+    Centralizes result serialization and error handling to eliminate
+    duplication between sync and async execution paths.
+    """
+    def __init__(self, state_manager: StateManager, circuit_breaker: CircuitBreaker):
+        """
+        Initialize the execution handler.
+        
+        Args:
+            state_manager: StateManager instance for checkpointing
+            circuit_breaker: CircuitBreaker instance for failure tracking
+        """
+        self.state_manager = state_manager
+        self.circuit_breaker = circuit_breaker
+    
+    def serialize_result(self, result: Any) -> Dict[str, Any]:
+        """
+        Serialize extraction result to dictionary.
+        
+        Pure function with no side effects - reusable in sync/async paths.
+        
+        Args:
+            result: Extraction result (PipelineResult, dict, or object)
+            
+        Returns:
+            Serialized result as dictionary
+        """
+        if hasattr(result, 'to_dict'):
+            return result.to_dict()
+        elif hasattr(result, 'model_dump'):
+            return result.model_dump()
+        elif isinstance(result, dict):
+            return result
+        return result.__dict__
+    
+    def handle_success(
+        self,
+        filename: str,
+        serialized: Dict[str, Any],
+        callback: Optional[Callable[[str, Any, str], None]] = None,
+        save: bool = True
+    ) -> tuple:
+        """
+        Handle successful extraction.
+        
+        Args:
+            filename: Document filename
+            serialized: Serialized extraction result
+            callback: Optional progress callback
+            save: Whether to save state immediately
+            
+        Returns:
+            Tuple of (filename, serialized_result, status)
+        """
+        self.state_manager.update_result(filename, serialized, status="success", save=save)
+        self.circuit_breaker.record_success()
+        logger.info(f"✓ Completed {filename}")
+        if callback:
+            callback(filename, serialized, "success")
+        return (filename, serialized, "success")
+    
+    def handle_memory_error(
+        self,
+        filename: str,
+        callback: Optional[Callable[[str, Any, str], None]] = None,
+        save: bool = True
+    ) -> tuple:
+        """
+        Handle memory error during extraction.
+        
+        Args:
+            filename: Document filename
+            callback: Optional progress callback
+            save: Whether to save state immediately
+            
+        Returns:
+            Tuple of (filename, error_payload, status)
+        """
+        logger.error(f"OOM processing {filename}")
+        self.circuit_breaker.record_failure()
+        error_payload = {"error": "Out of memory", "error_type": "MemoryError"}
+        self.state_manager.update_result(filename, error_payload, status="failed", save=save)
+        if callback:
+            callback(filename, error_payload, "failed")
+        return (filename, error_payload, "failed")
+    
+    def handle_general_error(
+        self,
+        filename: str,
+        error: Exception,
+        callback: Optional[Callable[[str, Any, str], None]] = None,
+        save: bool = True,
+        register_error: bool = False
+    ) -> tuple:
+        """
+        Handle general extraction error.
+        
+        Args:
+            filename: Document filename
+            error: Exception that occurred
+            callback: Optional progress callback
+            save: Whether to save state immediately
+            register_error: Whether to register error in ErrorRegistry
+            
+        Returns:
+            Tuple of (filename, error_payload, status)
+        """
+        logger.error(f"Error processing {filename}: {error}", exc_info=True)
+        self.circuit_breaker.record_failure()
+        
+        if register_error:
+            from core.error_registry import ErrorRegistry
+            ErrorRegistry().register(
+                error,
+                location="BatchExecutor.process_batch_async",
+                context={"filename": filename}
+            )
+        
+        error_payload = {"error": str(error)}
+        self.state_manager.update_result(filename, error_payload, status="failed", save=save)
+        logger.error(f"✗ Failed {filename}")
+        if callback:
+            callback(filename, str(error), "failed")
+        return (filename, error_payload, "failed")
+
+
 class BatchExecutor:
     """
     Handles parallel execution of document extraction.
@@ -62,7 +192,8 @@ class BatchExecutor:
         self.state_manager = state_manager
         self.max_workers = max_workers
         self.resource_manager = resource_manager
-        self.circuit_breaker = CircuitBreaker(threshold=3)
+        self.circuit_breaker = CircuitBreaker(threshold=CIRCUIT_BREAKER_THRESHOLD)
+        self.handler = ExecutionHandler(state_manager, self.circuit_breaker)
 
     def process_batch(
         self,
@@ -112,19 +243,13 @@ class BatchExecutor:
                 return (doc.filename, "Circuit breaker open", "skipped")
                 
             try:
-                # Call the pipeline's single-document extract method
-                # Note: Assuming pipeline is thread-safe or stateless enough
                 result = self.pipeline.extract_document(doc, schema, theme)
-                self.circuit_breaker.record_success()
-                return (doc.filename, result, "success")
+                serialized = self.handler.serialize_result(result)
+                return self.handler.handle_success(doc.filename, serialized, callback)
             except MemoryError:
-                logger.error(f"OOM processing {doc.filename}")
-                self.circuit_breaker.record_failure()
-                return (doc.filename, {"error": "Out of memory", "error_type": "MemoryError"}, "failed")
+                return self.handler.handle_memory_error(doc.filename, callback)
             except Exception as e:
-                logger.error(f"Error processing {doc.filename}: {e}", exc_info=True)
-                self.circuit_breaker.record_failure()
-                return (doc.filename, str(e), "failed")
+                return self.handler.handle_general_error(doc.filename, e, callback)
 
         # Execute
         with ThreadPoolExecutor(max_workers=limit) as executor:
@@ -135,29 +260,11 @@ class BatchExecutor:
             
             try:
                 for future in as_completed(future_to_doc):
-                    filename, data, status = future.result()
+                    filename, extraction_result, extraction_status = future.result()
                     
-                    if status == "success":
-                        # Use to_dict() if available, then model_dump(), then __dict__
-                        if hasattr(data, 'to_dict'):
-                            serialized = data.to_dict()
-                        elif hasattr(data, 'model_dump'):
-                            serialized = data.model_dump()
-                        else:
-                            serialized = data.__dict__
-                        
-                        self.state_manager.update_result(filename, serialized, status="success")
-                        logger.info(f"✓ Completed {filename}")
-                        if callback:
-                            callback(filename, serialized, "success")
-                    elif status == "skipped":
-                        logger.warning(f"Skipped {filename}: {data}")
-                    else:
-                        error_payload = data if isinstance(data, dict) else {"error": str(data)}
-                        self.state_manager.update_result(filename, error_payload, status="failed")
-                        logger.error(f"✗ Failed {filename}")
-                        if callback:
-                            callback(filename, data, "failed")
+                    if extraction_status == "skipped":
+                        logger.warning(f"Skipped {filename}: {extraction_result}")
+                    # Note: Success and error handling already done in _execute_single via handler
                         
             except KeyboardInterrupt:
                 logger.warning("Batch processing interrupted by user. Shutting down workers...")
@@ -224,51 +331,19 @@ class BatchExecutor:
             async with semaphore:
                 try:
                     result = await self.pipeline.extract_document_async(doc, schema, theme)
-                    self.circuit_breaker.record_success()
-                    
-                    # Process result
-                    if hasattr(result, 'to_dict'):
-                        serialized = result.to_dict()
-                    elif hasattr(result, 'model_dump'):
-                        serialized = result.model_dump()
-                    elif isinstance(result, dict):
-                        serialized = result
-                    else:
-                        serialized = result.__dict__
-
-                    self.state_manager.update_result(doc.filename, serialized, status="success", save=False)
+                    serialized = self.handler.serialize_result(result)
+                    self.handler.handle_success(doc.filename, serialized, callback, save=False)
                     await self.state_manager.save_async()
-                    logger.info(f"✓ Completed {doc.filename}")
-                    if callback:
-                        callback(doc.filename, serialized, "success")
                     return result
                 except MemoryError:
-                    logger.error(f"OOM processing {doc.filename}")
-                    self.circuit_breaker.record_failure()
-                    error_payload = {"error": "Out of memory", "error_type": "MemoryError"}
-                    self.state_manager.update_result(doc.filename, error_payload, status="failed", save=False)
+                    self.handler.handle_memory_error(doc.filename, callback, save=False)
                     await self.state_manager.save_async()
-                    if callback:
-                        callback(doc.filename, error_payload, "failed")
                     return None
                 except Exception as e:
-                    logger.error(f"Error processing {doc.filename}: {e}", exc_info=True)
-                    self.circuit_breaker.record_failure()
-                    
-                    # Register fatal error
-                    from core.error_registry import ErrorRegistry
-                    ErrorRegistry().register(
-                        e,
-                        location="BatchExecutor.process_batch_async",
-                        context={"filename": doc.filename}
+                    self.handler.handle_general_error(
+                        doc.filename, e, callback, save=False, register_error=True
                     )
-                    
-                    self.state_manager.update_result(doc.filename, {"error": str(e)}, status="failed", save=False)
-                    # We await async save even in failure to ensure checkpoint integrity
                     await self.state_manager.save_async()
-                    logger.error(f"✗ Failed {doc.filename}")
-                    if callback:
-                        callback(doc.filename, str(e), "failed")
                     return None
 
         # Execute all tasks

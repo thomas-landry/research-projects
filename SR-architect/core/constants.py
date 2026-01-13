@@ -16,6 +16,7 @@ VALIDATION_WEIGHT_ACCURACY = 0.4
 # === Batch Processing ===
 DEFAULT_BATCH_SIZE = 10
 DEFAULT_PREVIEW_CHARS = 500
+CIRCUIT_BREAKER_THRESHOLD = 3  # Number of consecutive failures before opening circuit
 
 # === Sentence Extraction ===
 SENTENCE_CONTEXT_WINDOW = 2
