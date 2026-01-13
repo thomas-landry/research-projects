@@ -9,6 +9,7 @@ from .helpers import (
     truncate_chunk,
     build_batch_prompt
 )
+from .classifier import RelevanceClassifier
 
 __all__ = [
     "RelevanceResult",
@@ -17,4 +18,5 @@ __all__ = [
     "coerce_relevance_list",
     "truncate_chunk",
     "build_batch_prompt",
+    "RelevanceClassifier",
 ]
