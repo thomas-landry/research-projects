@@ -42,7 +42,7 @@ from core.schema_chunker import (
     should_chunk_schema,
 )
 from agents.schema_discovery import interactive_discovery
-from core.extractor import StructuredExtractor
+from core.extractors import StructuredExtractor
 from core.vectorizer import ChromaVectorStore
 from core.audit_logger import AuditLogger
 from core.token_tracker import TokenTracker

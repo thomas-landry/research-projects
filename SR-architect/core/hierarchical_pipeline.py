@@ -24,7 +24,7 @@ from .content_filter import ContentFilter, FilterResult
 from .relevance_classifier import RelevanceClassifier, RelevanceResult
 from core.data_types import PipelineResult, IterationRecord, ExtractionLog, ExtractionWarning
 from core.semantic_chunker import SemanticChunker
-from .extractor import StructuredExtractor, ExtractionWithEvidence, EvidenceItem
+from .extractors import StructuredExtractor, ExtractionWithEvidence, EvidenceItem
 from .validation import ExtractionChecker, CheckerResult
 from .regex_extractor import RegexExtractor, RegexResult
 from .abstract_first_extractor import AbstractFirstExtractor, AbstractExtractionResult
@@ -612,7 +612,7 @@ class HierarchicalExtractionPipeline:
                             extraction.evidence = [e for e in extraction.evidence if e.field_name != field_type]
                             
                             # Add new evidence with provenance
-                            from .extractor import EvidenceItem
+                            from .extractors.models import EvidenceItem
                             extraction.evidence.append(EvidenceItem(
                                 field_name=field_type,
                                 extracted_value=text,

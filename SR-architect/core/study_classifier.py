@@ -11,7 +11,7 @@ Detects:
 from typing import Literal, Optional, Tuple
 from pydantic import BaseModel, Field
 
-from core.extractor import StructuredExtractor
+from core.extractors import StructuredExtractor
 from core.utils import get_logger
 
 

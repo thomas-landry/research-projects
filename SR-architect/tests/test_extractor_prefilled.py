@@ -7,7 +7,7 @@ in extract_with_evidence and extract_with_evidence_async methods.
 import pytest
 from unittest.mock import Mock, MagicMock, patch
 from pydantic import BaseModel, Field
-from core.extractor import StructuredExtractor, ExtractionWithEvidence
+from core.extractors import StructuredExtractor, ExtractionWithEvidence
 
 
 class SampleSchema(BaseModel):

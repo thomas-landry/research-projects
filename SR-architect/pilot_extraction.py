@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Optional
 
 from core.parser import DocumentParser
-from core.extractor import StructuredExtractor
+from core.extractors import StructuredExtractor
 from core.token_tracker import TokenTracker
 from core.binary_deriver import BinaryDeriver, process_extraction
 from schemas.dpm_gold_standard import DPMNarrativeExtractionSchema

@@ -20,7 +20,7 @@ from core.content_filter import ContentFilter
 from core.relevance_classifier import RelevanceClassifier
 from core.data_types import PipelineResult
 from core.semantic_chunker import SemanticChunker
-from core.extractor import StructuredExtractor
+from core.extractors import StructuredExtractor
 from core.validation import ExtractionChecker
 from core.regex_extractor import RegexExtractor
 from core.abstract_first_extractor import AbstractFirstExtractor

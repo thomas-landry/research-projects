@@ -9,7 +9,7 @@ from core.parser import DocumentParser, ParsedDocument, DocumentChunk
 from core.hierarchical_pipeline import HierarchicalExtractionPipeline, PipelineResult
 from core.relevance_classifier import RelevanceClassifier, RelevanceResult
 from core.vectorizer import ChromaVectorStore, VectorDocument
-from core.extractor import StructuredExtractor
+from core.extractors import StructuredExtractor
 
 # BUG-001: Index OOB in parser
 def test_parser_empty_headings_list():

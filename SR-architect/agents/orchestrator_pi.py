@@ -39,7 +39,7 @@ from core.audit_logger import AuditLogger
 from agents.librarian import LibrarianAgent
 from agents.screener import ScreenerAgent
 from agents.synthesizer import SynthesizerAgent
-from core.extractor import StructuredExtractor
+from core.extractors import StructuredExtractor
 from core.schema_builder import get_observational_schema, build_extraction_model
 
 

@@ -277,11 +277,13 @@ Extract the requested fields according to the provided schema."""
         if max_retries is None:
             max_retries = self.max_retries
         
-        for attempt in range(max_retries):
+        # max_retries is number of retries AFTER initial attempt
+        # So total attempts = 1 + max_retries
+        for attempt in range(max_retries + 1):
             try:
                 return self.extract(text, schema, filename)
             except Exception as e:
-                if attempt == max_retries - 1:
+                if attempt == max_retries:
                     raise
                 self.logger.warning(f"Extraction attempt {attempt + 1} failed: {e}")
     
@@ -298,17 +300,24 @@ Extract the requested fields according to the provided schema."""
         if max_retries is None:
             max_retries = self.max_retries
         
-        for attempt in range(max_retries):
+        # max_retries is number of retries AFTER initial attempt
+        # So total attempts = 1 + max_retries
+        for attempt in range(max_retries + 1):
             try:
                 return await self.extract_async(text, schema, filename)
             except Exception as e:
-                if attempt == max_retries - 1:
+                if attempt == max_retries:
                     raise
                 self.logger.warning(f"Async extraction attempt {attempt + 1} failed: {e}")
 
     def get_usage_stats(self) -> Dict[str, int]:
         """Get usage statistics."""
-        return {"call_count": self.call_count, "success_count": self.success_count, "failure_count": self.failure_count}
+        return {
+            "total_calls": self.call_count,
+            "call_count": self.call_count,
+            "success_count": self.success_count,
+            "failure_count": self.failure_count
+        }
 
     def _build_evidence_messages(
         self,
@@ -356,6 +365,7 @@ If you cannot find a supporting quote, use an empty string for exact_quote."""
         text: str,
         schema: Type[T],
         filename: Optional[str] = None,
+        revision_prompts: Optional[List[str]] = None,
         pre_filled_fields: Optional[Dict[str, Any]] = None,
     ) -> ExtractionWithEvidence:
         """
@@ -365,6 +375,7 @@ If you cannot find a supporting quote, use an empty string for exact_quote."""
             text: Source text
             schema: Pydantic schema
             filename: Optional filename
+            revision_prompts: Optional list of revision instructions from previous iterations
             pre_filled_fields: Optional dict of pre-filled field values
             
         Returns:
@@ -377,11 +388,17 @@ If you cannot find a supporting quote, use an empty string for exact_quote."""
         if self.examples:
             system_prompt += f"\n\n{self.examples}"
         
-        # Add pre-filled fields to prompt if provided
+        # Add revision prompts if provided
         user_prompt = f"Extract the following data from this text:\n\n{text}"
+        
+        if revision_prompts:
+            revision_text = "\n".join([f"- {prompt}" for prompt in revision_prompts])
+            user_prompt += f"\n\nREVISION INSTRUCTIONS:\n{revision_text}"
+        
+        # Add pre-filled fields to prompt if provided
         if pre_filled_fields:
             prefilled_str = "\n".join([f"  {k}: {v}" for k, v in pre_filled_fields.items()])
-            user_prompt += f"\n\nPRE-FILLED FIELDS (use these values):\n{prefilled_str}"
+            user_prompt += f"\n\nPRE-EXTRACTED FIELDS (use these values):\n{prefilled_str}"
         
         try:
             # Step 1: Extract data
@@ -463,6 +480,7 @@ If you cannot find a supporting quote, use an empty string for exact_quote."""
         text: str,
         schema: Type[T],
         filename: Optional[str] = None,
+        revision_prompts: Optional[List[str]] = None,
         pre_filled_fields: Optional[Dict[str, Any]] = None,
     ) -> ExtractionWithEvidence:
         """
@@ -472,6 +490,7 @@ If you cannot find a supporting quote, use an empty string for exact_quote."""
             text: Source text
             schema: Pydantic schema
             filename: Optional filename
+            revision_prompts: Optional list of revision instructions from previous iterations
             pre_filled_fields: Optional dict of pre-filled field values
             
         Returns:
@@ -484,11 +503,17 @@ If you cannot find a supporting quote, use an empty string for exact_quote."""
         if self.examples:
             system_prompt += f"\n\n{self.examples}"
         
-        # Add pre-filled fields to prompt if provided
+        # Add revision prompts if provided
         user_prompt = f"Extract the following data from this text:\n\n{text}"
+        
+        if revision_prompts:
+            revision_text = "\n".join([f"- {prompt}" for prompt in revision_prompts])
+            user_prompt += f"\n\nREVISION INSTRUCTIONS:\n{revision_text}"
+        
+        # Add pre-filled fields to prompt if provided
         if pre_filled_fields:
             prefilled_str = "\n".join([f"  {k}: {v}" for k, v in pre_filled_fields.items()])
-            user_prompt += f"\n\nPRE-FILLED FIELDS (use these values):\n{prefilled_str}"
+            user_prompt += f"\n\nPRE-EXTRACTED FIELDS (use these values):\n{prefilled_str}"
         
         try:
             # Step 1: Extract data

@@ -7,5 +7,5 @@ from .batch_processor import BatchExecutor
 from .state_manager import StateManager, PipelineCheckpoint
 from .content_filter import ContentFilter
 from .relevance_classifier import RelevanceClassifier
-from .extractor import StructuredExtractor
+from .extractors import StructuredExtractor
 from .validation import ExtractionChecker
