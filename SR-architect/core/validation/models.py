@@ -20,13 +20,13 @@ class Issue(BaseModel):
     
     @field_validator('issue_type', 'field', 'detail', mode='before')
     @classmethod
-    def coerce_to_string(cls, v):
+    def coerce_to_string(cls, value) -> str:
         """Handle local LLMs returning lists or other types instead of strings."""
-        if isinstance(v, list):
-            return ", ".join(str(x) for x in v)
-        if v is None:
+        if isinstance(value, list):
+            return ", ".join(str(x) for x in value)
+        if value is None:
             return ""
-        return str(v)
+        return str(value)
 
 
 class CheckerResponse(BaseModel):
@@ -38,31 +38,31 @@ class CheckerResponse(BaseModel):
     
     @field_validator('accuracy_score', 'consistency_score', mode='before')
     @classmethod
-    def coerce_score_to_float(cls, v):
+    def coerce_score_to_float(cls, value) -> float:
         """Handle local LLMs returning None or invalid score values."""
-        if v is None:
+        if value is None:
             return 0.0
         try:
-            score = float(v)
+            score = float(value)
             return max(0.0, min(1.0, score))  # Clamp to [0, 1]
         except (ValueError, TypeError):
             return 0.0
     
     @field_validator('suggestions', mode='before')
     @classmethod
-    def coerce_suggestions_to_strings(cls, v):
+    def coerce_suggestions_to_strings(cls, value) -> List[str]:
         """Handle local LLMs returning dicts like {'text': '...'} instead of strings."""
-        if not v:
+        if not value:
             return []
         result = []
-        for item in v:
-            if isinstance(item, dict):
+        for suggestion_item in value:
+            if isinstance(suggestion_item, dict):
                 # Extract text from dict format
-                result.append(item.get('text', item.get('suggestion', str(item))))
-            elif isinstance(item, str):
-                result.append(item)
+                result.append(suggestion_item.get('text', suggestion_item.get('suggestion', str(suggestion_item))))
+            elif isinstance(suggestion_item, str):
+                result.append(suggestion_item)
             else:
-                result.append(str(item))
+                result.append(str(suggestion_item))
         return result
 
 
