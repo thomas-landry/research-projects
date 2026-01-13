@@ -298,7 +298,7 @@ Extract the requested fields according to the provided schema."""
             return cached_result
 
         try:
-            self.logger.info(f"Extracting data (async) from {filename or 'text'} examples={len(self.examples)} using {self.model}")
+            self.logger.info(f"Extracting data (async) from {filename or 'text'} using {self.model}")
             result, completion = await self.async_client.chat.completions.create_with_completion(
                 model=self.model,
                 messages=messages,
