@@ -401,6 +401,39 @@ Extract the requested fields according to the provided schema."""
         """Get usage statistics."""
         return self._stats
     
+    def _build_evidence_messages(
+        self,
+        text: str,
+        extracted_data: Dict[str, Any]
+    ) -> List[Dict[str, str]]:
+        """
+        Build messages for evidence extraction call.
+        
+        Args:
+            text: Source text to extract evidence from
+            extracted_data: Already-extracted field values
+            
+        Returns:
+            List of message dicts for LLM call
+        """
+        evidence_context = text[:EVIDENCE_CONTEXT_MAX_CHARS]
+        if len(text) > EVIDENCE_CONTEXT_MAX_CHARS:
+            self.logger.warning(
+                f"Text truncated from {len(text)} to {EVIDENCE_CONTEXT_MAX_CHARS} "
+                f"chars for evidence extraction"
+            )
+        
+        return [
+            {"role": "system", "content": self.self_proving_prompt},
+            {"role": "user", "content": f"""Based on this text:
+{evidence_context}
+
+And these extracted values:
+{extracted_data}
+
+Provide evidence citations for each extracted value. For each field that has a non-null value, cite the exact quote from the text that supports it."""},
+        ]
+    
     # Self-proving extraction prompt
     SELF_PROVING_PROMPT_TEMPLATE = """You are an expert systematic reviewer extracting data for a meta-analysis.
 
@@ -503,26 +536,8 @@ You will receive text and must output:
             if filename:
                 data_dict["filename"] = filename
             
-            # Now extract evidence for each field
-            # Use proportional truncation based on data location hints
-            evidence_context = text[:EVIDENCE_CONTEXT_MAX_CHARS]
-            if len(text) > EVIDENCE_CONTEXT_MAX_CHARS:
-                # Log warning about truncation
-                self.logger.warning(
-                    f"Text truncated from {len(text)} to {EVIDENCE_CONTEXT_MAX_CHARS} "
-                    f"chars for evidence extraction"
-                )
-
-            evidence_messages = [
-                {"role": "system", "content": self.self_proving_prompt},
-                {"role": "user", "content": f"""Based on this text:
-{evidence_context}
-
-And these extracted values:
-{data_dict}
-
-Provide evidence citations for each extracted value. For each field that has a non-null value, cite the exact quote from the text that supports it."""},
-            ]
+            # Build evidence extraction messages
+            evidence_messages = self._build_evidence_messages(text, data_dict)
             
             evidence_result, completion_ev = self.client.chat.completions.create_with_completion(
                 model=self.model,
@@ -627,12 +642,8 @@ Provide evidence citations for each extracted value. For each field that has a n
             if filename:
                 data_dict["filename"] = filename
             
-            # Evidence extraction
-            evidence_context = text[:EVIDENCE_CONTEXT_MAX_CHARS]
-            evidence_messages = [
-                {"role": "system", "content": self.self_proving_prompt},
-                {"role": "user", "content": f"Based on this text:\n{evidence_context}\n\nAnd these extracted values:\n{data_dict}\n\nProvide evidence citations for each extracted value."},
-            ]
+            # Build evidence extraction messages
+            evidence_messages = self._build_evidence_messages(text, data_dict)
             
             ev_result, completion_ev = await self.async_client.chat.completions.create_with_completion(
                 model=self.model,
