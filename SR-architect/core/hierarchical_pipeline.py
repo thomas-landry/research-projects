@@ -27,8 +27,6 @@ from core.semantic_chunker import SemanticChunker
 from .extractors import StructuredExtractor, ExtractionWithEvidence, EvidenceItem
 from .validation import ExtractionChecker, CheckerResult
 from .regex_extractor import RegexExtractor, RegexResult
-from .abstract_first_extractor import AbstractFirstExtractor, AbstractExtractionResult
-from .pubmed_fetcher import PubMedFetcher
 from .two_pass_extractor import TwoPassExtractor, ModelCascader, ExtractionTier
 from core.sentence_extractor import SentenceExtractor
 
@@ -36,8 +34,6 @@ from core.sentence_extractor import SentenceExtractor
 from agents.schema_discovery import SchemaDiscoveryAgent, FieldDefinition
 from agents.quality_auditor import QualityAuditorAgent, AuditReport
 from agents.meta_analyst import MetaAnalystAgent, MetaAnalysisFeasibility
-from agents.conflict_resolver import ConflictResolverAgent
-from agents.section_locator import SectionLocatorAgent
 
 T = TypeVar('T', bound=BaseModel)
 
@@ -121,10 +117,6 @@ class HierarchicalExtractionPipeline:
             model=model,
             token_tracker=self.token_tracker
         )
-        
-        # Initialize abstract-first extraction components
-        self.abstract_extractor = AbstractFirstExtractor()
-        self.pubmed_fetcher = PubMedFetcher()
         
         # Initialize two-pass extractor for hybrid mode
         self.two_pass_extractor = TwoPassExtractor(

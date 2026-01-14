@@ -23,8 +23,6 @@ from core.semantic_chunker import SemanticChunker
 from core.extractors import StructuredExtractor
 from core.validation import ExtractionChecker
 from core.regex_extractor import RegexExtractor
-from core.abstract_first_extractor import AbstractFirstExtractor
-from core.pubmed_fetcher import PubMedFetcher
 from core.two_pass_extractor import TwoPassExtractor
 from core.sentence_extractor import SentenceExtractor
 
@@ -121,10 +119,6 @@ class HierarchicalExtractionPipeline:
             model=model,
             token_tracker=self.token_tracker
         )
-        
-        # Initialize abstract-first extraction components
-        self.abstract_extractor = AbstractFirstExtractor()
-        self.pubmed_fetcher = PubMedFetcher()
         
         # Initialize two-pass extractor for hybrid mode
         self.two_pass_extractor = TwoPassExtractor(
