@@ -9,40 +9,41 @@
 ## Phase 1: Dead Code Removal
 
 ### Core Modules
-- [ ] **Task 1.1**: Delete 3 dead core modules
+- [x] **Task 1.1**: Delete 4 dead core modules ✅
   - Files: `abstract_first_extractor.py`, `pubmed_fetcher.py`, `validation_rules.py`, `self_consistency.py`
   - Owner: `/senior_dev`
   
-- [ ] **Task 1.2**: Archive auto_corrector.py
+- [x] **Task 1.2**: Archive auto_corrector.py ✅
   - Move to `archive/` directory (may be needed in future)
   - Owner: `/senior_dev`
   
-- [ ] **Task 1.3**: Add rapidfuzz to requirements.txt
+- [x] **Task 1.3**: Add rapidfuzz to requirements.txt ✅
   - Required for `fuzzy_deduplicator.py`
   - Owner: `/senior_dev`
 
 ### Agent Modules
-- [ ] **Task 1.4**: Delete 2 unused agent modules
+- [x] **Task 1.4**: Delete 2 unused agent modules ✅
   - Files: `conflict_resolver.py`, `section_locator.py`
   - Note: Keeping `researcher_analysis.py` for future use
   - Owner: `/senior_dev`
 
 ### Test Files
-- [ ] **Task 1.5**: Delete orphaned test file
-  - File: `test_abstract_first.py`
+- [x] **Task 1.5**: Delete orphaned test files ✅
+  - Files: `test_abstract_first_extractor.py`, `test_self_consistency.py`, `test_phase2_components.py`, `test_phase4_components.py`
   - Owner: `/senior_dev`
 
 ### Cleanup
-- [ ] **Task 1.6**: Delete standalone scripts
-  - File: `debug_openrouter_pricing.py` (if exists)
+- [x] **Task 1.6**: Delete standalone scripts ✅
+  - File: `debug_openrouter_pricing.py` (not found - already deleted)
   - Owner: `/senior_dev`
 
-- [ ] **Task 1.7**: Delete temporary directories
-  - Directory: `temp_healy/`
+- [x] **Task 1.7**: Delete temporary directories ✅
+  - Directory: `temp_healy/` (not found - already deleted)
   - Owner: `/senior_dev`
 
-- [ ] **Task 1.8**: Clean unused imports in `hierarchical_pipeline.py`
-  - Remove dead imports and instantiations
+- [x] **Task 1.8**: Clean unused imports in `hierarchical_pipeline.py` ✅
+  - Removed dead imports and instantiations for AbstractFirstExtractor, PubMedFetcher, ConflictResolverAgent, SectionLocatorAgent
+  - Also cleaned `core/pipeline/core.py`
   - Owner: `/senior_dev`
 
 - [ ] **Task 1.9**: Clean minor Vulture findings - unused imports (7 files)

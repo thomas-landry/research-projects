@@ -250,5 +250,5 @@ class ManualReviewQueue:
     def __enter__(self):
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, _):
         self.close()

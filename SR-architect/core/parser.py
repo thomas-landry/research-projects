@@ -17,10 +17,6 @@ from .config import settings
 from .text_splitter import split_text_into_chunks
 from .utils import get_logger
 
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    BeautifulSoup = None
 
 try:
     import fitz  # PyMuPDF

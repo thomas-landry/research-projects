@@ -22,7 +22,7 @@ class EvidenceItem(BaseModel):
     
     @field_validator('exact_quote', mode='before')
     @classmethod
-    def coerce_quote_to_string(cls, value) -> str:
+    def coerce_quote_to_string(_, value) -> str:
         """Coerce None to empty string for robustness with local LLMs."""
         if value is None:
             return ""
