@@ -10,8 +10,32 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
+
+# Conditional import to avoid circular dependency
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from core.parser import ParsedDocument
+
 import chromadb
 from chromadb.utils import embedding_functions
+
+# Constants
+MAX_METADATA_VALUE_LENGTH = 1000  # ChromaDB metadata size limit
+
+
+
+def _safe_get(lst: List[Any], index: int, default: Any) -> Any:
+    """Safely get item from list with default fallback.
+    
+    Args:
+        lst: List to retrieve from
+        index: Index to access
+        default: Default value if index out of bounds
+        
+    Returns:
+        Item at index or default value
+    """
+    return lst[index] if index < len(lst) else default
 
 
 def _sanitize_metadata_value(value: Any) -> Any:
@@ -23,11 +47,11 @@ def _sanitize_metadata_value(value: Any) -> Any:
     if isinstance(value, str):
         # Limit string length and remove control characters
         sanitized = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', str(value))
-        return sanitized[:1000]  # Limit to 1000 chars
+        return sanitized[:MAX_METADATA_VALUE_LENGTH]
     if isinstance(value, (list, dict)):
         # Convert to string with length limit
-        return str(value)[:1000]
-    return str(value)[:1000]
+        return str(value)[:MAX_METADATA_VALUE_LENGTH]
+    return str(value)[:MAX_METADATA_VALUE_LENGTH]
 
 
 def load_env():
@@ -88,10 +112,8 @@ class ChromaVectorStore:
         if self._client is not None:
             return
         
-        try:
-            import chromadb
-            from chromadb.utils import embedding_functions
-        except ImportError:
+        # Verify chromadb is available (already imported at module level)
+        if chromadb is None:
             raise ImportError(
                 "ChromaDB not installed. Run: pip install chromadb"
             )
@@ -109,8 +131,11 @@ class ChromaVectorStore:
             self._embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
                 model_name=self.embedding_model
             )
-        except Exception:
-            # Fallback to default embeddings
+        except (ImportError, RuntimeError, OSError) as e:
+            # Fallback to default embeddings if model loading fails
+            from core.utils import get_logger
+            logger = get_logger("ChromaVectorStore")
+            logger.warning(f"Failed to load embedding model '{self.embedding_model}': {e}. Using default.")
             self._embedding_fn = embedding_functions.DefaultEmbeddingFunction()
         
         # Get or create collection
@@ -182,7 +207,7 @@ class ChromaVectorStore:
 
     def add_chunks_from_parsed_doc(
         self,
-        doc,  # ParsedDocument
+        doc: "ParsedDocument",
         extracted_data: Optional[Dict[str, Any]] = None,
     ) -> int:
         """
@@ -264,17 +289,17 @@ class ChromaVectorStore:
         # Format results
         formatted = []
         if results:
-            ids = results.get('ids', [[]])[0]
-            docs = results.get('documents', [[]])[0]
-            metas = results.get('metadatas', [[]])[0]
-            dists = results.get('distances', [[]])[0]
+            document_ids = results.get('ids', [[]])[0]
+            document_texts = results.get('documents', [[]])[0]
+            metadatas = results.get('metadatas', [[]])[0]
+            distances = results.get('distances', [[]])[0]
             
-            for i in range(len(ids)):
+            for idx in range(len(document_ids)):
                 formatted.append({
-                    "id": ids[i] if i < len(ids) else None,
-                    "text": docs[i] if i < len(docs) else "",
-                    "metadata": metas[i] if i < len(metas) else {},
-                    "distance": dists[i] if i < len(dists) else None,
+                    "id": _safe_get(document_ids, idx, None),
+                    "text": _safe_get(document_texts, idx, ""),
+                    "metadata": _safe_get(metadatas, idx, {}),
+                    "distance": _safe_get(distances, idx, None),
                 })
         
         return formatted
