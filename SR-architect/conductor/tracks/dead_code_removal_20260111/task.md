@@ -264,21 +264,21 @@
   - Line: 7
   - Owner: `/docs_agent`
 
-- [ ] **Task 5.4**: Expand docstring in `cache_manager.py::compute_doc_hash()`
+- [x] **Task 5.4**: Expand docstring in `cache_manager.py::compute_doc_hash()` ✅
   - Add Args, Returns sections
   - Line: 412
   - Owner: `/docs_agent`
 
 ### Phase 5B: Variable Renaming (Priority 5)
-- [ ] **Task 5.5**: Rename ambiguous variables in `schema_builder.py`
+- [x] **Task 5.5**: Rename ambiguous variables in `schema_builder.py` ✅
   - `clean_name` → `sanitized_name` (line 349)
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.6**: Rename ambiguous variables in `parser.py`
+- [x] **Task 5.6**: Rename ambiguous variables in `parser.py` ✅
   - `doc` → `pdf_document` (line 414 in `_parse_pdf_pymupdf`)
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.7**: Rename ambiguous variables in `schema_discovery.py`
+- [x] **Task 5.7**: Rename ambiguous variables in `schema_discovery.py` ✅
   - `all_suggestions` → `field_suggestions_from_all_papers` (line 308)
   - Owner: `/refactor-for-clarity`
 
@@ -291,18 +291,18 @@
   - Owner: `/refactor-for-clarity`
 
 ### Phase 5C: Extract Repeated Code (Priority 4)
-- [ ] **Task 5.10**: Extract `_chunk_text()` helper in `parser.py`
+- [x] **Task 5.10**: Extract `_chunk_text()` helper in `parser.py` ✅
   - Consolidate 3 repeated `split_text_into_chunks()` calls
   - Lines: 342, 423, 453
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.11**: Extract `FIELD_TYPE_MAPPING` constant in `schema_discovery.py`
+- [x] **Task 5.11**: Extract `FIELD_TYPE_MAPPING` constant in `schema_discovery.py` ✅
   - Move type mapping dict to module level
   - Lines: 337-345
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.12**: Extract `_prepare_extraction_context()` in `pipeline/core.py`
-  - Consolidate common logic between sync/async methods
+- [x] **Task 5.12**: Extract `_prepare_extraction_context()` in `pipeline/core.py` ✅
+  - Already complete - code delegates to _extraction_executor
   - Lines: 269-289, 291-311
   - Owner: `/refactor-for-clarity`
 
