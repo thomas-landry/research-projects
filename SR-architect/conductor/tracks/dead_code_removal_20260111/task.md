@@ -241,7 +241,89 @@
 
 ---
 
-## Phase 5: Hardcoded Values
+## Phase 5: Multi-File Code Quality Refactoring
+
+> **Source**: Multi-file code quality review (2026-01-14)  
+> **Files Analyzed**: 6 files (2,092 lines)  
+> **Issues Found**: 18 code smells  
+> **Reference**: `multi_file_refactor_plan.md`
+
+### Phase 5A: Quick Wins (Priority 1-2)
+- [ ] **Task 5.1**: Extract magic numbers in `schema_discovery.py`
+  - Extract: `MIN_PDF_SIZE_BYTES = 10240`, `MIN_TXT_SIZE_BYTES = 100`, `MAX_CONTEXT_CHARS = 20000`, `DEFAULT_RANDOM_SEED = 42`
+  - Lines: 146, 148, 187, 163
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.2**: Extract magic numbers in `researcher_analysis.py`
+  - Extract: `LOW_FILL_RATE_THRESHOLD = 0.5`, `MAX_UNIQUE_VALUES_FOR_CATEGORICAL = 5`
+  - Lines: 48, 72
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.3**: Add missing docstring to `researcher_analysis.py::analyze_extraction()`
+  - Add comprehensive docstring with Args and purpose
+  - Line: 7
+  - Owner: `/docs_agent`
+
+- [ ] **Task 5.4**: Expand docstring in `cache_manager.py::compute_doc_hash()`
+  - Add Args, Returns sections
+  - Line: 412
+  - Owner: `/docs_agent`
+
+### Phase 5B: Variable Renaming (Priority 5)
+- [ ] **Task 5.5**: Rename ambiguous variables in `schema_builder.py`
+  - `clean_name` → `sanitized_name` (line 349)
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.6**: Rename ambiguous variables in `parser.py`
+  - `doc` → `pdf_document` (line 414 in `_parse_pdf_pymupdf`)
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.7**: Rename ambiguous variables in `schema_discovery.py`
+  - `all_suggestions` → `field_suggestions_from_all_papers` (line 308)
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.8**: Remove unused variable in `researcher_analysis.py`
+  - Remove `low_confidence_fields` (line 29)
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.9**: Add type hints to `researcher_analysis.py`
+  - Add type hints to `analyze_extraction()` function
+  - Owner: `/refactor-for-clarity`
+
+### Phase 5C: Extract Repeated Code (Priority 4)
+- [ ] **Task 5.10**: Extract `_chunk_text()` helper in `parser.py`
+  - Consolidate 3 repeated `split_text_into_chunks()` calls
+  - Lines: 342, 423, 453
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.11**: Extract `FIELD_TYPE_MAPPING` constant in `schema_discovery.py`
+  - Move type mapping dict to module level
+  - Lines: 337-345
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.12**: Extract `_prepare_extraction_context()` in `pipeline/core.py`
+  - Consolidate common logic between sync/async methods
+  - Lines: 269-289, 291-311
+  - Owner: `/refactor-for-clarity`
+
+### Phase 5D: Large Function Refactoring (Priority 3) - DEFERRED
+> **Note**: These are complex refactorings that should be done when actively working on these files
+
+- [ ] **Task 5.13**: Refactor `parser.py::parse_pdf()` (86 lines) (DEFERRED)
+  - Extract: `_parse_with_fallback()`, `_apply_imrad_if_enabled()`
+  - Lines: 232-318
+  - Condition: Only when modifying parser logic
+  - Owner: `/refactor-for-clarity`
+
+- [ ] **Task 5.14**: Refactor `schema_discovery.py::discover_schema()` (69 lines) (DEFERRED)
+  - Extract: `_select_sample_papers()`, `_analyze_papers()`, `_build_field_definitions()`
+  - Lines: 285-354
+  - Condition: Only when modifying schema discovery
+  - Owner: `/refactor-for-clarity`
+
+---
+
+## Phase 6: Hardcoded Values
 
 - [ ] **Task 5.1**: Define magic number constants
   - Files: `client.py`, `service.py`, `hierarchical_pipeline.py`
