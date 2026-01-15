@@ -345,8 +345,8 @@ def infer_schema_from_csv(csv_path: str, header_line: int = 1) -> List[FieldDefi
         if not raw_name or "Unnamed" in raw_name:
             continue
             
-        clean_name = re.sub(r'[^a-zA-Z0-9_]', '_', raw_name.lower())
-        clean_name = re.sub(r'_+', '_', clean_name).strip('_')
+        sanitized_name = re.sub(r'[^a-zA-Z0-9_]', '_', raw_name.lower())
+        sanitized_name = re.sub(r'_+', '_', sanitized_name).strip('_')
         
         # Infer type from non-null values
         sample_values = df[col].dropna()
@@ -377,7 +377,7 @@ def infer_schema_from_csv(csv_path: str, header_line: int = 1) -> List[FieldDefi
         required = True 
 
         fields.append(FieldDefinition(
-            name=clean_name,
+            name=sanitized_name,
             description=f"Extracted from column '{raw_name}'",
             field_type=field_type,
             required=required,
