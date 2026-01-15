@@ -42,8 +42,14 @@ def test_parser_empty_headings_list():
     
     parser._chunker.chunk.return_value = [chunk1]
     
-    # Bypass _ensure_docling
-    with patch.object(DocumentParser, '_ensure_docling'):
+    # Bypass DoclingParser._ensure_docling
+    from core.parsers.docling import DoclingParser as RealDoclingParser
+    with patch.object(RealDoclingParser, '_ensure_docling'):
+        # Inject our mocked parser into the manager
+        parser._docling_parser = RealDoclingParser()
+        parser._docling_parser._converter = mock_converter
+        parser._docling_parser._chunker = mock_chunker
+        
         # Create a dummy pdf file
         with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
             doc = parser.parse_pdf(f.name)
@@ -77,7 +83,13 @@ def test_parser_docmeta_object_not_dict():
     chunk1 = MockChunk()
     parser._chunker.chunk.return_value = [chunk1]
     
-    with patch.object(DocumentParser, '_ensure_docling'):
+    from core.parsers.docling import DoclingParser as RealDoclingParser
+    with patch.object(RealDoclingParser, '_ensure_docling'):
+        # Inject our mocked parser into the manager
+        parser._docling_parser = RealDoclingParser()
+        parser._docling_parser._converter = mock_converter
+        parser._docling_parser._chunker = mock_chunker
+        
         with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
             doc = parser.parse_pdf(f.name)
     

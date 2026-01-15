@@ -48,7 +48,9 @@ def test_parse_file_dispatch_txt(parser, tmp_path):
     txt = tmp_path / "test.txt"
     txt.write_text("Test content")
     
-    with patch.object(parser, '_parse_txt', wraps=parser._parse_txt) as mock_txt:
+    # _parse_txt is now delegated to TextParser.parse
+    # We can inspect if _text_parser.parse is called
+    with patch.object(parser._text_parser, 'parse', wraps=parser._text_parser.parse) as mock_txt:
         doc = parser.parse_file(str(txt))
         mock_txt.assert_called_once()
         assert doc is not None
