@@ -410,7 +410,15 @@ class CacheManager:
     
     @staticmethod
     def compute_doc_hash(text: str, max_chars: int = None) -> str:
-        """Compute document hash for cache key."""
+        """Compute SHA256 hash of document text for cache key.
+        
+        Args:
+            text: Document text to hash
+            max_chars: Maximum characters to use (defaults to settings.CACHE_HASH_CHARS)
+            
+        Returns:
+            SHA256 hex digest string
+        """
         if max_chars is None:
             max_chars = settings.CACHE_HASH_CHARS
         sample = text[:max_chars].encode('utf-8')
