@@ -18,6 +18,15 @@ MIN_TXT_SIZE_BYTES = 100  # 100 bytes minimum for valid text files
 MAX_CONTEXT_CHARS = 20_000  # Maximum characters for LLM context
 DEFAULT_RANDOM_SEED = 42  # Stable seed for reproducible sampling
 
+# Field type mapping for schema discovery
+FIELD_TYPE_MAPPING = {
+    "text": FieldType.TEXT,
+    "integer": FieldType.INTEGER,
+    "float": FieldType.FLOAT,
+    "boolean": FieldType.BOOLEAN,
+    "list_text": FieldType.LIST_TEXT,
+}
+
 
 class SuggestedField(BaseModel):
     """A field suggested by the discovery agent."""
@@ -346,15 +355,7 @@ Input Fields:
                 continue
                 
             if uf.frequency >= min_frequency:
-                # Map string type to FieldType enum
-                type_map = {
-                    "text": FieldType.TEXT,
-                    "integer": FieldType.INTEGER,
-                    "float": FieldType.FLOAT,
-                    "boolean": FieldType.BOOLEAN,
-                    "list_text": FieldType.LIST_TEXT,
-                }
-                field_type = type_map.get(uf.field_type, FieldType.TEXT)
+                field_type = FIELD_TYPE_MAPPING.get(uf.field_type, FieldType.TEXT)
                 
                 definitions.append(FieldDefinition(
                     name=uf.canonical_name,
