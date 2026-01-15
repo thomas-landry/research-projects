@@ -53,6 +53,103 @@ class ExtractionService:
         )
         return agent.discover_schema(papers_dir, sample_size, existing_schema=existing_schema)
 
+    def _setup_extraction_context(self, output_path: Path) -> tuple[AuditLogger, StateManager]:
+        """Setup logging and state management."""
+        audit_log_dir = output_path.parent / "logs"
+        audit_logger = AuditLogger(log_dir=str(audit_log_dir))
+        checkpoint_path = output_path.parent / "extraction_checkpoint.json"
+        state_manager = StateManager(checkpoint_path)
+        return audit_logger, state_manager
+
+    def _build_extraction_model(self, fields: List[FieldDefinition]) -> tuple[Type[Any], List[str]]:
+        """Build Pydantic model for extraction."""
+        ExtractionModel = build_extraction_model(fields, "SRExtractionModel")
+        fieldnames = list(ExtractionModel.model_fields.keys())
+        return ExtractionModel, fieldnames
+
+    def _load_papers(self, papers_dir: str, limit: Optional[int] = None) -> List[Path]:
+        """Load and filter PDF files."""
+        papers_path = Path(papers_dir)
+        pdf_files = list(papers_path.glob("*.pdf"))
+        
+        if limit:
+            pdf_files = pdf_files[:limit]
+            
+        if not pdf_files:
+            raise FileNotFoundError(f"No PDF files found in {papers_dir}")
+            
+        return pdf_files
+
+    def _initialize_pipeline(
+        self, 
+        threshold: float, 
+        max_iter: int, 
+        examples: Optional[str], 
+        hybrid_mode: bool
+    ) -> HierarchicalExtractionPipeline:
+        """Initialize and configure the extraction pipeline."""
+        pipeline = HierarchicalExtractionPipeline(
+            provider=self.provider,
+            model=self.model,
+            score_threshold=threshold,
+            max_iterations=max_iter,
+            verbose=self.verbose,
+            examples=examples,
+            token_tracker=self.tracker
+        )
+        
+        # COST-001: Enable hybrid mode for local-first extraction
+        if hybrid_mode:
+            pipeline.set_hybrid_mode(True)
+            logger.info("Hybrid mode ENABLED: prioritizing local models (Ollama)")
+            
+        return pipeline
+
+    def _initialize_vector_store(self, output_path: Path, vectorize: bool) -> Optional[Any]:
+        """Initialize vector store if requested."""
+        if not vectorize:
+            return None
+            
+        from .vectorizer import ChromaVectorStore
+        vector_dir = output_path.parent / "vector_store"
+        return ChromaVectorStore(
+            collection_name="sr_extraction",
+            persist_directory=str(vector_dir),
+        )
+
+    def _parse_documents(
+        self, 
+        pdf_files: List[Path], 
+        callback: Optional[Callable[[str, Any, str], None]] = None
+    ) -> List[ParsedDocument]:
+        """Parse PDF documents."""
+        parsed_docs = []
+        for pdf_path in pdf_files:
+            try:
+                doc = self.parser.parse_pdf(str(pdf_path))
+                parsed_docs.append(doc)
+            except Exception as e:
+                logger.error(f"Failed to parse {pdf_path.name}: {e}")
+                if callback:
+                    callback(pdf_path.name, str(e), "failed")
+        return parsed_docs
+
+    def _build_summary(
+        self, 
+        pdf_files: List[Path], 
+        parsed_docs: List[ParsedDocument], 
+        failed_files: List[Any]
+    ) -> Dict[str, Any]:
+        """Build extraction summary."""
+        summary = self.tracker.get_session_summary()
+        return {
+            "total_files": len(pdf_files),
+            "parsed_files": len(parsed_docs),
+            "failed_files": failed_files,
+            "cost_usd": summary.get("total_cost_usd", 0.0),
+            "tokens": summary.get("total_tokens", 0)
+        }
+
     def run_extraction(
         self,
         papers_dir: str,
@@ -78,52 +175,22 @@ class ExtractionService:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
         # 1. Setup Logging & State
-        audit_log_dir = output_path.parent / "logs"
-        audit_logger = AuditLogger(log_dir=str(audit_log_dir))
-        checkpoint_path = output_path.parent / "extraction_checkpoint.json"
-        state_manager = StateManager(checkpoint_path)
+        audit_logger, state_manager = self._setup_extraction_context(output_path)
         
         # 2. Build Model
-        ExtractionModel = build_extraction_model(fields, "SRExtractionModel")
-        fieldnames = list(ExtractionModel.model_fields.keys())
+        ExtractionModel, fieldnames = self._build_extraction_model(fields)
         
         # 3. Load Papers
-        papers_path = Path(papers_dir)
-        pdf_files = list(papers_path.glob("*.pdf"))
-        if limit:
-            pdf_files = pdf_files[:limit]
-            
-        if not pdf_files:
-            raise FileNotFoundError(f"No PDF files found in {papers_dir}")
+        pdf_files = self._load_papers(papers_dir, limit)
             
         # 4. Initialize Pipeline & Extractor
-        pipeline = HierarchicalExtractionPipeline(
-            provider=self.provider,
-            model=self.model,
-            score_threshold=threshold,
-            max_iterations=max_iter,
-            verbose=self.verbose,
-            examples=examples,
-            token_tracker=self.tracker
-        )
-        
-        # COST-001: Enable hybrid mode for local-first extraction
-        if hybrid_mode:
-            pipeline.set_hybrid_mode(True)
-            logger.info("Hybrid mode ENABLED: prioritizing local models (Ollama)")
+        pipeline = self._initialize_pipeline(threshold, max_iter, examples, hybrid_mode)
         
         # For non-hierarchical mode, we still use the pipeline's components 
         # but call extract_document which handles the logic.
         
         # 5. Initialize Vector Store
-        vector_store = None
-        if vectorize:
-            from .vectorizer import ChromaVectorStore
-            vector_dir = output_path.parent / "vector_store"
-            vector_store = ChromaVectorStore(
-                collection_name="sr_extraction",
-                persist_directory=str(vector_dir),
-            )
+        vector_store = self._initialize_vector_store(output_path, vectorize)
         
         # 6. Initialize Batch Executor
         batch_executor = BatchExecutor(
@@ -133,15 +200,7 @@ class ExtractionService:
         )
         
         # 7. Parse PDFs
-        parsed_docs = []
-        for pdf_path in pdf_files:
-            try:
-                doc = self.parser.parse_pdf(str(pdf_path))
-                parsed_docs.append(doc)
-            except Exception as e:
-                logger.error(f"Failed to parse {pdf_path.name}: {e}")
-                if callback:
-                    callback(pdf_path.name, str(e), "failed")
+        parsed_docs = self._parse_documents(pdf_files, callback)
 
         # 8. Execute Batch
         failed_files = []
@@ -271,12 +330,6 @@ class ExtractionService:
                         callback=internal_callback
                     )
                 
+                
         # 9. Return Summary
-        summary = self.tracker.get_session_summary()
-        return {
-            "total_files": len(pdf_files),
-            "parsed_files": len(parsed_docs),
-            "failed_files": failed_files,
-            "cost_usd": summary.get("total_cost_usd", 0.0),
-            "tokens": summary.get("total_tokens", 0)
-        }
+        return self._build_summary(pdf_files, parsed_docs, failed_files)
