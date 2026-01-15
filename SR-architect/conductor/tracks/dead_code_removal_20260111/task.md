@@ -199,8 +199,9 @@
   - Extract nested loops into `_process_batch()`
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.16**: Fix deep nesting in `extraction_checker.py`
-  - Extract validation steps, use guard clauses
+- [x] **Task 4.16**: Fix deep nesting in `extraction_checker.py` ✅
+  - Already complete - max nesting = 2 levels
+  - validation/checker.py has clean structure
   - Owner: `/refactor-for-clarity`
 
 - [ ] **Task 4.18**: Fix deep nesting in `study_classifier.py`
