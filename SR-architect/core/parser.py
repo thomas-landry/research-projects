@@ -155,6 +155,21 @@ class DocumentParser:
             except ImportError:
                 self.logger.warning("IMRADParser not available")
     
+    def _chunk_text(self, text: str) -> List[str]:
+        """Split text into chunks using configured size and overlap.
+        
+        Args:
+            text: Text to chunk
+            
+        Returns:
+            List of text chunks
+        """
+        return split_text_into_chunks(
+            text, 
+            chunk_size=settings.PARSER_CHUNK_SIZE, 
+            chunk_overlap=settings.PARSER_CHUNK_OVERLAP
+        )
+    
     def _evict_cache_if_needed(self):
         """
         Evict oldest cache entries if over max_cache_size limit.
@@ -335,7 +350,7 @@ class DocumentParser:
                 full_text += text + "\n\n"
                 
                 # Chunk the page text
-                page_chunks = split_text_into_chunks(text, chunk_size=settings.PARSER_CHUNK_SIZE, chunk_overlap=settings.PARSER_CHUNK_OVERLAP)
+                page_chunks = self._chunk_text(text)
                 for chunk_text in page_chunks:
                     chunks.append(DocumentChunk(
                         text=chunk_text,
@@ -416,7 +431,7 @@ class DocumentParser:
             full_text += text + "\n\n"
             
             # Robust chunking for each page
-            page_chunks = split_text_into_chunks(text, chunk_size=settings.PARSER_CHUNK_SIZE, chunk_overlap=settings.PARSER_CHUNK_OVERLAP)
+            page_chunks = self._chunk_text(text)
             
             for chunk in page_chunks:
                 chunks.append(DocumentChunk(
