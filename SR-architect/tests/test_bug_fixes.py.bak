@@ -6,8 +6,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from core.parser import DocumentParser, ParsedDocument, DocumentChunk
-from core.pipeline import HierarchicalExtractionPipeline
-from core.data_types import PipelineResult
+from core.hierarchical_pipeline import HierarchicalExtractionPipeline, PipelineResult
 from core.classification import RelevanceClassifier, RelevanceResult
 from core.vectorizer import ChromaVectorStore, VectorDocument
 from core.extractors import StructuredExtractor
@@ -173,7 +172,7 @@ def test_pipeline_result_path_traversal():
     
     # It seems `PipelineResult` is the return type, but `save_evidence_json` IS a method of `PipelineResult`.
     # Let's import it.
-    from core.data_types import PipelineResult
+    from core.hierarchical_pipeline import PipelineResult
     
     result = PipelineResult(
         final_data={},

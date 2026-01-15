@@ -4,7 +4,7 @@ Verifies that TwoPassExtractor is properly initialized and can be used
 for local-first extraction strategy.
 """
 import pytest
-from core.pipeline import HierarchicalExtractionPipeline
+from core.hierarchical_pipeline import HierarchicalExtractionPipeline
 from core.two_pass_extractor import TwoPassExtractor, ExtractionTier
 
 

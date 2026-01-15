@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from core.pipeline import HierarchicalExtractionPipeline
-from core.parser import DocumentChunk, ParsedDocument
+from core.hierarchical_pipeline import HierarchicalExtractionPipeline, DocumentChunk, ParsedDocument
 from pydantic import BaseModel
 
 class SampleSchema(BaseModel):
@@ -9,10 +8,10 @@ class SampleSchema(BaseModel):
 
 @pytest.fixture
 def mock_pipeline_components():
-    with patch("core.pipeline.core.ContentFilter") as mock_filter_cls, \
-         patch("core.pipeline.core.RelevanceClassifier") as mock_rel_cls, \
-         patch("core.pipeline.core.StructuredExtractor") as mock_ext_cls, \
-         patch("core.pipeline.core.ExtractionChecker") as mock_check_cls:
+    with patch("core.hierarchical_pipeline.ContentFilter") as mock_filter_cls, \
+         patch("core.hierarchical_pipeline.RelevanceClassifier") as mock_rel_cls, \
+         patch("core.hierarchical_pipeline.StructuredExtractor") as mock_ext_cls, \
+         patch("core.hierarchical_pipeline.ExtractionChecker") as mock_check_cls:
         
         # Configure instances
         mock_filter = mock_filter_cls.return_value

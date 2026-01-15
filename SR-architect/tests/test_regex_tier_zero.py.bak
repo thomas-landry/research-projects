@@ -5,7 +5,7 @@ Tests verify that RegexExtractor is properly integrated into
 HierarchicalExtractionPipeline for cost-optimized extraction.
 """
 import pytest
-from core.pipeline import HierarchicalExtractionPipeline
+from core.hierarchical_pipeline import HierarchicalExtractionPipeline
 from core.regex_extractor import RegexExtractor
 
 

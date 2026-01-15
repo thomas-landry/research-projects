@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from core.pipeline import HierarchicalExtractionPipeline
-from core.parser import DocumentChunk, ParsedDocument
+from core.hierarchical_pipeline import HierarchicalExtractionPipeline, DocumentChunk, ParsedDocument
 from pydantic import BaseModel
 
 class SampleSchema(BaseModel):

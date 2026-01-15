@@ -97,7 +97,7 @@ def run_validation_loop(
     Returns:
         PipelineResult with extraction data
     """
-    from core.pipeline.helpers import build_pipeline_result, build_failed_result
+    from core.pipeline.extraction.helpers import build_pipeline_result, build_failed_result
     from core.pipeline.stages import build_revision_prompts
     
     revision_prompts: List[str] = []

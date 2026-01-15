@@ -5,8 +5,7 @@ These tests verify the pipeline end-to-end with mocked LLM clients.
 """
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
-from core.pipeline import HierarchicalExtractionPipeline
-from core.data_types import PipelineResult
+from core.hierarchical_pipeline import HierarchicalExtractionPipeline, PipelineResult
 from core.parser import DocumentParser, ParsedDocument, DocumentChunk
 from pydantic import BaseModel, Field
 from typing import List

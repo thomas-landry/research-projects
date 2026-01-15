@@ -192,7 +192,7 @@ def profile_extraction_pipeline(papers_dir: str, limit: int = 3) -> MemoryReport
     """
     from core.parser import DocumentParser
     from core.content_filter import ContentFilter
-    from core.pipeline import HierarchicalExtractionPipeline
+    from core.hierarchical_pipeline import HierarchicalExtractionPipeline
     from core.schema_builder import get_case_report_schema, build_extraction_model
     
     profiler = MemoryProfiler()

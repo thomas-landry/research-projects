@@ -34,20 +34,22 @@ def build_pipeline_result(
     if passed is None:
         passed = check_result.passed
     
+    evidence_dicts = [e.model_dump() if hasattr(e, 'model_dump') else e for e in extraction.evidence]
+    
     return PipelineResult(
-        filename=document.filename,
-        extracted_data=extraction.data,
-        evidence=extraction.evidence,
-        passed=passed,
-        quality_score=check_result.overall_score,
-        accuracy_score=check_result.accuracy_score,
-        consistency_score=check_result.consistency_score,
-        issues=check_result.issues,
-        suggestions=check_result.suggestions,
-        iteration_count=iteration_count,
+        source_filename=document.filename,
+        final_data=extraction.data,
+        evidence=evidence_dicts,
+        passed_validation=passed,
+        final_overall_score=check_result.overall_score,
+        final_accuracy_score=check_result.accuracy_score,
+        final_consistency_score=check_result.consistency_score,
+        iterations=iteration_count,
         iteration_history=iteration_history,
-        relevant_chunks_count=len(relevant_chunks),
-        timestamp=datetime.now().isoformat(),
+        content_filter_stats={},
+        relevance_stats={},
+        warnings=[],
+        extraction_timestamp=datetime.now().isoformat(),
     )
 
 
@@ -68,17 +70,17 @@ def build_failed_result(
         Failed PipelineResult instance
     """
     return PipelineResult(
-        filename=document.filename,
-        extracted_data={},
+        source_filename=document.filename,
+        final_data={},
         evidence=[],
-        passed=False,
-        quality_score=0.0,
-        accuracy_score=0.0,
-        consistency_score=0.0,
-        issues=[error_message],
-        suggestions=[],
-        iteration_count=len(iteration_history),
+        passed_validation=False,
+        final_overall_score=0.0,
+        final_accuracy_score=0.0,
+        final_consistency_score=0.0,
+        iterations=len(iteration_history),
         iteration_history=iteration_history,
-        relevant_chunks_count=0,
-        timestamp=datetime.now().isoformat(),
+        content_filter_stats={},
+        relevance_stats={},
+        warnings=[error_message],
+        extraction_timestamp=datetime.now().isoformat(),
     )
