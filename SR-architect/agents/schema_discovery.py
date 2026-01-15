@@ -327,7 +327,7 @@ Input Fields:
         for paper_path in papers:
             try:
                 # Pass currently known fields to prompt
-                result = self.analyze_paper(paper_path, list(current_known_fields))
+                result = self.analyze_paper(paper_path, existing_fields=list(current_known_fields))
                 
                 # Add new suggestions
                 field_suggestions_from_all_papers.extend(result.suggested_fields)
