@@ -46,11 +46,13 @@
   - Also cleaned `core/pipeline/core.py`
   - Owner: `/senior_dev`
 
-- [ ] **Task 1.9**: Clean minor Vulture findings - unused imports (7 files)
+- [x] **Task 1.9**: Clean minor Vulture findings - unused imports (7 files) ✅
+  - Removed 8 unused imports
   - Owner: `/senior_dev`
 
-- [ ] **Task 1.10**: Clean unused variables
-  - Replace unused `cls`, exception variables with `_`
+- [x] **Task 1.10**: Clean unused variables ✅
+  - Replaced 13 unused `cls`, exception variables, lambda params with `_`
+  - Removed 1 unused function parameter
   - Owner: `/senior_dev`
 
 ### Documentation Updates

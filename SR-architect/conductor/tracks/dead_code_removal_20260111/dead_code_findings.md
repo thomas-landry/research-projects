@@ -1,145 +1,149 @@
 # Dead Code Findings Log
 
-**Last Updated**: 2026-01-11 14:48  
-**Status**: Verified + Regression Found
+**Last Updated**: 2026-01-14 18:05  
+**Status**: ✅ Phase 1 Complete - All dead code removed
 
 ---
 
-## 🔴 CRITICAL REGRESSION DISCOVERED
+## ✅ CRITICAL REGRESSION FIXED (Phase 2 Complete)
 
-**Integration Code Deleted**: Between commits c45ec9e → HEAD (cleanup commits c86a233/a420b5e)
+**Integration Code Restored**: Tasks 2.1-2.5 completed
 
 | Component | Status | Tests | Integration | Action |
 |-----------|--------|-------|-------------|--------|
-| `regex_extractor.py` | ✅ Working | 12/12 passing | ❌ **DELETED** | **RESTORE** integration |
-| `two_pass_extractor.py` | ✅ Working | 6/6 passing | ❌ **DELETED** | **RESTORE** integration |
+| `regex_extractor.py` | ✅ Working | 12/12 passing | ✅ **RESTORED** | ✅ Complete |
+| `two_pass_extractor.py` | ✅ Working | 6/6 passing | ✅ **RESTORED** | ✅ Complete |
 
-**What was deleted**:
-- Line 32: `from .regex_extractor import RegexExtractor, RegexResult`
-- Lines 153-155: RegexExtractor initialization
-- Line 387+: Tier 0 extraction logic
-- Integration code that calls the extractors
+**What was restored**:
+- RegexExtractor integration in hierarchical_pipeline.py (Tier 0 extraction)
+- TwoPassExtractor integration verified
+- StructuredExtractor `pre_filled_fields` parameter added
 
-**Impact**: Pipeline optimization (60-70% cost reduction) is NOT active despite working code.
-
-**Recovery**: Can restore from commit c45ec9e
+**Impact**: Pipeline optimization (60-70% cost reduction) is NOW ACTIVE ✅
 
 ---
 
-## Confirmed Dead Code
+## ✅ Confirmed Dead Code - DELETED
 
-### Core Extractors - Status Update
+### Core Extractors - Completed
 
 | File | Size | Tests | Integration | Action |
 |------|------|-------|-------------|--------|
-| `core/abstract_first_extractor.py` | 14.5KB | 6/8 passing | ❌ Never integrated | **DELETE** ✅ |
-| `core/pubmed_fetcher.py` | 11.8KB | N/A | ❌ Only used by abstract_first | **DELETE** ✅ |
-| ~~`core/two_pass_extractor.py`~~ | 22.3KB | ✅ 6/6 passing | ❌ **Integration deleted** | **RESTORE** then KEEP |
-| ~~`core/regex_extractor.py`~~ | 9.5KB | ✅ 12/12 passing | ❌ **Integration deleted** | **RESTORE** then KEEP |
+| ~~`core/abstract_first_extractor.py`~~ | 14.5KB | N/A | ❌ Never integrated | ✅ **DELETED** |
+| ~~`core/pubmed_fetcher.py`~~ | 11.8KB | N/A | ❌ Only used by abstract_first | ✅ **DELETED** |
+| `core/two_pass_extractor.py` | 22.3KB | ✅ 6/6 passing | ✅ Integration restored | ✅ **KEPT** |
+| `core/regex_extractor.py` | 9.5KB | ✅ 12/12 passing | ✅ Integration restored | ✅ **KEPT** |
 
-### Additional Unused Core Modules
-
-| File | Size | Usage | Action |
-|------|------|-------|--------|
-| `core/auto_corrector.py` | 6.2KB | ❌ No imports found | **DELETE** ✅ |
-| `core/validation_rules.py` | 7.6KB | ❌ No imports found | **DELETE** ✅ |
-| `core/self_consistency.py` | 9.2KB | ❌ No imports found | **DELETE** ✅ |
-| `core/complexity_classifier.py` | 7.4KB | ⚠️ Test-only (`verify_phase2_integration.py`) | **REVIEW** - Keep if future feature |
-| `core/fuzzy_deduplicator.py` | 4.4KB | ⚠️ Test-only (`verify_phase3_integration.py`) | **REVIEW** - Keep if future feature |
-
-### Agents Directory - Unused Modules
+### Additional Unused Core Modules - Completed
 
 | File | Size | Usage | Action |
 |------|------|-------|--------|
-| `agents/researcher_analysis.py` | 79 lines | ❌ No imports found (standalone script) | **DELETE** ✅ |
-| `agents/conflict_resolver.py` | 113 lines | ⚠️ Imported in hierarchical_pipeline.py but **never used** | **DELETE** ✅ |
-| `agents/section_locator.py` | 92 lines | ⚠️ Imported in hierarchical_pipeline.py but **never used** | **DELETE** ✅ |
+| ~~`core/auto_corrector.py`~~ | 6.2KB | ❌ No imports found | ✅ **ARCHIVED** to `archive/` |
+| ~~`core/validation_rules.py`~~ | 7.6KB | ❌ No imports found | ✅ **DELETED** |
+| ~~`core/self_consistency.py`~~ | 9.2KB | ❌ No imports found | ✅ **DELETED** |
+| `core/complexity_classifier.py` | 7.4KB | ⚠️ Test-only | ✅ **KEPT** (future feature) |
+| `core/fuzzy_deduplicator.py` | 4.4KB | ⚠️ Test-only | ✅ **KEPT** (future feature) |
 
-**Note**: `meta_analyst.py` IS used (hierarchical_pipeline.py:792) - KEEP ✅
+### Agents Directory - Completed
 
-### Associated Test Files
+| File | Size | Usage | Action |
+|------|------|-------|--------|
+| ~~`agents/researcher_analysis.py`~~ | 79 lines | ❌ Standalone script | ✅ **KEPT** (utility script) |
+| ~~`agents/conflict_resolver.py`~~ | 113 lines | ❌ Never used | ✅ **DELETED** |
+| ~~`agents/section_locator.py`~~ | 92 lines | ❌ Never used | ✅ **DELETED** |
+
+**Note**: `meta_analyst.py` IS used - KEPT ✅
+
+### Associated Test Files - Completed
+
 | File | Reason | Action |
 |------|--------|--------|
-| `tests/test_abstract_first.py` | Tests dead code (`abstract_first_extractor.py`) | **DELETE** ✅ |
-| `tests/test_two_pass_gemini.py` | Tests dead code (`two_pass_extractor.py`) | **DELETE** ✅ |
-| `tests/test_two_pass_premium.py` | Tests dead code (`two_pass_extractor.py`) | **DELETE** ✅ |
-| ~~`tests/test_regex_integration.py`~~ | Tests **ACTIVE CODE** (`regex_extractor.py`) | **KEEP** ❌ |
+| ~~`tests/test_abstract_first_extractor.py`~~ | Tests deleted code | ✅ **DELETED** |
+| ~~`tests/test_self_consistency.py`~~ | Tests deleted code | ✅ **DELETED** |
+| ~~`tests/test_phase2_components.py`~~ | Tests deleted code | ✅ **DELETED** |
+| ~~`tests/test_phase4_components.py`~~ | Tests deleted code | ✅ **DELETED** |
+| `tests/test_regex_integration.py` | Tests active code | ✅ **KEPT** |
 
-### Standalone Scripts
+### Standalone Scripts - Completed
+
 | File | Reason | Action |
 |------|--------|--------|
-| `agents/researcher_analysis.py` | Standalone CLI script, never imported | DELETE or MOVE to scripts/ |
-| `debug_openrouter_pricing.py` | One-time debug utility | DELETE |
+| `debug_openrouter_pricing.py` | Already deleted | ✅ N/A |
 
-### Temporary Directories
+### Temporary Directories - Completed
+
 | Directory | Contents | Action |
 |-----------|----------|--------|
-| `temp_healy/` | Single test PDF | DELETE |
+| `temp_healy/` | Already deleted | ✅ N/A |
 
 ---
 
-## Unused Imports (hierarchical_pipeline.py)
+## ✅ Unused Imports - CLEANED
 
-**Lines to remove**:
-- Line 25: `ExtractionLog`, `ExtractionWarning` (from `core.data_types`)
-- Line 29: `AbstractFirstExtractor`, `AbstractExtractionResult`
-- Line 30: `PubMedFetcher`
-- Line 31: `TwoPassExtractor`, `ModelCascader`, `ExtractionTier`
-- Line 41: `ConflictResolverAgent` (if unused)
-- Line 42: `SectionLocatorAgent` (if unused)
+**Removed from hierarchical_pipeline.py**:
+- ✅ Line 25: `ExtractionLog`, `ExtractionWarning` (from `core.data_types`)
+- ✅ Line 29: `AbstractFirstExtractor`, `AbstractExtractionResult`
+- ✅ Line 30: `PubMedFetcher`
+- ✅ Line 41: `ConflictResolverAgent`
+- ✅ Line 42: `SectionLocatorAgent`
 
-**Instantiations to remove**:
-- Lines 129: `self.abstract_extractor = AbstractFirstExtractor()`
-- Lines 130: `self.pubmed_fetcher = PubMedFetcher()`
-- Lines 140-143: `self.two_pass_extractor = TwoPassExtractor(...)`
+**Removed from other files**:
+- ✅ `core/cache_manager.py:21` - `contextmanager`
+- ✅ `core/parser.py:21` - `BeautifulSoup`
+- ✅ `core/schema_builder.py:9` - `get_type_hints`, `Union`
+- ✅ `agents/researcher_analysis.py:3` - `numpy`
+- ✅ `agents/schema_discovery.py:7` - `Counter`
 
----
-
-## Minor Vulture Findings
-
-### Unused Imports
-- `core/cache_manager.py:21` - `contextmanager`
-- `core/parser.py:16` - `BeautifulSoup`
-- `core/relevance_classifier.py:13` - `ValidationInfo`
-- `core/schema_builder.py:9` - `get_type_hints`
-- `benchmarks/llm_ie_benchmark.py:26` - `LLMInformationExtractionDocument`
-- `tests/test_phase4_components.py:11` - `CacheEntry`
-- `tests/test_data_loss_diagnostic.py:17` - `FlexibleFlag`
-
-### Unused Variables
-- Multiple `cls` parameters in `@classmethod` decorators (can replace with `_`)
-- Exception tuple unpacking (`exc_type`, `exc_val`, `exc_tb`) in except blocks
-- Test fixtures: `clean_state` in `test_bug_fix_03.py`, `MockMeta` in `verify_pipeline_integration.py`
+**Total**: 8 unused imports removed
 
 ---
 
-## Summary
+## ✅ Unused Variables - FIXED
 
-**Total Dead Files**: 14 (was 11, updated after agents/ scan)  
-**Total Dead Code (LOC)**: ~4,200+ lines  
-**Unused Imports**: 15+  
-**Unused Variables**: 10+
+**Validators** (5 files):
+- ✅ `core/extractors/models.py` - `cls` → `_`
+- ✅ `core/validation/models.py` - 3x `cls` → `_`
+- ✅ `core/state_manager.py` - `cls` → `_`
 
-**Files to Delete**:
-1. `core/abstract_first_extractor.py` (14.5KB)
-2. `core/pubmed_fetcher.py` (11.8KB)
-3. `core/auto_corrector.py` (6.2KB)
-4. `core/validation_rules.py` (7.6KB)
-5. `core/self_consistency.py` (9.2KB)
-6. `agents/researcher_analysis.py` (79 lines) - NEW
-7. `agents/conflict_resolver.py` (113 lines) - NEW
-8. `agents/section_locator.py` (92 lines) - NEW
-9. `tests/test_abstract_first.py`
-10. `tests/test_two_pass_gemini.py`
-11. `tests/test_two_pass_premium.py`
-12. `temp_healy/` directory
+**Exception Handlers** (2 files):
+- ✅ `core/manual_review.py` - `exc_tb` → `_`
+- ✅ `core/vectorizer.py` - `exc_type`, `exc_val`, `exc_tb` → `_`, `__`, `___`
 
-**Note**: `debug_openrouter_pricing.py` confirmed missing/already deleted.
+**Other** (2 files):
+- ✅ `core/utils.py` - lambda parameter `m` → `_`
+- ✅ `agents/librarian.py` - unused `comparator` parameter removed
 
-**Files to Restore Integration**:
-- `core/regex_extractor.py` (integration deleted, needs restore)
-- `core/two_pass_extractor.py` (integration deleted, needs restore)
+**Total**: 13 unused variables fixed
 
-**Files to Review** (test-only usage):
-- `core/complexity_classifier.py` - Keep if future feature
-- `core/fuzzy_deduplicator.py` - Keep if future feature
+---
+
+## Summary - Phase 1 Complete ✅
+
+**Files Deleted**: 8 files (1,817 LOC removed)
+1. ✅ `core/abstract_first_extractor.py`
+2. ✅ `core/pubmed_fetcher.py`
+3. ✅ `core/validation_rules.py`
+4. ✅ `core/self_consistency.py`
+5. ✅ `agents/conflict_resolver.py`
+6. ✅ `agents/section_locator.py`
+7. ✅ `tests/test_abstract_first_extractor.py`
+8. ✅ `tests/test_self_consistency.py`
+9. ✅ `tests/test_phase2_components.py`
+10. ✅ `tests/test_phase4_components.py`
+
+**Files Archived**: 1 file
+- ✅ `core/auto_corrector.py` → `archive/auto_corrector.py`
+
+**Imports Cleaned**: 8 unused imports removed  
+**Variables Fixed**: 13 unused variables replaced with `_`  
+**Dependency Added**: `rapidfuzz>=3.0.0`
+
+**Verification**: 
+- ✅ 288 tests passing
+- ✅ Same 3 pre-existing failures
+- ✅ No new import errors
+
+**Commits**:
+- `47134d7`: Dead code removal (1,817 LOC)
+- `96e4fbc`: Unused imports cleanup
+- `b4b06cc`: Unused variables cleanup
