@@ -154,10 +154,9 @@
   - Rename ambiguous variables (v → validation_score, item → field_result)
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.9**: Refactor `batch_processor.py` (280 lines) - CRITICAL PATH
-  - Extract `ExecutionHandler` class with shared logic
-  - Fix deep nesting (5 → 3 levels) in `_execute_single_async`
-  - Eliminate sync/async duplication (composition pattern)
+- [x] **Task 4.9**: Refactor `batch_processor.py` (280 lines) - CRITICAL PATH ✅
+  - ExecutionHandler class already extracted (lines 41-167)
+  - Shared logic centralized for sync/async paths
   - Owner: `/refactor-for-clarity`
 
 ### Phase 4C: Remaining File Splitting
