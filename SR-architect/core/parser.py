@@ -407,25 +407,27 @@ class DocumentParser:
             raise ImportError("PyMuPDF not installed. Run: pip install pymupdf")
             
         self.logger.info(f"Parsing {path.name} using PyMuPDF (fallback)...")
-        doc = fitz.open(path)
+        pdf_document = fitz.open(path)
         full_text = ""
         chunks = []
         
-        for i, page in enumerate(doc):
+        for i, page in enumerate(pdf_document):
             text = page.get_text()
             full_text += text + "\n\n"
             
             # Robust chunking for each page
             page_chunks = split_text_into_chunks(text, chunk_size=settings.PARSER_CHUNK_SIZE, chunk_overlap=settings.PARSER_CHUNK_OVERLAP)
             
-            for chunk_text in page_chunks:
+            for chunk in page_chunks:
                 chunks.append(DocumentChunk(
-                    text=chunk_text,
-                    section=f"Page {i+1}",
-                    page_number=i+1,
-                    source_file=path.name
+                    text=chunk,
+                    section="",
+                    chunk_type="text",
+                    page_number=i + 1,
+                    source_file=path.name,
                 ))
-            
+        
+        pdf_document.close()
         return ParsedDocument(
             filename=path.name,
             chunks=chunks,
