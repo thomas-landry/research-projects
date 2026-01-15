@@ -249,17 +249,17 @@
 > **Reference**: `multi_file_refactor_plan.md`
 
 ### Phase 5A: Quick Wins (Priority 1-2)
-- [ ] **Task 5.1**: Extract magic numbers in `schema_discovery.py`
+- [x] **Task 5.1**: Extract magic numbers in `schema_discovery.py` ✅
   - Extract: `MIN_PDF_SIZE_BYTES = 10240`, `MIN_TXT_SIZE_BYTES = 100`, `MAX_CONTEXT_CHARS = 20000`, `DEFAULT_RANDOM_SEED = 42`
   - Lines: 146, 148, 187, 163
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.2**: Extract magic numbers in `researcher_analysis.py`
+- [x] **Task 5.2**: Extract magic numbers in `researcher_analysis.py` ✅
   - Extract: `LOW_FILL_RATE_THRESHOLD = 0.5`, `MAX_UNIQUE_VALUES_FOR_CATEGORICAL = 5`
   - Lines: 48, 72
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.3**: Add missing docstring to `researcher_analysis.py::analyze_extraction()`
+- [x] **Task 5.3**: Add missing docstring to `researcher_analysis.py::analyze_extraction()` ✅
   - Add comprehensive docstring with Args and purpose
   - Line: 7
   - Owner: `/docs_agent`
@@ -282,11 +282,11 @@
   - `all_suggestions` → `field_suggestions_from_all_papers` (line 308)
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.8**: Remove unused variable in `researcher_analysis.py`
+- [x] **Task 5.8**: Remove unused variable in `researcher_analysis.py` ✅
   - Remove `low_confidence_fields` (line 29)
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.9**: Add type hints to `researcher_analysis.py`
+- [x] **Task 5.9**: Add type hints to `researcher_analysis.py` ✅
   - Add type hints to `analyze_extraction()` function
   - Owner: `/refactor-for-clarity`
 
