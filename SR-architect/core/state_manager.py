@@ -24,7 +24,7 @@ class PipelineCheckpoint(BaseModel):
 
     @model_validator(mode='before')
     @classmethod
-    def convert_sets(cls, data: Any) -> Any:
+    def convert_sets(_, data: Any) -> Any:
         # Handle JSON loading where sets are lists
         if isinstance(data, dict):
             if 'processed_files' in data and isinstance(data['processed_files'], list):

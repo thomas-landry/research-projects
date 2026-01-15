@@ -140,7 +140,7 @@ class ChromaVectorStore:
         self._ensure_initialized()
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, _, __, ___):
         """Context manager exit - closes resources."""
         self.close()
         return False

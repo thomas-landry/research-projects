@@ -20,7 +20,7 @@ class Issue(BaseModel):
     
     @field_validator('issue_type', 'field', 'detail', mode='before')
     @classmethod
-    def coerce_to_string(cls, value) -> str:
+    def coerce_to_string(_, value) -> str:
         """Handle local LLMs returning lists or other types instead of strings."""
         if isinstance(value, list):
             return ", ".join(str(x) for x in value)
@@ -38,7 +38,7 @@ class CheckerResponse(BaseModel):
     
     @field_validator('accuracy_score', 'consistency_score', mode='before')
     @classmethod
-    def coerce_score_to_float(cls, value) -> float:
+    def coerce_score_to_float(_, value) -> float:
         """Handle local LLMs returning None or invalid score values."""
         if value is None:
             return 0.0
@@ -50,7 +50,7 @@ class CheckerResponse(BaseModel):
     
     @field_validator('suggestions', mode='before')
     @classmethod
-    def coerce_suggestions_to_strings(cls, value) -> List[str]:
+    def coerce_suggestions_to_strings(_, value) -> List[str]:
         """Handle local LLMs returning dicts like {'text': '...'} instead of strings."""
         if not value:
             return []

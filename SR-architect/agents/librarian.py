@@ -275,7 +275,6 @@ def build_pico_query(
     population: str,
     intervention: str,
     outcome: str,
-    comparator: Optional[str] = None,
 ) -> str:
     """
     Build a PubMed Boolean query from PICO elements.

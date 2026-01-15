@@ -317,7 +317,7 @@ def apply_prompt_template(prompt_template: str, text_content: Any) -> str:
     
     if isinstance(text_content, str):
         # Single replacement
-        return pattern.sub(lambda m: text_content, prompt_template)
+        return pattern.sub(lambda _: text_content, prompt_template)
     
     if isinstance(text_content, dict):
         # Key-based replacement
