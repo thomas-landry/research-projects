@@ -1,7 +1,7 @@
 
 import pytest
 from unittest.mock import MagicMock
-from core.batch_processor import BatchExecutor
+from core.batch import BatchExecutor
 
 def test_batch_oom_tagging():
     pipeline = MagicMock()

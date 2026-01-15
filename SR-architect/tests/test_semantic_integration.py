@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, AsyncMock, patch
 from core.pipeline import HierarchicalExtractionPipeline
 from core.parser import DocumentChunk
 
-@pytest.mark.asyncio
-async def test_pipeline_segment_document():
+# @pytest.mark.asyncio -- removed to allow synchronous chunk() call
+def test_pipeline_segment_document():
     # Mock dependencies
     provider = "mock"
     model = "mock-model"
@@ -23,7 +23,7 @@ async def test_pipeline_segment_document():
         pipeline = HierarchicalExtractionPipeline(provider=provider, model=model)
         
         text = "Abstract\nContent.\nMethods\nStart of methods."
-        chunks = await pipeline.segment_document(text, doc_id="test_doc")
+        chunks = pipeline.segment_document(text, doc_id="test_doc")
         
         assert len(chunks) > 0
         assert isinstance(chunks[0], DocumentChunk)

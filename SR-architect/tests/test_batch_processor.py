@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from core.batch_processor import BatchExecutor
+from core.batch import BatchExecutor
 from core.state_manager import StateManager, PipelineCheckpoint
 from core.parser import ParsedDocument
 from pydantic import BaseModel

@@ -1,7 +1,7 @@
 import pytest
 import asyncio
 from unittest.mock import MagicMock, AsyncMock
-from core.batch_processor import BatchExecutor
+from core.batch import BatchExecutor
 
 @pytest.mark.asyncio
 async def test_batch_semaphore_safety():

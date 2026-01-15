@@ -2,7 +2,7 @@
 import pytest
 import asyncio
 from unittest.mock import MagicMock, patch
-from core.batch_processor import BatchExecutor
+from core.batch import BatchExecutor
 
 def test_batch_executor_accepts_resource_manager():
     pipeline = MagicMock()

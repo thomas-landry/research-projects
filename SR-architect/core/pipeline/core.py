@@ -172,6 +172,12 @@ class HierarchicalExtractionPipeline:
             enabled: Whether to enable hybrid mode
         """
         self.hybrid_mode = enabled
+        
+        # Inject sentence extractor into executor if hybrid mode is enabled
+        if enabled:
+            self._extraction_executor.set_sentence_extractor(self.sentence_extractor)
+        else:
+            self._extraction_executor.set_sentence_extractor(None)
     
     def segment_document(self, text: str, doc_id: Optional[str] = None):
         """

@@ -244,6 +244,20 @@ class Settings(BaseSettings):
         default="https://openrouter.ai/api/v1/models",
         description="OpenRouter models API endpoint for pricing data"
     )
+    OPENROUTER_BASE_URL: str = Field(
+        default="https://openrouter.ai/api/v1",
+        description="OpenRouter API base URL"
+    )
+    
+    # ========== Defaults ==========
+    DEFAULT_COLLECTION_NAME: str = Field(
+        default="sr_extraction",
+        description="Default ChromaDB collection name"
+    )
+    DEFAULT_THEME: str = Field(
+        default="General extraction",
+        description="Default extraction theme"
+    )
     
     # ========== Fallback Pricing ==========
     # CRITICAL: These are FALLBACK values only. Always fetch from API first.

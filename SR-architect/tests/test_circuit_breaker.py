@@ -1,5 +1,5 @@
 import pytest
-from core.batch_processor import CircuitBreaker
+from core.batch import CircuitBreaker
 
 def test_circuit_breaker_logic():
     # Threshold = 3 consecutive failures

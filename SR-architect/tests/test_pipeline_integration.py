@@ -18,7 +18,7 @@ from core.data_types import EvidenceFrame
 
 @pytest.fixture
 def mock_pipeline():
-    with patch('core.hierarchical_pipeline.SentenceExtractor') as MockSentenceExtractor:
+    with patch('core.sentence_extractor.SentenceExtractor') as MockSentenceExtractor:
         # Setup mock instance
         mock_instance = AsyncMock()
         mock_instance.extract.return_value = [
@@ -44,12 +44,20 @@ async def test_sentence_extraction_integration(mock_pipeline):
     # Enable hybrid/sentence mode
     pipeline.set_hybrid_mode(True)
     
-    # Mock legacy extractor to return partial data (age only)
+    # Mock legacy extractor to behave realistically (merge pre-filled with its own extraction)
     pipeline.extractor.extract_with_evidence_async = AsyncMock()
-    mock_legacy_result = MagicMock()
-    mock_legacy_result.data = {"patient_age": "45"}
-    mock_legacy_result.evidence = [] 
-    pipeline.extractor.extract_with_evidence_async.return_value = mock_legacy_result
+    
+    async def mock_extract(*args, **kwargs):
+        pre_filled = kwargs.get('pre_filled_fields', {})
+        result = MagicMock()
+        # Merge legacy extraction (age) with pre-filled (histopathology)
+        result.data = {"patient_age": "45"}
+        if pre_filled:
+            result.data.update(pre_filled)
+        result.evidence = []
+        return result
+        
+    pipeline.extractor.extract_with_evidence_async.side_effect = mock_extract
     
     # Create dummy doc
     doc = ParsedDocument(

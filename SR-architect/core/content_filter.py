@@ -13,6 +13,7 @@ from dataclasses import dataclass
 # Import from sibling module
 from .parser import DocumentChunk
 from .config import settings
+from .fuzzy_deduplicator import FuzzyDeduplicator
 
 
 @dataclass
@@ -81,6 +82,9 @@ class ContentFilter:
         if chars_per_token is None:
             chars_per_token = settings.CHARS_PER_TOKEN_ESTIMATE
         self.chars_per_token = chars_per_token
+        
+        # Initialize fuzzy deduplicator (default threshold 0.90)
+        self.deduplicator = FuzzyDeduplicator(similarity_threshold=0.90)
     
     def _should_exclude_section(self, section: str) -> bool:
         """Check if a section header matches exclusion patterns."""
@@ -156,6 +160,23 @@ class ContentFilter:
                 removed.append(chunk)
             else:
                 filtered.append(chunk)
+        
+        # Step 2: Content Deduplication
+        deduplicated = []
+        deduplicated_count = 0
+        if filtered:
+            chunk_texts = [c.text for c in filtered]
+            _, kept_indices = self.deduplicator.deduplicate_with_indices(chunk_texts)
+            
+            # Reconstruct list preserving objects
+            for i in range(len(filtered)):
+                if i in kept_indices:
+                    deduplicated.append(filtered[i])
+                else:
+                    removed.append(filtered[i]) # Count duplicates as removed
+                    deduplicated_count += 1
+            
+            filtered = deduplicated
         
         # Calculate token statistics
         original_chars = sum(len(c.text) for c in chunks)

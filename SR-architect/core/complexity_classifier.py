@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 import yaml
 
 from core.utils import get_logger
-from core.parser import ParsedDocument
+from core.parsers.base import ParsedDocument
 
 logger = get_logger("ComplexityClassifier")
 

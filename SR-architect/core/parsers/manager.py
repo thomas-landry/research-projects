@@ -11,6 +11,7 @@ from ..utils import get_logger
 from .base import ParsedDocument
 from .docling import DoclingParser
 from .fallbacks import PyMuPDFParser, PDFPlumberParser, TextParser, simple_chunk
+from ..complexity_classifier import ComplexityClassifier
 
 logger = get_logger("DocumentParser")
 
@@ -45,6 +46,7 @@ class DocumentParser:
         self._pdfplumber_parser = PDFPlumberParser(extract_tables=extract_tables)
         self._text_parser = TextParser()
         self._imrad_parser = None
+        self.classifier = ComplexityClassifier()
         
         # Ensure cache directory exists
         if not self.cache_dir.exists():
@@ -126,21 +128,44 @@ class DocumentParser:
         if cached_doc:
             return cached_doc
         
-        parsed_doc = None
-        
-        # 1. Try Docling
+        # 1. Fast Path: Always try PyMuPDF first (Scanner)
         try:
-            parsed_doc = self._docling_parser.parse(path)
+            parsed_doc = self._pymupdf_parser.parse(path)
+            self.logger.debug(f"Initial scan with PyMuPDF successful for {path.name}")
         except (ImportError, Exception) as e:
-            self.logger.warning(f"Docling parsing failed or unavailable: {e}. Falling back to PyMuPDF.")
-            
-            # 2. Try PyMuPDF Fallback
+            self.logger.warning(f"PyMuPDF scan failed: {e}. Defaulting to Docling.")
+            parsed_doc = None
+
+        # 2. Check Complexity & Upgrade if needed
+        used_docling = False
+        if parsed_doc:
             try:
-                parsed_doc = self._pymupdf_parser.parse(path)
-                self.logger.info(f"Successfully parsed {path.name} using PyMuPDF fallback")
-            except (ImportError, Exception) as e2:
-                self.logger.error(f"All parsers failed for {path.name}: Docling={e}, PyMuPDF={e2}")
-                raise RuntimeError(f"Failed to parse {pdf_path}: no available parser succeeded")
+                # Classify complexity
+                strategy = self.classifier.get_parser_strategy(parsed_doc)
+                primary_parser = strategy.get("primary", "pymupdf")
+                
+                # Upgrade to Docling if recommended
+                if primary_parser == "docling":
+                    self.logger.info(f"Complexity Upgrade: Re-parsing {path.name} with Docling (Strategy: {strategy})")
+                    try:
+                        parsed_doc = self._docling_parser.parse(path)
+                        used_docling = True
+                    except Exception as e:
+                        self.logger.error(f"Docling upgrade failed: {e}. Keeping PyMuPDF result.")
+            except Exception as e:
+                self.logger.warning(f"Complexity classification failed: {e}")
+
+        # 3. Fallback: If PyMuPDF failed initially or we haven't succeeded yet
+        if not parsed_doc and not used_docling:
+            try:
+                parsed_doc = self._docling_parser.parse(path)
+            except Exception as e:
+                self.logger.error(f"Docling fallback failed: {e}")
+                
+                # Ultimate fallback if we haven't tried PyMuPDF yet (e.g. init failure)
+                # But logic above guarantees we tried PyMuPDF first.
+                # Just raise error if nothing worked.
+                raise RuntimeError(f"Failed to parse {pdf_path}: all strategies failed")
         
         # Post-processing: IMRAD parsing
         if parsed_doc and self._imrad_parser and self.use_imrad:

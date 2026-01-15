@@ -7,16 +7,21 @@ These files are the foundation of the extraction and review pipelines.
 
 | File | Role | Dependencies |
 |------|------|--------------|
-| `core/hierarchical_pipeline.py` | **Main Extraction Engine**. Orchestrates filtering, classification, extraction, validation. | `utils`, `extractor`, `checker`, `filter` |
-| `core/batch_processor.py` | **Parallel Executor**. Handles threading and state updates for batch jobs. | `state_manager`, `hierarchical_pipeline` |
-| `core/extractor.py` | **LLM Interface**. Wraps Instructor for structured output. | `utils`, `token_tracker` |
-| `core/extraction_checker.py` | **LLM Validator**. checks accuracy/consistency of extractions. | `extractor`, `utils` |
+| `core/pipeline/core.py` | **Main Extraction Engine**. Orchestrates filtering, classification, extraction, validation. | `utils`, `extractor`, `checker`, `filter` |
+| `core/pipeline/extraction/executor.py` | **Extraction Logic**. Handles hybrid extraction and validation loops. | `checker`, `extractor` |
+| `core/batch/handler.py` | **Parallel Executor**. Handles threading and state updates for batch jobs. | `state_manager`, `pipeline` |
+| `core/extractors/structured.py` | **LLM Interface**. Wraps Instructor for structured output. | `utils`, `token_tracker` |
+| `core/validation/checker.py` | **LLM Validator**. Checks accuracy/consistency of extractions. | `extractor`, `utils` |
 | `core/state_manager.py` | **Persistence**. JSON/Pydantic state for extraction jobs. | |
 | `core/prisma_state.py` | **Domain Model**. TypedDicts/Enums for PRISMA compliance. | |
 | `core/utils.py` | **Utilities**. Shared `load_env`, `make_request`, logging. | |
+| `core/complexity_classifier.py` | **Adaptive Logic**. Routes simple/complex docs to appropriate parsers. | `utils` |
+| `core/fuzzy_deduplicator.py` | **Deduplication**. Removes near-duplicate text/chunks. | `config` |
+| `core/cache/manager.py` | **Cache Manager**. File-based caching for API responses. | `core.cache.models` |
+| `core/platform_utils.py` | **Platform Ops**. Service management (Ollama) & system checks. | |
 
 ## 🔵 Active Agents (The Workers)
-Autonomous agents performing specific lifecycle tasks.
+These files are the foundation of the extraction and review pipelines.
 
 | File | Role | Status |
 |------|------|--------|
@@ -41,33 +46,26 @@ Autonomous agents performing specific lifecycle tasks.
 | `core/schema_builder.py` | Dynamic Pydantic models for user schemas. |
 | `core/vectorizer.py` | ChromaDB wrapper for semantic search. |
 | `core/audit_logger.py` | Structured logging for audits. |
-| `core/parser.py` | PDF parsing (Docling/PyMuPDF). |
-| `core/pubmed_fetcher.py`| PubMed API client with caching and session reuse. | **DEAD CODE** - Only used by abstract_first_extractor (also dead) |
+| `core/parsers/docling.py` | PDF parsing strategy (Docling). |
+| `core/parsers/fallbacks.py` | Fallback parsers (PyMuPDF). |
 
 ## 🔴 Dead Code (To Be Removed)
 | File | Reason | LOC | Action |
 |------|--------|-----|--------|
-| `core/abstract_first_extractor.py` | Never integrated into pipeline | 312 | DELETE |
-| `core/pubmed_fetcher.py` | Only used by abstract_first (dead) | 250 | DELETE |
-| `core/auto_corrector.py` | No imports found | 210 | DELETE |
-| `core/validation_rules.py` | No imports found | 210 | DELETE |
-| `core/self_consistency.py` | No imports found | 286 | DELETE |
-| `tests/test_abstract_first.py` | Tests dead code | - | DELETE |
-| `tests/test_two_pass_gemini.py` | Tests dead code | - | DELETE |
-| `tests/test_two_pass_premium.py` | Tests dead code | - | DELETE |
-| `agents/researcher_analysis.py` | Standalone, never imported | - | DELETE |
-| `debug_openrouter_pricing.py` | One-time debug utility | - | DELETE |
-| `temp_healy/` | Temporary directory | - | DELETE |
+| `core/hierarchical_pipeline.py` | **Splitted & Removed** | - | - |
+| `core/parser.py` | **Splitted & Removed** | - | - |
+| `core/binary_deriver.py` | **Splitted & Removed** | - | - |
+| `core/relevance_classifier.py` | **Splitted & Removed** | - | - |
+| `core/extractors.py` | **Splitted & Removed** | - | - |
 
 **Total**: 11 files, ~3,900 LOC
 
-## ⚠️ Regression Discovered
+## ✅ Resolved Issues
 | File | Status | Issue | Action |
 |------|--------|-------|--------|
-| `core/regex_extractor.py` | ✅ Working (12/12 tests) | Integration DELETED in cleanup commits | **RESTORE** from c45ec9e |
-| `core/two_pass_extractor.py` | ✅ Working (6/6 tests) | Integration DELETED in cleanup commits | **RESTORE** from c45ec9e |
-
-**Impact**: Pipeline optimization (60-70% cost reduction) is NOT active despite working code.
+| `core/regex_extractor.py` | ✅ Working | Integration Restored | - |
+| `core/two_pass_extractor.py` | ✅ Working | Integration Restored | - |
+| `tests/test_pipeline.py` | ✅ Passing | Retry Loop Test Fixed | - |
 
 ## ⚪️ Future / Experimental (Inactive but Valuable)
 | File | Role | Recommendation |

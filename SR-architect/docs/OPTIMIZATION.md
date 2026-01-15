@@ -8,7 +8,7 @@
 
 **Optimizations**:
 ```python
-# In parser.py - Add parallel processing
+# In core/parsers/manager.py - Add parallel processing
 from concurrent.futures import ProcessPoolExecutor
 
 def parse_folder_parallel(self, folder_path: str, max_workers: int = 4):

@@ -11,7 +11,9 @@ Expected impact: 30-40% reduction in cloud API calls.
 import yaml
 from enum import IntEnum
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any, Optional, Set, Tuple
+from pydantic import create_model, Field, BaseModel
+from core.client import LLMClientFactory
 from dataclasses import dataclass, field
 
 from core.utils import get_logger
@@ -226,24 +228,14 @@ class TwoPassExtractor:
         
         This is a lenient pass - we accept lower confidence initially.
         """
-        results = {}
-        
-        # TODO: Implement actual Ollama extraction
-        # For now, this is a placeholder that returns empty results
-        # The actual implementation will call self._call_local_model()
-        
-        for field_name in fields:
-            tier = self.get_field_tier(field_name)
-            # Placeholder - real implementation extracts via Ollama
-            results[field_name] = TierResult(
-                field_name=field_name,
-                value=None,
-                confidence=0.0,
-                tier=tier,
-            )
-            
-        self._stats["local_extractions"] += len(fields)
-        return results
+        logger.info(f"Extracting {len(fields)} fields with local model: {self.local_model}")
+        return self._call_model(
+            context, 
+            fields, 
+            model=self.local_model,
+            provider="ollama",
+            tier_func=self.get_field_tier
+        )
     
     def _extract_cloud(
         self, 
@@ -255,21 +247,14 @@ class TwoPassExtractor:
         
         Only called for fields that failed local extraction.
         """
-        results = {}
-        
-        # TODO: Implement actual cloud extraction
-        # For now, this is a placeholder
-        
-        for field_name in fields:
-            results[field_name] = TierResult(
-                field_name=field_name,
-                value=None,
-                confidence=0.0,
-                tier=ExtractionTier.CLOUD_CHEAP,
-            )
-            
-        self._stats["cloud_extractions"] += len(fields)
-        return results
+        logger.info(f"Extracting {len(fields)} fields with cloud model: {self.cloud_model}")
+        return self._call_model(
+            context, 
+            fields, 
+            model=self.cloud_model,
+            provider="openrouter",
+            default_tier=ExtractionTier.CLOUD_PREMIUM
+        )
     
     def extract(
         self,
@@ -332,6 +317,99 @@ class TwoPassExtractor:
             pass2_needed_count=len(needs_escalation),
         )
     
+    def _call_model(
+        self, 
+        context: str, 
+        fields: List[str], 
+        model: str,
+        provider: str,
+        tier_func: Optional[Any] = None,
+        default_tier: ExtractionTier = ExtractionTier.LOCAL_STANDARD
+    ) -> Dict[str, TierResult]:
+        """Generic model call method."""
+        # 1. Provide a simplified schema for generic fields
+        # Ideally, we would know the type of each field. 
+        # For generic extraction, we assume they are strings or generic types.
+        # We also want confidence.
+        
+        # We'll create a nested model: 
+        # class FieldValue(BaseModel):
+        #     value: Any
+        #     confidence: float = Field(description="Confidence score 0.0-1.0")
+        #     quote: str = Field(description="Exact quote from text")
+        
+        class ExtractedField(BaseModel):
+            value: Any = Field(..., description="The extracted value")
+            confidence: float = Field(..., description="Confidence score between 0.0 and 1.0")
+            supporting_quote: str = Field(..., description="Exact substring from text supporting the value")
+
+        # Create dynamic model with a field for each requested field_name
+        field_definitions = {
+            f: (Optional[ExtractedField], Field(default=None, description=f"Extraction for {f}"))
+            for f in fields
+        }
+        
+        DynamicModel = create_model("DynamicExtraction", **field_definitions)
+        
+        # 2. Get Client
+        try:
+            client = LLMClientFactory.create(provider=provider)
+            
+            # 3. Call API
+            completion = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": "Extract the requested fields from the text. For each field, provide the value, confidence (0-1), and an exact quote."},
+                    {"role": "user", "content": f"Context:\n{context}"}
+                ],
+                response_model=DynamicModel,
+                max_retries=2
+            )
+            
+            # 4. Map Results
+            results = {}
+            for f in fields:
+                extracted = getattr(completion, f)
+                tier = tier_func(f) if tier_func else default_tier
+                
+                if extracted:
+                    results[f] = TierResult(
+                        field_name=f,
+                        value=extracted.value,
+                        confidence=extracted.confidence,
+                        supporting_quote=extracted.supporting_quote,
+                        tier=tier
+                    )
+                else:
+                    results[f] = TierResult(
+                        field_name=f,
+                        value=None,
+                        confidence=0.0,
+                        supporting_quote="",
+                        tier=tier
+                    )
+                    
+            if provider == "ollama":
+                self._stats["local_extractions"] += len(fields)
+            else:
+                self._stats["cloud_extractions"] += len(fields)
+                
+            return results
+            
+        except Exception as e:
+            logger.error(f"Extraction failed for {provider}/{model}: {e}")
+            # Return empty failures
+            results = {}
+            for f in fields:
+                tier = tier_func(f) if tier_func else default_tier
+                results[f] = TierResult(
+                    field_name=f,
+                    value=None,
+                    confidence=0.0,
+                    tier=tier
+                )
+            return results
+
     def get_stats(self) -> Dict[str, int]:
         """Get extraction statistics."""
         return self._stats.copy()

@@ -77,14 +77,15 @@ async def test_extract_async_flow(sentence_extractor, mock_llm_client):
     # Check results structure
     assert isinstance(results, list)
     assert len(results) >= 1
-    assert results[0]["entity_text"] == "45 years old"
-    assert results[0]["attr"]["entity_type"] == "patient_age"
+    # Result is EvidenceFrame object, access fields via dot notation
+    assert results[0].text == "45 years old"
+    assert results[0].content["entity_type"] == "patient_age"
 
 @pytest.mark.asyncio
 async def test_concurrency_control(sentence_extractor):
     """Verify that concurrency is limited."""
     # Mock _extract_single_sentence to be slow
-    async def slow_extract(*args):
+    async def slow_extract(*args, **kwargs):
         await asyncio.sleep(0.1)
         return []
     

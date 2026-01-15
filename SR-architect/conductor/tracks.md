@@ -11,6 +11,12 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+## [x] Track: Dead Code Removal & Code Quality Fixes
+*Link: [./conductor/archive/dead_code_removal_20260111/](./conductor/archive/dead_code_removal_20260111/)*
+*Status: Archived (2026-01-14). Completed all Phases 1-8.*
+
+---
+
 ## [x] Track: Token Optimization & Hybrid Local/Cloud Architecture (SUPERSEDED)
 *Link: [./archive/token_optimization_20260106/](./archive/token_optimization_20260106/)*
 

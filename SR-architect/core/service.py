@@ -4,13 +4,13 @@ import csv
 import asyncio
 import functools
 from pathlib import Path
-from typing import List, Optional, Type, Dict, Any, Callable
+from typing import List, Optional, Type, Dict, Any, Callable, TextIO
 
 from .config import settings
 from .parser import DocumentParser, ParsedDocument
 from .pipeline import HierarchicalExtractionPipeline
 from .data_types import PipelineResult
-from .batch_processor import BatchExecutor
+from .batch import BatchExecutor
 from .state_manager import StateManager
 from .token_tracker import TokenTracker
 from .audit_logger import AuditLogger
@@ -113,7 +113,7 @@ class ExtractionService:
         from .vectorizer import ChromaVectorStore
         vector_dir = output_path.parent / "vector_store"
         return ChromaVectorStore(
-            collection_name="sr_extraction",
+            collection_name=settings.DEFAULT_COLLECTION_NAME,
             persist_directory=str(vector_dir),
         )
 
@@ -150,13 +150,150 @@ class ExtractionService:
             "tokens": summary.get("total_tokens", 0)
         }
 
+    def _handle_extraction_success(
+        self, 
+        filename: str, 
+        data: Any, 
+        writer: csv.DictWriter, 
+        file_handle: TextIO,
+        vector_store: Optional[Any],
+        parsed_docs: List[ParsedDocument],
+        fieldnames: List[str],
+        callback: Optional[Callable]
+    ):
+        """Handle successful extraction result (write to CSV and vectorize)."""
+        extracted_data = data
+        if "final_data" in data:
+            extracted_data = data["final_data"]
+        
+        row = {k: v for k, v in extracted_data.items() if k in fieldnames}
+        writer.writerow(row)
+        file_handle.flush()
+        
+        # Handle Vectorization (Non-blocking)
+        if vector_store:
+            # Find the doc in parsed_docs
+            doc = next((d for d in parsed_docs if d.filename == filename), None)
+            if doc:
+                try:
+                    loop = asyncio.get_running_loop()
+                    func = functools.partial(vector_store.add_chunks_from_parsed_doc, doc, extracted_data=extracted_data)
+                    loop.run_in_executor(None, func)
+                except RuntimeError as e:
+                    # No event loop - fallback to sync
+                    logger.debug(f"No async loop available, using sync vectorization: {e}")
+                    vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
+                except Exception as e:
+                    # Vectorization failed - log but don't fail extraction
+                    logger.error(f"Vectorization failed for {filename}: {e}", exc_info=True)
+                    
+        if callback:
+            callback(filename, data, "success")
+
+    def _execute_standard_extraction(
+        self,
+        batch_executor: BatchExecutor,
+        parsed_docs: List[ParsedDocument],
+        model: Type[Any],
+        theme: str,
+        hierarchical: bool,
+        workers: int,
+        resume: bool,
+        result_handler: Callable
+    ):
+        """Execute standard (non-chunked) extraction."""
+        if hierarchical:
+            asyncio.run(batch_executor.process_batch_async(
+                documents=parsed_docs,
+                schema=model,
+                theme=theme,
+                resume=resume,
+                callback=result_handler,
+                concurrency_limit=workers
+            ))
+        else:
+            batch_executor.process_batch(
+                documents=parsed_docs,
+                schema=model,
+                theme=theme,
+                resume=resume,
+                callback=result_handler
+            )
+
+    def _execute_chunked_extraction(
+        self,
+        batch_executor: BatchExecutor,
+        parsed_docs: List[ParsedDocument],
+        schema_chunks: List[List[FieldDefinition]],
+        theme: str,
+        hierarchical: bool,
+        workers: int,
+        writer: csv.DictWriter,
+        file_handle: TextIO,
+        vector_store: Optional[Any],
+        fieldnames: List[str],
+        callback: Optional[Callable],
+        failed_files: List[Any]
+    ):
+        """Execute extraction with schema chunking."""
+        logger.info(f"Schema chunking enabled: {len(schema_chunks)} chunks")
+        
+        # Store chunk results per document
+        chunk_results_by_doc = {}
+        
+        for chunk_idx, chunk_fields in enumerate(schema_chunks):
+            logger.info(f"Processing chunk {chunk_idx + 1}/{len(schema_chunks)}")
+            
+            # Build model for this chunk
+            ChunkModel = build_extraction_model(chunk_fields, f"ChunkModel_{chunk_idx}")
+            
+            # Run extraction for this chunk
+            def chunk_callback(filename, data, status):
+                if status == "success":
+                    if filename not in chunk_results_by_doc:
+                        chunk_results_by_doc[filename] = []
+                    
+                    extracted_data = data
+                    if "final_data" in data:
+                        extracted_data = data["final_data"]
+                    
+                    chunk_results_by_doc[filename].append(extracted_data)
+                else:
+                    failed_files.append((filename, f"Chunk {chunk_idx}: {str(data)}"))
+            
+            if hierarchical:
+                asyncio.run(batch_executor.process_batch_async(
+                    documents=parsed_docs,
+                    schema=ChunkModel,
+                    theme=theme,
+                    resume=False,  # Don't resume for chunks
+                    callback=chunk_callback,
+                    concurrency_limit=workers
+                ))
+            else:
+                batch_executor.process_batch(
+                    documents=parsed_docs,
+                    schema=ChunkModel,
+                    theme=theme,
+                    resume=False,
+                    callback=chunk_callback
+                )
+        
+        # Merge chunk results and write to CSV
+        for filename, chunk_results in chunk_results_by_doc.items():
+            merged_data = merge_extraction_results(chunk_results)
+            self._handle_extraction_success(
+                filename, merged_data, writer, file_handle, 
+                vector_store, parsed_docs, fieldnames, callback
+            )
+
     def run_extraction(
         self,
         papers_dir: str,
         fields: List[FieldDefinition],
         output_csv: str,
         hierarchical: bool = False,
-        theme: str = "General extraction",
+        theme: str = settings.DEFAULT_THEME,
         threshold: float = settings.SCORE_THRESHOLD,
         max_iter: int = settings.MAX_ITERATIONS,
         workers: int = settings.WORKERS,
@@ -186,9 +323,6 @@ class ExtractionService:
         # 4. Initialize Pipeline & Extractor
         pipeline = self._initialize_pipeline(threshold, max_iter, examples, hybrid_mode)
         
-        # For non-hierarchical mode, we still use the pipeline's components 
-        # but call extract_document which handles the logic.
-        
         # 5. Initialize Vector Store
         vector_store = self._initialize_vector_store(output_path, vectorize)
         
@@ -209,127 +343,25 @@ class ExtractionService:
             writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             
-            def internal_callback(filename, data, status):
-                if status == "success":
-                    extracted_data = data
-                    if "final_data" in data:
-                        extracted_data = data["final_data"]
-                    
-                    row = {k: v for k, v in extracted_data.items() if k in fieldnames}
-                    writer.writerow(row)
-                    f.flush()
-                    
-                    # Handle Vectorization (Non-blocking)
-                    if vector_store:
-                        # Find the doc in parsed_docs
-                        doc = next((d for d in parsed_docs if d.filename == filename), None)
-                        if doc:
-                            try:
-                                loop = asyncio.get_running_loop()
-                                func = functools.partial(vector_store.add_chunks_from_parsed_doc, doc, extracted_data=extracted_data)
-                                loop.run_in_executor(None, func)
-                            except RuntimeError as e:
-                                # No event loop - fallback to sync
-                                logger.debug(f"No async loop available, using sync vectorization: {e}")
-                                vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
-                            except Exception as e:
-                                # Vectorization failed - log but don't fail extraction
-                                logger.error(f"Vectorization failed for {filename}: {e}", exc_info=True)
-                else:
-                    failed_files.append((filename, str(data)))
-                
-                if callback:
-                    callback(filename, data, status)
-
-            # Handle schema chunking if enabled
             if schema_chunks:
-                logger.info(f"Schema chunking enabled: {len(schema_chunks)} chunks")
-                
-                # Store chunk results per document
-                chunk_results_by_doc = {}
-                
-                for chunk_idx, chunk_fields in enumerate(schema_chunks):
-                    logger.info(f"Processing chunk {chunk_idx + 1}/{len(schema_chunks)}")
-                    
-                    # Build model for this chunk
-                    ChunkModel = build_extraction_model(chunk_fields, f"ChunkModel_{chunk_idx}")
-                    
-                    # Run extraction for this chunk
-                    def chunk_callback(filename, data, status):
-                        if status == "success":
-                            if filename not in chunk_results_by_doc:
-                                chunk_results_by_doc[filename] = []
-                            
-                            extracted_data = data
-                            if "final_data" in data:
-                                extracted_data = data["final_data"]
-                            
-                            chunk_results_by_doc[filename].append(extracted_data)
-                        else:
-                            failed_files.append((filename, f"Chunk {chunk_idx}: {str(data)}"))
-                    
-                    if hierarchical:
-                        asyncio.run(batch_executor.process_batch_async(
-                            documents=parsed_docs,
-                            schema=ChunkModel,
-                            theme=theme,
-                            resume=False,  # Don't resume for chunks
-                            callback=chunk_callback,
-                            concurrency_limit=workers
-                        ))
-                    else:
-                        batch_executor.process_batch(
-                            documents=parsed_docs,
-                            schema=ChunkModel,
-                            theme=theme,
-                            resume=False,
-                            callback=chunk_callback
-                        )
-                
-                # Merge chunk results and write to CSV
-                for filename, chunk_results in chunk_results_by_doc.items():
-                    merged_data = merge_extraction_results(chunk_results)
-                    row = {k: v for k, v in merged_data.items() if k in fieldnames}
-                    writer.writerow(row)
-                    f.flush()
-                    
-                    # Call user callback
-                    if callback:
-                        callback(filename, merged_data, "success")
-                    
-                    # Handle Vectorization
-                    if vector_store:
-                        doc = next((d for d in parsed_docs if d.filename == filename), None)
-                        if doc:
-                            try:
-                                loop = asyncio.get_running_loop()
-                                func = functools.partial(vector_store.add_chunks_from_parsed_doc, doc, extracted_data=merged_data)
-                                loop.run_in_executor(None, func)
-                            except RuntimeError as e:
-                                logger.debug(f"No async loop available, using sync vectorization: {e}")
-                                vector_store.add_chunks_from_parsed_doc(doc, extracted_data=merged_data)
-                            except Exception as e:
-                                logger.error(f"Vectorization failed for {filename}: {e}", exc_info=True)
+                self._execute_chunked_extraction(
+                    batch_executor, parsed_docs, schema_chunks, theme, hierarchical, workers,
+                    writer, f, vector_store, fieldnames, callback, failed_files
+                )
             else:
-                # Normal (non-chunked) extraction
-                if hierarchical:
-                    asyncio.run(batch_executor.process_batch_async(
-                        documents=parsed_docs,
-                        schema=ExtractionModel,
-                        theme=theme,
-                        resume=resume,
-                        callback=internal_callback,
-                        concurrency_limit=workers
-                    ))
-                else:
-                    batch_executor.process_batch(
-                        documents=parsed_docs,
-                        schema=ExtractionModel,
-                        theme=theme,
-                        resume=resume,
-                        callback=internal_callback
-                    )
-                
+                def result_handler(filename, data, status):
+                    if status == "success":
+                        self._handle_extraction_success(
+                            filename, data, writer, f, vector_store, parsed_docs, fieldnames, callback
+                        )
+                    else:
+                        failed_files.append((filename, str(data)))
+                        if callback:
+                            callback(filename, data, status)
+                            
+                self._execute_standard_extraction(
+                    batch_executor, parsed_docs, ExtractionModel, theme, hierarchical, workers, resume, result_handler
+                )
                 
         # 9. Return Summary
         return self._build_summary(pdf_files, parsed_docs, failed_files)

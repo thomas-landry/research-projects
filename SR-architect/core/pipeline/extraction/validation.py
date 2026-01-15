@@ -97,7 +97,7 @@ def run_validation_loop(
     Returns:
         PipelineResult with extraction data
     """
-    from core.pipeline.extraction.helpers import build_pipeline_result, build_failed_result
+    from core.pipeline.extraction.helpers import build_pipeline_result
     from core.pipeline.stages import build_revision_prompts
     
     revision_prompts: List[str] = []
@@ -191,7 +191,7 @@ async def run_validation_loop_async(
     
     Same structure as sync version, but with async I/O.
     """
-    from core.pipeline.helpers import build_pipeline_result, build_failed_result
+    from core.pipeline.extraction.helpers import build_pipeline_result
     from core.pipeline.stages import build_revision_prompts
     
     revision_prompts: List[str] = []

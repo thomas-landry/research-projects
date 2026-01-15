@@ -19,6 +19,7 @@ def mock_pipeline_components():
         mock_rel = mock_rel_cls.return_value
         mock_ext = mock_ext_cls.return_value
         mock_check = mock_check_cls.return_value
+        mock_check.format_revision_prompt.return_value = "fix it"
         
         yield {
             "filter": mock_filter,
@@ -59,6 +60,10 @@ def test_extract_document_flow(mock_pipeline_components):
     mock_check_res.consistency_score = 1.0
     mock_check_res.overall_score = 1.0
     mock_check_res.issues = []
+    mock_check_res.suggestions = []
+    mock_check_res.suggestions = []
+    mock_check_res.suggestions = []
+    mock_check_res.suggestions = []
     mock_check_res.suggestions = []
     mocks["checker"].check.return_value = mock_check_res
     

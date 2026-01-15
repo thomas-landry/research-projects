@@ -205,6 +205,41 @@ class ChromaVectorStore:
 
 
 
+    def _should_include_metadata_field(self, key: str) -> bool:
+        """Check if a field should be included in metadata."""
+        return not (key.startswith("_") or key.endswith("_quote"))
+
+    def _enrich_metadata_from_extraction(self, metadata: Dict[str, Any], extracted_data: Dict[str, Any]) -> None:
+        """Add extracted fields to metadata if valid."""
+        for key, value in extracted_data.items():
+            if not self._should_include_metadata_field(key):
+                continue
+            
+            sanitized = _sanitize_metadata_value(value)
+            if sanitized is not None:
+                metadata[key] = sanitized
+
+    def _build_chunk_metadata(
+        self, 
+        doc: "ParsedDocument", 
+        chunk: "DocumentChunk", 
+        index: int, 
+        extracted_data: Optional[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Build complete metadata for a chunk."""
+        metadata = {
+            "filename": doc.filename,
+            "section": chunk.section,
+            "subsection": chunk.subsection,
+            "chunk_type": chunk.chunk_type,
+            "chunk_index": index,
+        }
+        
+        if extracted_data:
+            self._enrich_metadata_from_extraction(metadata, extracted_data)
+            
+        return metadata
+
     def add_chunks_from_parsed_doc(
         self,
         doc: "ParsedDocument",
@@ -223,26 +258,7 @@ class ChromaVectorStore:
         documents = []
         
         for i, chunk in enumerate(doc.chunks):
-            # Build metadata
-            metadata = {
-                "filename": doc.filename,
-                "section": chunk.section,
-                "subsection": chunk.subsection,
-                "chunk_type": chunk.chunk_type,
-                "chunk_index": i,
-            }
-            
-            # Add extracted data to metadata (for filtering)
-            if extracted_data:
-                for key, value in extracted_data.items():
-                    # Skip internal fields and quote fields
-                    if key.startswith("_") or key.endswith("_quote"):
-                        continue
-                    
-                    sanitized = _sanitize_metadata_value(value)
-                    if sanitized is not None:
-                        metadata[key] = sanitized
-            
+            metadata = self._build_chunk_metadata(doc, chunk, i, extracted_data)
             doc_id = f"{doc.filename}_{i}"
             
             documents.append(VectorDocument(

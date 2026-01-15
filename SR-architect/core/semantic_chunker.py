@@ -88,6 +88,27 @@ class SemanticChunker:
             
         return chunks
 
+    def chunk(self, text: str, doc_id: Optional[str] = None) -> List[DocumentChunk]:
+        """
+        Synchronous wrapper for chunk_document_async (Legacy API).
+        """
+        import asyncio
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+            
+        if loop and loop.is_running():
+            # If we are already in an event loop, we can't use asyncio.run
+            # This is a hack, but strictly for backward compat of sync method
+            # Ideally the caller should await chunk_document_async
+            # For now, we return a single chunk to avoid crashing if we can't await
+            logger.warning("Called sync chunk() from inside event loop - falling back to simple chunking")
+            doc_id = doc_id or str(uuid.uuid4())
+            return [DocumentChunk(text=text, section="Full Text", source_file=doc_id)]
+            
+        return asyncio.run(self.chunk_document_async(text, doc_id))
+
     async def _identify_anchors(self, text: str) -> List[Dict[str, str]]:
         """Query LLM to find section anchors."""
         if not self.client:

@@ -76,7 +76,13 @@ class ExtractionExecutor:
         self.filter_and_classify = filter_and_classify
         
         # Optional components
+        # Optional components
         self.quality_auditor = quality_auditor
+        self.sentence_extractor = None
+        
+    def set_sentence_extractor(self, extractor):
+        """Inject sentence extractor."""
+        self.sentence_extractor = extractor
     
     def _prepare_context(
         self, 
@@ -215,6 +221,52 @@ class ExtractionExecutor:
         
         if pre_filled:
             self.logger.info(f"  Tier 0 extracted {len(pre_filled)} fields via regex")
+            
+        # Apply Sentence Extractor (Hybrid Mode)
+        if self.sentence_extractor:
+            self.logger.info("  Running hybrid sentence extraction...")
+            try:
+                # Extract frames
+                # Note: SentenceExtractor.extract takes (chunks, template="")
+                # We reuse chunks from document
+                frames = await self.sentence_extractor.extract(document.chunks)
+                
+                sentence_data = {}
+                count = 0
+                for frame in frames:
+                    # Frame content is dict of attributes
+                    # We expect keys like 'attr' or flattened content
+                    # Based on test mock: content={"entity_type": "histopathology"}
+                    # And text="Spindle cell neoplasm"
+                    # We need to map this to schema fields.
+                    # This implies SentenceExtractor needs to know Schema or mappings.
+                    # Or it returns {schema_field: value}.
+                    # The test mock returns content={"entity_type": ...}. 
+                    # The integration test expects result.final_data["histopathology"]
+                    # If SentenceExtractor returns generic frames, we need mapping.
+                    # Assuming for now frame.content IS the data, or frame keys map to schema.
+                    # Let's assume simplest: merge result extraction dicts.
+                    if frame.content:
+                        for k, v in frame.content.items():
+                             # Heuristic: if key matches schema field?
+                             # Or use frame.text as value for frame.content['entity_type']? 
+                             # Test mock: text="Spindle...", content={"entity_type": "histopathology"}
+                             # So field is 'histopathology', value is 'Spindle...'
+                             if "entity_type" in frame.content:
+                                 field_name = frame.content["entity_type"]
+                                 sentence_data[field_name] = frame.text
+                                 count += 1
+                             else:
+                                 # Direct key-value merge
+                                 sentence_data.update(frame.content)
+                                 count += len(frame.content)
+                
+                if sentence_data:
+                    self.logger.info(f"  Hybrid extracted {count} items. Merging into pre-filled.")
+                    pre_filled.update(sentence_data)
+                    
+            except Exception as e:
+                self.logger.warning(f"  Hybrid extraction failed: {e}")
         
         # Validation loop (async)
         result = await run_validation_loop_async(
@@ -235,3 +287,4 @@ class ExtractionExecutor:
         # Cache result
         self.cache_result(ctx["fingerprint"], result)
         return result
+

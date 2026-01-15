@@ -28,7 +28,7 @@ from core.prisma_state import (
     recalculate_counts,
     validate_prisma_counts,
 )
-from core.batch_processor import BatchExecutor
+from core.batch import BatchExecutor
 from core.state_manager import StateManager
 from core.schema_builder import get_observational_schema, build_extraction_model
 from core.parser import DocumentParser

@@ -1,92 +1,25 @@
 """
 Centralized LLM Client Factory.
 Handles initialization of Instructor-patched OpenAI clients for various providers.
-Includes health checks for local providers.
 """
 import os
-import requests
 from typing import Optional, Any, Dict
+import requests
+from requests.exceptions import Timeout, ConnectionError
 
 from .config import settings
 from .utils import get_logger
+from .platform_utils import OllamaServiceManager
 
 logger = get_logger("LLMClient")
 
-class OllamaHealthCheck:
-    """Checks availability of local Ollama instance and manages restart."""
-    
-    @staticmethod
-    def is_available(base_url: str) -> bool:
-        """Check if Ollama API is responsive."""
-        try:
-            # Simple check to /api/tags or version
-            # Only checking connectivity here
-            url = base_url.replace("/v1", "") # standard ollama api is at root/api
-            if not url.endswith("/"):
-                url += "/"
-            
-            # Check version
-            resp = requests.get(f"{url}api/version", timeout=2.0)
-            return resp.status_code == 200
-        except requests.Timeout as e:
-            logger.debug(f"Ollama health check timeout after 2.0s: {e}")
-            return False
-        except requests.ConnectionError as e:
-            logger.debug(f"Ollama health check connection failed: {e}")
-            return False
-        except requests.RequestException as e:
-            logger.warning(f"Ollama health check failed with unexpected error: {e}", exc_info=True)
-            return False
-
-    @staticmethod
-    def restart_service() -> bool:
-        """
-        Attempt to restart the Ollama service.
-        Returns True if restart appears successful (process launched).
-        """
-        import subprocess
-        import time
-        import platform
-
-        logger.info("Attempting to auto-restart Ollama service...")
-
-        # 1. Kill existing if any (Unix/Mac specific)
-        try:
-            if platform.system() != "Windows":
-                 subprocess.run(["pkill", "ollama"], check=False)
-                 time.sleep(1) # Grace period
-        except Exception as e:
-            logger.warning(f"Could not kill existing ollama process: {e}")
-
-        # 2. Start new instance
-        try:
-            # Run in background
-            # Check for brew services first on Mac
-            if platform.system() == "Darwin":
-                # Try brew services restart first as it's cleaner
-                res = subprocess.run(["brew", "services", "restart", "ollama"], capture_output=True)
-                if res.returncode == 0:
-                    logger.info("Restarted via brew services")
-                    return True
-            
-            # Fallback to direct execution
-            subprocess.Popen(
-                ["ollama", "serve"], 
-                stdout=subprocess.DEVNULL, 
-                stderr=subprocess.DEVNULL,
-                start_new_session=True
-            )
-            logger.info("Launched 'ollama serve' subprocess")
-            return True
-        except FileNotFoundError:
-            logger.error("Could not find 'ollama' executable in PATH")
-            return False
-        except Exception as e:
-            logger.error(f"Failed to restart ollama: {e}")
-            return False
+# Alias for backward compatibility if imported elsewhere
+OllamaHealthCheck = OllamaServiceManager
 
 class LLMClientFactory:
-    """Factory for creating LLM clients."""
+    """
+    Factory for creating LLM clients (Sync and Async).
+    """
     
     @staticmethod
     def create(
@@ -96,16 +29,7 @@ class LLMClientFactory:
         mode: Optional[Any] = None 
     ) -> Any:
         """
-        Create a configured Instructor client.
-        
-        Args:
-            provider: 'openrouter', 'ollama', or 'openai'
-            api_key: Override API key
-            base_url: Override Base URL
-            mode: Instructor mode (TOOLS, MD_JSON, etc.)
-            
-        Returns:
-            Instructor-patched OpenAI client
+        Create a configured Instructor client (Synchronous).
         """
         try:
             import instructor
@@ -113,12 +37,20 @@ class LLMClientFactory:
         except ImportError:
             raise ImportError("pip install instructor openai")
             
+        # 1. Get arguments
+        client_args = LLMClientFactory._get_client_args(provider, api_key, base_url)
+        
+        # 2. Handle provider specifics (like side effects)
         if provider == "ollama":
-            return LLMClientFactory._create_ollama(api_key, base_url, mode)
-        elif provider == "openrouter":
-            return LLMClientFactory._create_openrouter(api_key, base_url, mode)
-        else:
-            return LLMClientFactory._create_openai(api_key, base_url, mode)
+            LLMClientFactory._ensure_ollama_available(client_args.get("base_url"))
+            if mode is None:
+                mode = instructor.Mode.JSON
+        elif mode is None:
+            # Default for cloud providers
+            mode = instructor.Mode.TOOLS
+            
+        # 3. Create Client
+        return instructor.from_openai(OpenAI(**client_args), mode=mode)
 
     @staticmethod
     def create_async(
@@ -127,105 +59,97 @@ class LLMClientFactory:
         base_url: Optional[str] = None,
         mode: Optional[Any] = None
     ) -> Any:
-        """Create a configured Async Instructor client."""
+        """
+        Create a configured Instructor client (Asynchronous).
+        """
         try:
             import instructor
             from openai import AsyncOpenAI
         except ImportError:
             raise ImportError("pip install instructor openai")
 
+        # 1. Get arguments
         client_args = LLMClientFactory._get_client_args(provider, api_key, base_url)
         
-        # Determine mode
-        if mode is None:
-            if provider == "ollama":
+        # 2. Handle provider specifics
+        if provider == "ollama":
+            # Note: We check health even for async creation? Yes, usually good.
+            # But async creation might want to avoid blocking calls. 
+            # For now, we keep it consistent with sync, but maybe log warning if slow.
+            LLMClientFactory._ensure_ollama_available(client_args.get("base_url"))
+            if mode is None:
                 mode = instructor.Mode.JSON
-            else:
-                mode = instructor.Mode.TOOLS
+        elif mode is None:
+            mode = instructor.Mode.TOOLS
 
-        base_client = AsyncOpenAI(**client_args)
-        return instructor.from_openai(base_client, mode=mode)
+        # 3. Create Client
+        return instructor.from_openai(AsyncOpenAI(**client_args), mode=mode)
 
     @staticmethod
-    def _create_ollama(api_key, base_url, mode):
-        import instructor
-        from openai import OpenAI
+    def _get_client_args(provider: str, api_key: Optional[str], base_url: Optional[str]) -> Dict[str, Any]:
+        """Resolve API Key and Base URL based on provider."""
+        args = {}
         
-        url = base_url or settings.OLLAMA_BASE_URL
-        
-        # Health Check & Auto-Healing
-        if not OllamaHealthCheck.is_available(url):
-            logger.warning(f"Ollama appears down at {url}. Attempting auto-restart...")
-            if OllamaHealthCheck.restart_service():
-                # Wait up to 10s for it to come up
-                import time
-                for i in range(5):
-                    time.sleep(2)
-                    if OllamaHealthCheck.is_available(url):
-                        logger.info("Ollama service successfully recovered!")
-                        break
+        if provider == "ollama":
+            args["base_url"] = base_url or settings.OLLAMA_BASE_URL
+            args["api_key"] = api_key or "ollama"
+            
+        elif provider == "openrouter":
+            key = api_key or settings.OPENROUTER_API_KEY
+            if not key:
+                 # We raise error here or let client fail? Better to fail early.
+                 pass # ValueError("OPENROUTER_API_KEY") check was in old code
+            if not key and not api_key:
+                 # If no key provided at all
+                 raise ValueError("OPENROUTER_API_KEY not set")
+            
+            args["base_url"] = base_url or settings.OPENROUTER_BASE_URL
+            args["api_key"] = key
+            
+        else: # openai or generic
+            args["api_key"] = api_key or settings.OPENAI_API_KEY
+            if base_url:
+                args["base_url"] = base_url
+                
+        return args
+
+    @staticmethod
+    def _ensure_ollama_available(url: Optional[str]) -> None:
+        """Check and recover Ollama if needed."""
+        target_url = url or settings.OLLAMA_BASE_URL
+        try:
+            if not OllamaServiceManager.is_available(target_url):
+                logger.warning(f"Ollama appears down at {target_url}. Attempting auto-restart...")
+                if OllamaServiceManager.restart_service():
+                    # Poll for recovery
+                    import time
+                    for _ in range(settings.OLLAMA_RESTART_MAX_ATTEMPTS):
+                        time.sleep(settings.OLLAMA_RESTART_POLL_INTERVAL)
+                        if OllamaServiceManager.is_available(target_url):
+                            logger.info("Ollama service successfully recovered!")
+                            return
+                    logger.error("Ollama restart initiated but service is still unresponsive.")
                 else:
-                    logger.error("Ollama restart initiated but service is still unresponsive after 10s.")
-            else:
-                logger.error("Auto-restart failed. Please run 'ollama serve' manually.")
-            
-        client_args = {
-            "base_url": url,
-            "api_key": api_key or "ollama"
-        }
-        
-        if mode is None:
-            # Mode.TOOLS often fails with "multiple tool calls" error on local LLMs
-            # Mode.JSON is more robust for Ollama/Llama3/Mistral
-            mode = instructor.Mode.JSON
-            
-        return instructor.from_openai(OpenAI(**client_args), mode=mode)
+                    logger.error("Auto-restart failed. Please run 'ollama serve' manually.")
+        except (Timeout, ConnectionError) as e:
+            logger.error(f"Connection error checking Ollama status: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error checking Ollama status: {e}")
+    
+    # Backward compatibility helpers (if needed by old code using private methods)
+    # _create_ollama, _create_openrouter etc. can be deprecated or proxied
+    @staticmethod
+    def _create_ollama(api_key, base_url, mode):
+        """Deprecated: Use create('ollama', ...) instead."""
+        # Bridge to new create logic
+        return LLMClientFactory.create("ollama", api_key, base_url, mode)
 
     @staticmethod
     def _create_openrouter(api_key, base_url, mode):
-        import instructor
-        from openai import OpenAI
-        
-        from core.config import settings
-        key = api_key or settings.OPENROUTER_API_KEY
-        if not key:
-            raise ValueError("OPENROUTER_API_KEY not set")
-            
-        client_args = {
-            "base_url": base_url or "https://openrouter.ai/api/v1",
-            "api_key": key
-        }
-        
-        if mode is None:
-            mode = instructor.Mode.TOOLS
-            
-        return instructor.from_openai(OpenAI(**client_args), mode=mode)
+        """Deprecated: Use create('openrouter', ...) instead."""
+        return LLMClientFactory.create("openrouter", api_key, base_url, mode)
 
     @staticmethod
     def _create_openai(api_key, base_url, mode):
-        import instructor
-        from openai import OpenAI
-        
-        client_args = {
-            "api_key": api_key or settings.OPENAI_API_KEY
-        }
-        if base_url:
-            client_args["base_url"] = base_url
-            
-        if mode is None:
-            mode = instructor.Mode.TOOLS
-            
-        return instructor.from_openai(OpenAI(**client_args), mode=mode)
-
-    @staticmethod
-    def _get_client_args(provider, api_key, base_url):
-        """Helper to get args for Async client reuse."""
-        # Reuse logic from Sync methods essentially
-        if provider == "ollama":
-            url = base_url or settings.OLLAMA_BASE_URL
-            return {"base_url": url, "api_key": api_key or "ollama"}
-        elif provider == "openrouter":
-            key = api_key or settings.OPENROUTER_API_KEY
-            return {"base_url": base_url or "https://openrouter.ai/api/v1", "api_key": key}
-        else:
-            return {"api_key": api_key or settings.OPENAI_API_KEY}
+        """Deprecated: Use create('openai', ...) instead."""
+        return LLMClientFactory.create("openai", api_key, base_url, mode)

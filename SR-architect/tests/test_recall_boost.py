@@ -9,6 +9,7 @@ from core.parser import ParsedDocument, DocumentChunk
 
 # Mock schema
 from pydantic import BaseModel, Field
+from core.validation.models import Issue
 
 class ClinicalTrial(BaseModel):
     sample_size: str = Field(..., description="Number of patients")
@@ -50,12 +51,16 @@ async def test_recall_boost_trigger(mock_pipeline_recall):
     
     # Checker passes on Iteration 1 (no errors in existing data)
     check1 = CheckerResult(
-        passed=True,
-        suggestions=[],
-        accuracy_score=1.0,
-        consistency_score=1.0,
-        overall_score=1.0,
-        issues=[]
+        passed=False,
+        suggestions=["Missing primary_outcome"],
+        accuracy_score=0.5,
+        consistency_score=0.5,
+        overall_score=0.5,
+        issues=[Issue(
+            field="primary_outcome",
+            issue_type="missing",
+            detail="Missing field: primary_outcome"
+        )]
     )
     
     check2 = CheckerResult(

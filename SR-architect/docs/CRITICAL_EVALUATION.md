@@ -48,8 +48,8 @@ We are moving from a linear script to a robust, resumable workflow:
 | Component | Status | Critique / Improvement Needed |
 |-----------|--------|-------------------------------|
 | `core/parser.py` | 🟢 Robust | **Good**. Now has fallback (PyMuPDF), caching, and robust chunking. |
-| `core/hierarchical_pipeline.py` | 🟢 Modular | **Clean**. Refactored to be stateless. Logic is sound. |
-| `core/batch_processor.py` | 🔴 Missing | **CRITICAL**. Currently we cannot run batch jobs or resume progress. Needs creation. |
+| `core/pipeline/core.py` | 🟢 Modular | **Clean**. Refactored to be stateless. Logic is sound. |
+| `core/batch/processor.py` | 🟢 Active | **Implemented**. Handles state, resuming, and parallel execution. |
 | `agents/*` | 🟢 Complete | All 5 agents implemented. Integration testing passed. |
 | `cli.py` | 🟡 Outdated | Needs update to use new `BatchProcessor` instead of old pipeline methods. |
 
@@ -57,8 +57,9 @@ We are moving from a linear script to a robust, resumable workflow:
 
 ## Part 3: Roadmap & Improvements
 
-### 1. The "BatchProcessor" (Immediate Priority)
+### 1. The "BatchProcessor" (Completed)
 **Problem**: We have a great engine (`HierarchicalExtractionPipeline`) but no car to drive it across 100 papers.
+**Solution**: Implemented `BatchExecutor` in `core/batch/processor.py`.
 **Solution**:
 ```python
 class BatchProcessor:

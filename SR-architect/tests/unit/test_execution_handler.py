@@ -6,7 +6,7 @@ sync and async execution paths.
 """
 import pytest
 from unittest.mock import Mock, MagicMock
-from core.batch_processor import ExecutionHandler, CircuitBreaker
+from core.batch import ExecutionHandler, CircuitBreaker
 from core.state_manager import StateManager
 
 

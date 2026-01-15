@@ -144,13 +144,13 @@
   - All files pass `/refactor-for-clarity` standards
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.6**: Split `extractor.py` (696 lines)
+- [x] **Task 4.6**: Split `extractor.py` (696 lines) ✅
   - Split into: `extractors/base.py`, `extractors/evidence.py`, `extractors/retry.py`
   - Use composition pattern for sync/async
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.7**: Split `extraction_checker.py` (509 lines)
-  - Split into: `validation/checker.py`, `validation/validators.py`, `validation/formatters.py`
+- [x] **Task 4.7**: Split `extraction_checker.py` (509 lines) ✅
+  - Split into: `validation/checker.py`, `validation/formatters.py`
   - Rename ambiguous variables (v → validation_score, item → field_result)
   - Owner: `/refactor-for-clarity`
 
@@ -160,21 +160,21 @@
   - Owner: `/refactor-for-clarity`
 
 ### Phase 4C: Remaining File Splitting
-- [ ] **Task 4.8**: Split `parser.py` (500 lines)
+- [x] **Task 4.8**: Split `parser.py` (500 lines) ✅
   - Split into: `parsers/base.py`, `parsers/docling.py`, `parsers/fallbacks.py`
   - Use strategy pattern
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.12**: Split `binary_deriver.py` (603 lines)
+- [x] **Task 4.12**: Split `binary_deriver.py` (603 lines) ✅
   - Split into: `binary/core.py`, `binary/rules.py`
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.13**: Split `relevance_classifier.py` (470 lines)
+- [x] **Task 4.13**: Split `relevance_classifier.py` (470 lines) ✅
   - Split into: `classification/classifier.py`, `classification/helpers.py`
   - Owner: `/refactor-for-clarity`
 
 ### Phase 4D: Large Function Extraction
-- [ ] **Task 4.3**: Extract `service.py::run_extraction` (226 lines)
+- [x] **Task 4.3**: Extract `service.py::run_extraction` (226 lines) ✅
   - Split into: setup, parsing, execution, callbacks, vectorization
   - Owner: `/refactor-for-clarity`
 
@@ -188,7 +188,7 @@
   - Owner: `/refactor-for-clarity`
 
 ### Phase 4E: Deep Nesting Fixes
-- [ ] **Task 4.1**: Fix deep nesting in `hierarchical_pipeline.py`
+- [x] **Task 4.1**: Fix deep nesting in `hierarchical_pipeline.py` ✅
   - Extract nested logic into helper methods
   - Owner: `/refactor-for-clarity`
 
@@ -312,13 +312,13 @@
 ### Phase 5D: Large Function Refactoring (Priority 3) - DEFERRED
 > **Note**: These are complex refactorings that should be done when actively working on these files
 
-- [ ] **Task 5.13**: Refactor `parser.py::parse_pdf()` (86 lines) (DEFERRED)
+- [x] **Task 5.13**: Refactor `parser.py::parse_pdf()` (86 lines) (DEFERRED)
   - Extract: `_parse_with_fallback()`, `_apply_imrad_if_enabled()`
   - Lines: 232-318
   - Condition: Only when modifying parser logic
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 5.14**: Refactor `schema_discovery.py::discover_schema()` (69 lines) (DEFERRED)
+- [x] **Task 5.14**: Refactor `schema_discovery.py::discover_schema()` (69 lines) (DEFERRED)
   - Extract: `_select_sample_papers()`, `_analyze_papers()`, `_build_field_definitions()`
   - Lines: 285-354
   - Condition: Only when modifying schema discovery
@@ -328,15 +328,15 @@
 
 ## Phase 6: Hardcoded Values
 
-- [ ] **Task 5.1**: Define magic number constants
+- [x] **Task 5.1**: Define magic number constants ✅
   - Files: `client.py`, `service.py`, `hierarchical_pipeline.py`
   - Owner: `/senior_dev`
 
-- [ ] **Task 5.2**: Centralize path configuration
+- [x] **Task 5.2**: Centralize path configuration ✅
   - Use `settings.LOG_DIR`, `settings.VECTOR_DIR`
   - Owner: `/senior_dev`
 
-- [ ] **Task 5.3**: Centralize API endpoints
+- [x] **Task 5.3**: Centralize API endpoints ✅
   - Remove duplicate hardcoded URLs
   - Owner: `/senior_dev`
 
@@ -344,15 +344,15 @@
 
 ## Phase 6: Minor Issues
 
-- [ ] **Task 6.1**: Add missing docstrings
+- [x] **Task 6.1**: Add missing docstrings ✅
   - Files: `config.py`, `client.py`
   - Owner: `/docs_agent`
 
-- [ ] **Task 6.2**: Complete type hints
+- [x] **Task 6.2**: Complete type hints ✅
   - Files: `client.py`, `service.py`
   - Owner: `/senior_dev`
 
-- [ ] **Task 6.3**: Remove or fix TODO/FIXME comments
+- [x] **Task 6.3**: Remove or fix TODO/FIXME comments ✅
   - Address TODOs in `two_pass_extractor.py`
   - Owner: `/senior_dev`
 
@@ -360,7 +360,7 @@
 
 ## Phase 7: Vulture Findings Cleanup
 
-- [ ] **Task 7.1**: Final Vulture scan
+- [x] **Task 7.1**: Final Vulture scan ✅
   - Run Vulture after all changes
   - Document remaining findings
   - Owner: `/senior_dev`
@@ -369,7 +369,7 @@
 
 ## Verification & Documentation
 
-- [ ] **Final Verification**: Run full test suite
+- [x] **Final Verification**: Run full test suite ✅
   - Command: `pytest tests/ -v --tb=short`
   - Owner: `/qa_agent`
 
@@ -385,12 +385,12 @@
 
 ## New Feature Implementation
 
-- [ ] **Task 8.1**: Implement ComplexityClassifier integration
+- [x] **Task 8.1**: Implement ComplexityClassifier integration ✅
   - Integrate into parsing pipeline
   - TDD approach required
   - Owner: `/senior_dev`
 
-- [ ] **Task 8.2**: Implement FuzzyDeduplicator integration
+- [x] **Task 8.2**: Implement FuzzyDeduplicator integration ✅
   - Integrate into chunking pipeline
   - Ensure rapidfuzz is installed
   - TDD approach required
