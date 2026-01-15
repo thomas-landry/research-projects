@@ -183,7 +183,7 @@
   - extract_sync() and extract_async() are 52 lines each (well-structured)
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.14**: Extract `extractor.py::extract_with_evidence` (128 lines)
+- [x] **Task 4.14**: Extract `extractor.py::extract_with_evidence` (128 lines) ✅
   - Extract: prompt building, response parsing, validation
   - Owner: `/refactor-for-clarity`
 
@@ -192,7 +192,7 @@
   - Extract nested logic into helper methods
   - Owner: `/refactor-for-clarity`
 
-- [ ] **Task 4.2**: Fix deep nesting in `service.py`
+- [x] **Task 4.2**: Fix deep nesting in `service.py` ✅
   - Use early returns, extract nested loops
   - Owner: `/refactor-for-clarity`
 
