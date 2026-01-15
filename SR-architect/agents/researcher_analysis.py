@@ -3,8 +3,25 @@
 import pandas as pd
 import sys
 from pathlib import Path
+from typing import Optional
 
-def analyze_extraction(csv_path):
+# Constants for analysis thresholds
+LOW_FILL_RATE_THRESHOLD = 0.5  # 50% fill rate minimum
+MAX_UNIQUE_VALUES_FOR_CATEGORICAL = 5  # Threshold for "messy" categorical data
+
+
+def analyze_extraction(csv_path: str) -> None:
+    """Analyze extraction results from CSV and generate research report.
+    
+    Generates a markdown-formatted report with:
+    - Executive summary of dataset
+    - Field-by-field analysis with fill rates
+    - Ghost column detection (100% missing)
+    - Data standardization recommendations
+    
+    Args:
+        csv_path: Path to CSV file containing extraction results
+    """
     try:
         df = pd.read_csv(csv_path)
     except FileNotFoundError:
@@ -26,7 +43,6 @@ def analyze_extraction(csv_path):
     print(f"| Field | Fill Rate | Mean Confidence | Issues |")
     print(f"|-------|-----------|-----------------|--------|")
     
-    low_confidence_fields = []
     ghost_columns = []
     
     for col in data_cols:
@@ -43,8 +59,8 @@ def analyze_extraction(csv_path):
         if fill_rate == 0:
             ghost_columns.append(col)
             issues.append("Ghost Column (100% missing)")
-        elif fill_rate < 0.5:
-            issues.append("Low Fill Rate (<50%)")
+        elif fill_rate < LOW_FILL_RATE_THRESHOLD:
+            issues.append(f"Low Fill Rate (<{LOW_FILL_RATE_THRESHOLD:.0%})")
             
         # detections of "Not reported" as text
         not_reported = df[col].astype(str).str.contains("Not reported", case=False, na=False).sum()
@@ -69,7 +85,7 @@ def analyze_extraction(csv_path):
     for col in ['patient_sex', 'outcome']:
         if col in df.columns:
             unique_vals = df[col].unique()
-            if len(unique_vals) > 5: # Arbitrary threshold for "messy"
+            if len(unique_vals) > MAX_UNIQUE_VALUES_FOR_CATEGORICAL:
                  print(f"- **{col}**: High variance in values (`{list(unique_vals)[:3]}...`). Consider strict Enum or normalization.")
 
 if __name__ == "__main__":

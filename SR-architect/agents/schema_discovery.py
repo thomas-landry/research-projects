@@ -12,6 +12,12 @@ from pydantic import BaseModel, Field
 from core.parser import DocumentParser, ParsedDocument
 from core.schema_builder import FieldDefinition, FieldType
 
+# Constants for schema discovery
+MIN_PDF_SIZE_BYTES = 10 * 1024  # 10KB minimum for valid PDFs
+MIN_TXT_SIZE_BYTES = 100  # 100 bytes minimum for valid text files
+MAX_CONTEXT_CHARS = 20_000  # Maximum characters for LLM context
+DEFAULT_RANDOM_SEED = 42  # Stable seed for reproducible sampling
+
 
 class SuggestedField(BaseModel):
     """A field suggested by the discovery agent."""
@@ -142,9 +148,9 @@ Input Fields:
         valid_files = []
         for p in all_files:
             size = p.stat().st_size
-            if p.suffix == ".pdf" and size > 10240:
+            if p.suffix == ".pdf" and size > MIN_PDF_SIZE_BYTES:
                 valid_files.append(p)
-            elif p.suffix == ".txt" and size > 100:
+            elif p.suffix == ".txt" and size > MIN_TXT_SIZE_BYTES:
                 valid_files.append(p)
         
         if not valid_files:
@@ -159,7 +165,7 @@ Input Fields:
         if seed is not None:
             random.seed(seed)
         else:
-            random.seed(42) # Stable default shuffle
+            random.seed(DEFAULT_RANDOM_SEED)  # Stable default shuffle
             
         random.shuffle(valid_files)
         
@@ -183,7 +189,7 @@ Input Fields:
         doc = self.parser.parse_file(paper_path)
         
         # Get extraction context (Abstract + Methods + Results)
-        content = doc.get_extraction_context(max_chars=20000)
+        content = doc.get_extraction_context(max_chars=MAX_CONTEXT_CHARS)
         
         # Prepare existing fields context
         if existing_fields:
