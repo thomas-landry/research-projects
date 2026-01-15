@@ -310,7 +310,7 @@ Input Fields:
         # USE ROBUST SAMPLING
         papers = self.get_sample_papers(papers_dir, sample_size)
         
-        all_suggestions = []
+        field_suggestions_from_all_papers = []
         # Track known fields to enable iterative discovery of NOVEL items
         existing_field_names = [f.name for f in existing_schema] if existing_schema else []
         current_known_fields = set(existing_field_names)
@@ -318,22 +318,29 @@ Input Fields:
         for paper_path in papers:
             try:
                 # Pass currently known fields to prompt
-                result = self.analyze_paper(paper_path, existing_fields=list(current_known_fields))
+                result = self.analyze_paper(paper_path, list(current_known_fields))
                 
-                # Add newly found fields to knowledge base for next paper
-                for s in result.suggested_fields:
-                    current_known_fields.add(s.field_name)
+                # Add new suggestions
+                field_suggestions_from_all_papers.extend(result.suggested_fields)
+                
+                # Update known fields for next iteration (to avoid redundant suggestions)
+                for field in result.suggested_fields:
+                    current_known_fields.add(field.field_name)
                     
-                all_suggestions.extend(result.suggested_fields)
             except Exception as e:
-                self.logger.error(f"Failed to analyze {Path(paper_path).name}: {e}")
+                self.logger.error(f"Failed to analyze {paper_path}: {e}")
+                continue
         
-        # Semantic Unification
-        unified_fields = self.unify_fields(all_suggestions)
+        if not field_suggestions_from_all_papers:
+            self.logger.warning("No fields discovered from sample papers.")
+            return []
+        
+        # Unify synonymous fields
+        unified = self.unify_fields(field_suggestions_from_all_papers)
         
         # Build FieldDefinition list
         definitions = []
-        for uf in unified_fields:
+        for uf in unified:
             # Skip if already in existing_schema (original set)
             if uf.canonical_name in existing_field_names:
                 continue
