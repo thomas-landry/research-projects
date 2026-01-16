@@ -14,8 +14,10 @@ from schemas.dpm_modular import (
     IndividualPatientData,
     AggregateStudyData,
 )
+from schemas.dpm_cohort import DPMCohort
 
 __all__ = [
+    "DPMCohort",
     "StudyMetadataSchema",
     "DemographicsSchema",
     "SymptomsSchema",
