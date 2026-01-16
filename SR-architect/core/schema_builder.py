@@ -142,13 +142,17 @@ def build_extraction_model(
         FlexibleStr,
         Field(default=None, description="Source filename")
     )
+    field_definitions["extraction_status"] = (
+        Optional[str],
+        Field(default="SUCCESS", description="Extraction status: SUCCESS, FAILED, or PARTIAL")
+    )
     field_definitions["extraction_confidence"] = (
         Optional[float],
         Field(default=None, description="Model's confidence in extraction (0-1)")
     )
     field_definitions["extraction_notes"] = (
         Optional[str],
-        Field(default=None, description="Any notes or uncertainties about extraction")
+        Field(default=None, description="Any notes, errors, or uncertainties about extraction")
     )
     
     # Create the model

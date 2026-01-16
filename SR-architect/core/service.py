@@ -166,6 +166,10 @@ class ExtractionService:
         if "final_data" in data:
             extracted_data = data["final_data"]
         
+        
+        # Ensure extraction_status is set to SUCCESS
+        if "extraction_status" not in extracted_data:
+            extracted_data["extraction_status"] = "SUCCESS"
         row = {k: v for k, v in extracted_data.items() if k in fieldnames}
         writer.writerow(row)
         file_handle.flush()
@@ -182,13 +186,50 @@ class ExtractionService:
                 except RuntimeError as e:
                     # No event loop - fallback to sync
                     logger.debug(f"No async loop available, using sync vectorization: {e}")
-                    vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
+                    try:
+                        vector_store.add_chunks_from_parsed_doc(doc, extracted_data=extracted_data)
+                    except Exception as ve:
+                        logger.error(f"Synchronous vectorization failed for {filename}: {ve}")
                 except Exception as e:
                     # Vectorization failed - log but don't fail extraction
                     logger.error(f"Vectorization failed for {filename}: {e}", exc_info=True)
                     
         if callback:
             callback(filename, data, "success")
+    
+    def _write_error_row(
+        self,
+        filename: str,
+        error: Any,
+        writer: csv.DictWriter,
+        file_handle: TextIO,
+        fieldnames: List[str],
+        callback: Optional[Callable]
+    ):
+        """Write error row to CSV when extraction fails."""
+        # Create error row with metadata
+        error_message = str(error)
+        # Truncate long error messages
+        if len(error_message) > 500:
+            error_message = error_message[:500] + "..."
+        
+        error_row = {
+            "extraction_status": "FAILED",
+            "extraction_notes": error_message
+        }
+        
+        # Fill other fields with empty values
+        for field in fieldnames:
+            if field not in error_row:
+                error_row[field] = None
+        
+        writer.writerow(error_row)
+        file_handle.flush()
+        
+        logger.warning(f"Wrote error row for {filename}: {error_message[:100]}")
+        
+        if callback:
+            callback(filename, error, "failed")
 
     def _execute_standard_extraction(
         self,
@@ -356,8 +397,10 @@ class ExtractionService:
                         )
                     else:
                         failed_files.append((filename, str(data)))
-                        if callback:
-                            callback(filename, data, status)
+                        # Write error row to CSV
+                        self._write_error_row(
+                            filename, data, writer, f, fieldnames, callback
+                        )
                             
                 self._execute_standard_extraction(
                     batch_executor, parsed_docs, ExtractionModel, theme, hierarchical, workers, resume, result_handler
