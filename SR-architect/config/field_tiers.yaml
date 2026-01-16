@@ -1,0 +1,94 @@
+tiers:
+  1:
+    confidence_threshold: 0.9
+    description: Keyword-based (92-95% target)
+    fields:
+    - symptom_fever
+    - symptom_dyspnea
+    - symptom_wheezing
+    - biopsy_tblb
+    - biopsy_surgical
+    - biopsy_cryobiopsy
+    - biopsy_autopsy
+    - exposure_birds
+    - exposure_rabbits
+  2:
+    confidence_threshold: 0.85
+    description: Pattern-based (85-90% target)
+    fields:
+    - symptom_asymptomatic
+    - symptom_cough_dry
+    - symptom_chest_pressure
+    - symptom_progression
+    - symptom_persistence
+    - ct_ground_glass
+    - ct_solid_nodules
+    - ct_central_cavitation
+    - ct_cystic_micronodules
+    - ct_random
+    - ct_cheerio
+    - ct_upper_lobe_predominance
+    - ct_lower_lobe_predominance
+    - ct_subpleural_predominance
+    - ct_assoc_emphysema
+    - ct_assoc_fibrosis
+    - ihc_ema_pos
+    - ihc_ema_neg
+    - ihc_pr_pos
+    - ihc_pr_neg
+    - ihc_vimentin_pos
+    - ihc_vimentin_neg
+    - ihc_ttf1_pos
+    - ihc_ttf1_neg
+    - ihc_cytokeratin_pos
+    - ihc_cytokeratin_neg
+    - ihc_s100_pos
+    - ihc_s100_neg
+    - ihc_sma_pos
+    - ihc_sma_neg
+  3:
+    confidence_threshold: 0.7
+    description: Numeric fields (70-80% target)
+    fields:
+    - age
+    - number_of_cases
+    - female_count
+    - male_count
+    - followup_interval_imaging_months
+    - followup_interval_clinical_months
+    - ihc_ki67_high
+    - ihc_ki67_neg
+  4:
+    confidence_threshold: 0.6
+    description: Clinical judgment (65-75% target)
+    fields:
+    - biopsy_tblb_diagnostic
+    - biopsy_endobronchial_diagnostic
+    - biopsy_ttnb_diagnostic
+    - biopsy_surgical_diagnostic
+    - biopsy_cryobiopsy_diagnostic
+    - outcome_dpm_stable
+    - outcome_dpm_improved
+    - outcome_dpm_progressed
+    - outcome_dpm_died
+    - outcome_followup_available
+    - mgmt_observation
+    - mgmt_hormone_therapy_withdrawal
+    - mgmt_lung_transplant_referral
+  5:
+    confidence_threshold: 0.5
+    description: Rare fields (40-60% target)
+    fields:
+    - assoc_pulmonary_ca
+    - assoc_extrapulmonary_ca
+    - assoc_pulmonary_embolism
+    - assoc_gerd
+    - assoc_cad
+    - assoc_metabolic_disease
+    - assoc_hypersensitivity_pneumonitis
+    - assoc_cryptococcus
+    - assoc_autoimmune_dz
+    - assoc_hypothyroid
+    - assoc_turner_syndrome
+    - assoc_hrt
+    - mgmt_no_followup_data
