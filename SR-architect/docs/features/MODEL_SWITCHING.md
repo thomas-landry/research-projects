@@ -10,8 +10,8 @@ You can use short aliases instead of full model paths with the `--model` flag:
 
 | Alias | Full Model String | Use Case |
 |-------|-------------------|----------|
-| `gemini` | `google/gemini-2.0-flash-lite-001` | **Default**. Lowest cost ($0.10/M tokens). High speed. |
-| `flash` | `google/gemini-2.0-flash-lite-001` | Same as `gemini`. |
+| `gemini` | `google/gemini-2.5-flash-lite` | **Default**. Lowest cost ($0.10/M tokens). High speed. |
+| `flash` | `google/gemini-2.5-flash-lite` | Same as `gemini`. |
 | `sonnet` | `anthropic/claude-3.5-sonnet` | High reasoning capability. Best for complex logic. |
 | `haiku` | `anthropic/claude-3-haiku` | Fast, cheap alternative to Sonnet. |
 | `gpt4o` | `openai/gpt-4o` | General purpose high performance. |
@@ -36,7 +36,7 @@ python cli.py extract ./papers --model llama3 --provider ollama
 Set your key in `.env`:
 ```bash
 OPENROUTER_API_KEY=sk-...
-DEFAULT_OPENROUTER_MODEL=google/gemini-2.0-flash-lite-001
+DEFAULT_OPENROUTER_MODEL=google/gemini-2.5-flash-lite
 ```
 
 ### Ollama (Local)

@@ -40,7 +40,7 @@ python cli.py extract ./papers \
 ## Known Limitations
 
 ### Gemini Flash Lite & Large Schemas
-When using `google/gemini-2.0-flash-lite-001` with large schemas (>50 fields), you will encounter a `400 Bad Request` error:
+When using `google/gemini-2.5-flash-lite` with large schemas (>50 fields), you will encounter a `400 Bad Request` error:
 `"The specified schema produces a constraint that has too many states for serving."`
 
 **Cause**: Gemini Flash Lite has strict grammar complexity limits. Even with all fields marked as required, 80+ fields with quote fields (~160 total keys) exceeds the model's constraint solver capacity.

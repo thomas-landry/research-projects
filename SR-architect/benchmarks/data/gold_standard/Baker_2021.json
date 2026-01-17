@@ -1,0 +1,22 @@
+{
+    "study_id": "Baker_2021",
+    "cohort_id": "Baker_2021_overall",
+    "cohort_n_patients": 20,
+    "year": 2021,
+    "title": "Imaging in DPM",
+    "ct_ground_glass": {
+        "status": "absent"
+    },
+    "ct_solid_nodules": {
+        "status": "present",
+        "n": 5,
+        "N": 20,
+        "aggregation_unit": "patient"
+    },
+    "sex_female": {
+        "status": "present",
+        "n": 10,
+        "N": 20,
+        "aggregation_unit": "patient"
+    }
+}

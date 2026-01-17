@@ -253,7 +253,7 @@ def extract(
         
         estimate = tracker.estimate_extraction_cost(
             num_documents=len(pdf_files),
-            model=model or settings.LLM_MODEL or "anthropic/claude-3.5-sonnet",
+            model=model or settings.LLM_MODEL or settings.OPENROUTER_MODEL,
             num_passes=passes
         )
         console.print(tracker.display_cost_report(estimate))

@@ -27,10 +27,19 @@ class ColumnSpec:
     
     def to_field(self) -> FieldInfo:
         """Convert ColumnSpec to Pydantic Field."""
+        # Create serializable spec dict
+        spec_dict = asdict(self)
+        
+        # Convert Type objects to string names for JSON serialization
+        if isinstance(self.dtype, type):
+            spec_dict['dtype'] = self.dtype.__name__
+        else:
+            spec_dict['dtype'] = str(self.dtype)
+
         return Field(
             default=None,
             description=self.description,
-            json_schema_extra={"column_spec": asdict(self)},
+            json_schema_extra={"column_spec": spec_dict},
         )
 
 

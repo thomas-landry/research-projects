@@ -97,7 +97,7 @@ def run_validation_loop(
     Returns:
         PipelineResult with extraction data
     """
-    from core.pipeline.extraction.helpers import build_pipeline_result
+    from core.pipeline.extraction.helpers import build_pipeline_result, build_failed_result
     from core.pipeline.stages import build_revision_prompts
     
     revision_prompts: List[str] = []
@@ -164,11 +164,18 @@ def run_validation_loop(
         revision_prompts = build_revision_prompts(check_result, checker)
     
     # Max iterations reached - return best result
-    logger.warning(f"  Max iterations reached. Using best result (score={best_check.overall_score:.2f})")
-    return build_pipeline_result(
-        document, best_result, best_check, iteration_history,
-        relevant_chunks, max_iterations, passed=False
-    )
+    # Max iterations reached - return best result
+    if best_check:
+        logger.warning(f"  Max iterations reached. Using best result (score={best_check.overall_score:.2f})")
+        return build_pipeline_result(
+            document, best_result, best_check, iteration_history,
+            relevant_chunks, max_iterations, passed=False
+        )
+    else:
+        logger.error("  Max iterations reached without any successful extraction.")
+        return build_failed_result(
+            document, iteration_history, error_message="Max iterations reached without successful extraction"
+        )
 
 
 async def run_validation_loop_async(

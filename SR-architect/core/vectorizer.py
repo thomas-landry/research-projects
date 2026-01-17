@@ -109,7 +109,7 @@ class ChromaVectorStore:
     
     def _ensure_initialized(self):
         """Lazy initialization of ChromaDB."""
-        if self._client is not None:
+        if self._collection is not None:
             return
         
         # Verify chromadb is available (already imported at module level)

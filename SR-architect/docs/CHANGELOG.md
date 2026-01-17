@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **CSV Schema Inference**: Automatically generate extraction schemas from CSV templates (`--schema template.csv`).
 - **Model Aliases**: Easy switching with `--model gemini`, `--model sonnet`, `--model llama3`.
-- **Cost Optimization**: Defaulted to `google/gemini-2.0-flash-lite-001` for 95% cost reduction.
+- **Cost Optimization**: Defaulted to `google/gemini-2.5-flash-lite` for 95% cost reduction.
 - **Excellence-Focused Integration (Phase A & B)**
     - **Fuzzy Quote Validation (`core/text_utils.py`)**: Added Jaccard similarity scoring to robustly validate quotes, preventing "hallucination" flags for minor punctuation differences.
     - **Unit-Context Extraction (`core/sentence_extractor.py`)**: New extractor class that processes text sentence-by-sentence with sliding windows to improve recall for complex fields.

@@ -48,7 +48,7 @@ class HierarchicalExtractionPipeline:
     def __init__(
         self,
         provider: str = settings.LLM_PROVIDER,
-        model: Optional[str] = settings.LLM_MODEL,
+        model: Optional[str] = None,
         score_threshold: float = settings.SCORE_THRESHOLD,
         max_iterations: int = settings.MAX_ITERATIONS,
         verbose: bool = False,
@@ -63,7 +63,7 @@ class HierarchicalExtractionPipeline:
         
         Args:
             provider: LLM provider (e.g., 'openai', 'anthropic')
-            model: Model name
+            model: Model name (if None, uses provider-specific default)
             score_threshold: Minimum confidence score to accept extraction
             max_iterations: Maximum feedback loops for validation
             verbose: Enable debug logging
@@ -73,6 +73,10 @@ class HierarchicalExtractionPipeline:
             meta_analyst: Optional injected MetaAnalystAgent
             token_tracker: Optional token usage tracker
         """
+        # Resolve model name if not provided
+        if model is None:
+            model = settings.get_model_for_provider(provider)
+        
         self.score_threshold = score_threshold
         self.max_iterations = max_iterations
         self.verbose = verbose

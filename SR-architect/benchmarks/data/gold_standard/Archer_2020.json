@@ -1,0 +1,22 @@
+{
+    "study_id": "Archer_2020",
+    "cohort_id": "Archer_2020_cohort1",
+    "cohort_n_patients": 45,
+    "year": 2020,
+    "title": "Clinical features of DPM",
+    "ct_ground_glass": {
+        "status": "present",
+        "n": 20,
+        "N": 45,
+        "aggregation_unit": "patient"
+    },
+    "ct_solid_nodules": {
+        "status": "absent"
+    },
+    "sex_female": {
+        "status": "present",
+        "n": 25,
+        "N": 45,
+        "aggregation_unit": "patient"
+    }
+}

@@ -42,7 +42,7 @@ Output validation:
     def __init__(
         self,
         provider: str = "openrouter",
-        model: str = "google/gemini-2.0-flash-001", 
+        model: str = "google/gemini-2.5-flash-lite", 
         context_window_size: int = None,
         concurrency_limit: int = None,
         token_tracker: Optional[Any] = None

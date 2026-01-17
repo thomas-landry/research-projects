@@ -39,3 +39,37 @@ class ExtractionWithEvidence(BaseModel):
 class EvidenceResponse(BaseModel):
     """Response model for evidence extraction."""
     evidence: List[EvidenceItem]
+    
+    @field_validator('evidence', mode='before')
+    @classmethod
+    def coerce_strings_to_evidence_items(cls, value):
+        """
+        Coerce simple string arrays to EvidenceItem objects.
+        
+        LLMs sometimes return simple strings instead of structured objects:
+        ["quote1", "quote2"] instead of [{"field_name": "...", ...}, ...]
+        
+        This validator handles both formats for robustness.
+        """
+        if not isinstance(value, list):
+            return value
+        
+        coerced = []
+        for item in value:
+            if isinstance(item, str):
+                # Convert simple string to EvidenceItem
+                # Use the string as the exact_quote field
+                coerced.append(EvidenceItem(
+                    field_name="unknown",
+                    extracted_value=item,
+                    exact_quote=item
+                ))
+            elif isinstance(item, dict):
+                # Already a dict, let Pydantic handle it
+                coerced.append(item)
+            else:
+                # Already an EvidenceItem object
+                coerced.append(item)
+        
+        return coerced
+

@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     
     # ========== Model Names ==========
     OPENROUTER_MODEL: str = Field(
-        default="google/gemini-2.0-flash-exp:free",
+        default="google/gemini-2.5-flash-lite",
         description="Default OpenRouter model (Gemini for low cost)"
     )
     OLLAMA_MODEL: str = Field(
@@ -269,8 +269,7 @@ class Settings(BaseSettings):
         "anthropic/claude-3-haiku": {"prompt": 0.25, "completion": 1.25},
         "openai/gpt-4o": {"prompt": 2.5, "completion": 10.0},
         "openai/gpt-4o-mini": {"prompt": 0.15, "completion": 0.6},
-        "google/gemini-2.0-flash-exp:free": {"prompt": 0.0, "completion": 0.0},
-        "google/gemini-2.0-flash-lite-001": {"prompt": 0.0, "completion": 0.0},
+        "google/gemini-2.5-flash-lite": {"prompt": 0.0, "completion": 0.0},
     }
     
     # ========== Pydantic Settings Config ==========
@@ -280,6 +279,35 @@ class Settings(BaseSettings):
         extra="ignore",  # Ignore validation of extra env vars
         case_sensitive=True
     )
+    
+    def get_model_for_provider(self, provider: Optional[str] = None) -> str:
+        """
+        Get the appropriate model for the given provider.
+        
+        If LLM_MODEL is set, returns that. Otherwise, returns the provider-specific default.
+        
+        Args:
+            provider: LLM provider name (defaults to LLM_PROVIDER if not specified)
+            
+        Returns:
+            Model name string
+        """
+        # If LLM_MODEL is explicitly set, use it
+        if self.LLM_MODEL:
+            return self.LLM_MODEL
+        
+        # Otherwise, use provider-specific default
+        provider = provider or self.LLM_PROVIDER
+        provider = provider.lower()
+        
+        if provider == "openrouter":
+            return self.OPENROUTER_MODEL
+        elif provider == "ollama":
+            return self.OLLAMA_MODEL
+        else:
+            # Fallback to OpenRouter model for unknown providers
+            return self.OPENROUTER_MODEL
+
 
 
 # Singleton instance - import this everywhere
@@ -288,8 +316,8 @@ settings = Settings()
 
 # Model aliases for CLI convenience
 MODEL_ALIASES = {
-    "gemini": "google/gemini-2.0-flash-exp:free",
-    "flash": "google/gemini-2.0-flash-exp:free",
+    "gemini": "google/gemini-2.5-flash-lite",
+    "flash": "google/gemini-2.5-flash-lite",
     "sonnet": "anthropic/claude-3.5-sonnet",
     "haiku": "anthropic/claude-3-haiku",
     "gpt4o": "openai/gpt-4o",

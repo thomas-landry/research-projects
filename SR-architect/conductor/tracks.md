@@ -4,6 +4,20 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+## [x] Track: Semantic Schema Implementation
+*Link: [./conductor/archive/semantic_schema_20260116/](./conductor/archive/semantic_schema_20260116/)*
+*Status: Complete (2026-01-15) - Implemented tri-state + n-N schema, FieldLibrary, and DPMCohort model.*
+*Documents: [plan.md](./conductor/archive/semantic_schema_20260116/plan.md) | [task.md](./conductor/archive/semantic_schema_20260116/task.md)*
+
+---
+
+## [~] Track: Binary Extraction Accuracy
+*Link: [./tracks/binary_extraction_accuracy_20260115/](./tracks/binary_extraction_accuracy_20260115/)*
+*Status: In Progress - Phase 0 baseline complete, semantic schema in design*
+*Documents: [plan.md](./tracks/binary_extraction_accuracy_20260115/plan.md) | [task.md](./tracks/binary_extraction_accuracy_20260115/task.md)*
+
+---
+
 ## [ ] Track: Pipeline Optimization v2 (Streamlined)
 *Link: [./tracks/pipeline_optimization_v2_20250107/](./tracks/pipeline_optimization_v2_20250107/)*
 *Status: New - Supersedes token_optimization track with simplified 5-phase plan*

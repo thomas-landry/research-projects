@@ -37,8 +37,13 @@ def calculate_field_accuracy(
         pred_value = pred.get(field)
         gold_value = gold.get(field)
         
-        # Both NULL = match, otherwise compare values
-        if pred_value == gold_value:
+        # Check for FindingReport-like objects (duck typing)
+        # For binary accuracy, we only care if the status matches
+        if hasattr(pred_value, 'status') and hasattr(gold_value, 'status'):
+            if pred_value.status == gold_value.status:
+                correct += 1
+        elif pred_value == gold_value:
+            # Fallback for standard types (bool, str, int, None)
             correct += 1
     
     return correct / total

@@ -6,7 +6,7 @@ Schema chunking automatically splits large extraction schemas into smaller batch
 
 ## The Problem
 
-Models like `google/gemini-2.0-flash-lite-001` have strict grammar complexity limits for structured output. Schemas with >30 fields fail with:
+Models like `google/gemini-2.5-flash-lite` have strict grammar complexity limits for structured output. Schemas with >30 fields fail with:
 ```
 400 Bad Request: "The specified schema produces a constraint that has too many states for serving."
 ```
